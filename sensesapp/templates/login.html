@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html ng-app="login">
+<head>
+	<title>Welcome! Please Login!</title>
+	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/login.css">
+</head>
+<body ng-controller="loginCtrl">
+	<img style="position: absolute;top: 0px;width:100%;height:150px;left: 0px;" src="{{STATIC_URL}}images/logo.png">
+	{% csrf_token %}	
+	{% verbatim %}
+	<div class="background">
+		<div class="login">
+			<div class="login-screen">
+				<div class="app-title">
+					<h1>Login</h1>
+				</div>
+				<div class="login-form">
+					<div class="control-group">
+					<input type="text" ng-model="name" placeholder="&nbsp;&nbsp;&nbsp;username">
+					</div>
+					<div class="control-group">
+					<input type="password" ng-model="password" placeholder="&nbsp;&nbsp;&nbsp;password"  ng-enter="login(name,password)">
+					</div>
+					<a class="forgotpass" href="#">Forgot password?</a>
+					<span class="btn btn-primary btn-large btn-block" ng-click="login(name,password)">login</span>
+					
+				</div>
+			</div>
+		</div>
+	</div>	
+{% endverbatim %} 
+</body>
+<script src="{{STATIC_URL}}js/jquery/jquery-2.0.3.min.js"></script>
+<script src="{{STATIC_URL}}bootstrap/js/bootstrap.min.js"></script>
+<script src="{{STATIC_URL}}js/angular/angular.min.js"></script>
+<script src="{{STATIC_URL}}js/angular/ui-bootstrap-tpls.js"></script>
+<script src="{{STATIC_URL}}js/angular/angular-cookies.min.js"></script>
+<script src="{{STATIC_URL}}js/angular/angular-route.min.js"></script>
+<script src="{{STATIC_URL}}js/angular/angular-sanitize.min.js"></script>
+<script src="{{STATIC_URL}}js/select.js"></script>
+<script src="{{STATIC_URL}}js/angular-custom.js"></script>
+<script src="{{STATIC_URL}}metisMenu/metisMenu.min.js"></script>
+<script src="{{STATIC_URL}}bootstrap/dashboard/js/sb-admin-2.js"></script>
+<script src="{{STATIC_URL}}js/login.js"></script>
+</html>
