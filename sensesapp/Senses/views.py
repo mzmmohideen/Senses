@@ -1,29 +1,19 @@
-class Family(models.Model):
-    ration_card_id =  models.CharField(max_length=20)
-    address = models.CharField(max_length=50)
-    city = models.TextField(max_length=20)
-    state = models.TextField(max_length=20)
-    mobile = models.TextField(max_length=20)
-    mother_tongue = models.TextField(max_length=20)
-    house_type = models.TextField(max_length=50,CHOICES=STATUS)
-    toilet = models.BooleanField(default=True)
-    financial_status = models.TextField(max_length=50,CHOICES=FINANCIAL)
+from django.shortcuts import render_to_response, HttpResponse, render
+from Senses.models import *
+from django.contrib.auth.models import User
+from django.core.context_processors import csrf
+from django.views.decorators.csrf import *
+import json,csv
+from django.contrib.auth.decorators import login_required
+from collections import defaultdict
+from django.core.exceptions import ObjectDoesNotExist
+from datetime import datetime, time
+from traceback import format_exc
+from itertools import groupby
+from operator import itemgetter
 
-class Member(models.Model):
-    govt_id = models.CharField(max_length=20)
-    name = models.CharField(max_length=20)
-    gender = models.CharField(max_length=10)
-    age = models.CharField(max_length=10)
-    Relation = models.CharField(max_length=20)
-    marital_status = models.CharField(max_length=20)
-    voter_status = models.BooleanField(default=False)
-    family = models.ForeignKey(Family)
-    job_status = models.CharField(max_length=20)
-    curr_location = models.CharField(max_length=20)
-    to_join_madarasa = models.BooleanField(max_length=20) 
-    schemes = models.ManyToManyField(Scheme)
-
-class Scheme(models.Model):
-    scheme_type = models.CharField(max_length=20)
-    name = models.CharField(max_length=20)
-    description = models.TextField()# Create your views here.
+def login(request):
+    # if Staff.objects.filter(role="Admin"):
+    return render(request, 'login.html')
+    # else:
+        # return render(request, 'signup.html')
