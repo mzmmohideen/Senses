@@ -1,4 +1,8 @@
 # Django settings for sensesapp project.
+import os
+def absolute_path(path):
+    return os.path.abspath(os.path.join(os.path.dirname(__file__), path))
+
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -11,7 +15,7 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
+        'ENGINE': 'django.db.backends.postgresql_psycopg2', # 'mysql', 'sqlite3' or 'oracle'.
         'NAME': '',                      # Or path to database file if using sqlite3.
         # The following settings are not used with sqlite3:
         'USER': '',
@@ -69,6 +73,7 @@ STATIC_URL = '/static/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
+    '%s'%(os.path.join(os.getcwd(), 'static')),
     # Put strings here, like "/home/html/static" or "C:/www/django/static".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
@@ -108,6 +113,7 @@ ROOT_URLCONF = 'sensesapp.urls'
 WSGI_APPLICATION = 'sensesapp.wsgi.application'
 
 TEMPLATE_DIRS = (
+    absolute_path('../templates')
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.

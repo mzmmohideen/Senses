@@ -1,10 +1,16 @@
 from django.conf.urls import patterns, include, url
+from Senses.views import *
+from django.contrib import admin
+
+admin.autodiscover()
+
 
 # Uncomment the next two lines to enable the admin:
 # from django.contrib import admin
 # admin.autodiscover()
 
 urlpatterns = patterns('',
+	url(r'^$', login),
     # Examples:
     # url(r'^$', 'sensesapp.views.home', name='home'),
     # url(r'^sensesapp/', include('sensesapp.foo.urls')),
