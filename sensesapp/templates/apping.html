@@ -20,14 +20,6 @@
     <link href="{{STATIC_URL}}metisMenu/metisMenu.css" rel="stylesheet">
     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.5/select2.css">
     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.8.5/css/selectize.default.css">
-    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]- ->
-    <script src="../../assets/js/ie-emulation-modes-warning.js"></script>
-    <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
     <style type="text/css">
     .select2 > .select2-choice.ui-select-match {
         /* Because of the inclusion of Bootstrap */
@@ -282,34 +274,13 @@
                             <a href="#/dashboard">Dashboard</a>
                         </li>
                         <li>
-                            <a href="#/role">Roles</a>
+                            <a href="#/location">Locations</a>
                         </li>
                         <li>
-                            <a href="#/programs">Programs</a>
+                            <a href="#/masjid">Masjids</a>
                         </li>
                         <li>
-                            <a href="#/courses">Courses</a>
-                        </li>
-                        <li>
-                            <a href="#/coursemap">Course Mapping</a>
-                        </li>
-                        <li>
-                            <a href="#/students">Students</a>
-                        </li>
-                        <li>
-                            <a href="#/groups">Groups</a>
-                        </li>
-                        <li>
-                            <a href="#/staffalot">Staff Allotment</a>
-                        </li>
-                        <li>
-                            <a href="#/timetable">Time Table</a>
-                        </li>
-                        <li>
-                            <a href="#/callenderview">Calender View</a>
-                        </li>
-                        <li>
-                            <a href="#/attendance">Attendance</a>
+                            <a href="#/family">Families</a>
                         </li>
                     </ul>
                 </div>
@@ -322,94 +293,10 @@
         <!-- /#page-wrapper -->
     </div>
     <!-- /#wrapper -->
-    <script type="text/ng-template" id="coursemap.html">
+    <script type="text/ng-template" id="location.html">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Course Mapping</h1>
-            </div>
-            <!-- /.col-lg-12 -->
-        </div>
-        <div class="row" ng-init="fetch_data();positionUpdated('without')">
-             <div class="row">
-                <div class="col-md-12" style="padding-left:35%;">
-                        <label ng-repeat="a in ['with','without'] track by $index" style="margin-left:5%;">
-                            <input name="sub" ng-model="a" type="radio" value="{{a}}" ng-click="positionUpdated(a)"></input>
-                            {{a}} Module 
-                        </label>
-                </div>
-            </div>      
-            <div ng-show="course_module" class="form-group">
-                <select style="display: inline-block;width: 15%;float: left;margin:0 auto;" ng-model="prog" ng-options="prog as prog.name for prog in program" class="form-control">
-                    <option value="">SELECT PROGRAM</option>
-                </select>
-                <select style="display: inline-block;width: 10%;float: left;" ng-model="semester" ng-options="semester for semester in get_sem(prog.duration)" class="form-control">
-                    <option value="">SEMESTER</option>
-                </select>
-                <select style="display: inline-block;width: 15%;float: left;" ng-model="course_type" ng-options="type for type in get_unique_ctype()" class="form-control">
-                    <option value="">COURSE TYPE</option>
-                </select>
-                <select style="display: inline-block;width: 15%;float: left;" ng-model="module" ng-options="module as module for module in get_unique_module(course_type)" class="form-control">
-                    <option value="">SELECT MODULE</option>
-                </select>
-                <select style="display: inline-block;width: 15%;float: left;" ng-model="course" ng-options="course as course.name for course in get_unique_course(course_type,module)" class="form-control">
-                    <option value="">SELECT COURSE</option>
-                </select>
-                <input style="display: inline-block;width: 15%;height: 34px;float: left;" type="text" placeholder="Description(Optional)" ng-model="description" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <button  ng-disabled="!semester || !prog || !course || !course_type" type="submit" style="width:10%;height: 34px;" ng-click="course_map(semester,prog,course_type,course,description)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
-            </div>
-            <div ng-show="!course_module" class="form-group">
-                <select style="display: inline-block;width: 20%;float: left;margin:0 auto;" ng-model="prog" ng-options="prog as prog.name for prog in program" class="form-control">
-                    <option value="">SELECT PROGRAM</option>
-                </select>
-                <select style="display: inline-block;width: 10%;float: left;" ng-model="semester" ng-options="semester for semester in get_sem(prog.duration)" class="form-control">
-                    <option value="">SEMESTER</option>
-                </select>      
-                <select style="display: inline-block;width: 15%;float: left;" ng-model="course_type" ng-options="type for type in get_unique_ctype()" class="form-control">
-                    <option value="">COURSE TYPE</option>
-                </select>          
-                <select style="display: inline-block;width: 20%;float: left;" ng-model="course" ng-options="course as course.name for course in get_unique_course(course_type,'')" class="form-control">
-                    <option value="">SELECT COURSE</option>
-                </select>
-                <input style="display: inline-block;width: 20%;height: 34px;float: left;" type="text" placeholder="Description(Optional)" ng-model="description" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <button  ng-disabled="!semester || !prog || !course || !course_type" type="submit" style="width:10%;height: 34px;" ng-click="course_map(semester,prog,course_type,course,description)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
-            </div>
-            <table class="table table-striped table-bordered table-hover ng-scope">
-                <thead>
-                    <tr class="ng-scope">
-                        <th>S.No</th>
-                        <th>Program</th>
-                        <th>Semester</th>
-                        <th>Course Type</th>
-                        <th>Course</th>
-                        <th>Description</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-show="coursemap_data.length==0">
-                        <td colspan="6" style="text-align:center;" class="ng-binding">No Groups Data Found!</td>
-                    </tr>
-                    <tr ng-show="coursemap_data.length!=0" ng-repeat="group in coursemap_data" class="ng-scope">
-                        <td>{{$index+1}}</td>
-                        <td class="ng-binding">{{group.program}}</td>
-                        <td class="ng-binding">{{group.semester}}</td>
-                        <td class="ng-binding">
-                            <span style="display:block;" ng-repeat="(k,val) in group.course">{{k}}</span>
-                        </td>
-                        <td class="ng-binding">
-                            <span style="display:block;" ng-repeat="(k,val) in group.course"><div ng-repeat="cors in val">{{cors}}</div></span>
-                        </td>
-                        <td class="ng-binding">{{group.description}}</td>
-                        <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </script>
-    <script type="text/ng-template" id="groups.html">
-        <div class="row">
-            <div class="col-lg-12">
-                <h1 class="page-header">Groups</h1>
+                <h1 class="page-header">Locations</h1>
 
             </div>
         </div>
@@ -511,12 +398,11 @@
             </table>
          </div>
     </script>
-    <script type="text/ng-template" id="courses.html">
+    <script type="text/ng-template" id="masjid.html">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Courses</h1>
+                <h1 class="page-header">Masjids</h1>
             </div>
-            <!-- /.col-lg-12 -->
         </div>
         <div class="row" ng-init="fetch_data();positionUpdated('without')">
              <div class="row">
@@ -594,12 +480,11 @@
         </div>
         <!-- /.row -->
     </script>
-    <script type="text/ng-template" id="programs.html">
+    <script type="text/ng-template" id="family.html">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Programs</h1>
+                <h1 class="page-header">Families</h1>
             </div>
-            <!-- /.col-lg-12 -->
         </div>
         <div class="row" ng-init="fetch_data()">
             <div class="form-group">
@@ -643,533 +528,12 @@
             </table>
         </div>
     </script>
-    <script type="text/ng-template" id="students.html">
-        <div class="row">
-            <div class="col-lg-12">
-                <h1 class="page-header">Students</h1>
-            </div>
-            <!-- /.col-lg-12 -->
-        </div>
-        <div class="row" ng-init="fetch_data()">
-            <div class="form-group">
-                <label for="addCategory" class="sr-only">New Student</label>
-                <input style="width:21%;display: -webkit-inline-box;" type="text" placeholder="Enter Student ID" ng-model="stud_id" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <input style="width:22%;display: -webkit-inline-box;" type="text" placeholder="Enter Student name" ng-model="name" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <input style="width:22%;display: -webkit-inline-box;" type="email" placeholder="Enter Email ID" ng-model="email" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <input style="width:30%;display: -webkit-inline-box;" type="text" placeholder="Address" ng-model="address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <br/>
-                <select ng-model="gen" style="width:18%;display: -webkit-inline-box;" ng-options="gen for gen in gender" class="form-control">
-                    <option value="">GENDER</option>
-                </select>
-                <select ng-model="prog" style="width:18.5%;display: -webkit-inline-box;" ng-options="prog as prog.name for prog in program" class="form-control">
-                    <option value="">PROGRAM</option>
-                </select>
-                <select ng-model="batch" style="width:18%;display: -webkit-inline-box;"  ng-options="batch for batch in generate_year()" class="form-control">
-                    <option value="">BATCH</option>
-                </select>
-                <select ng-model="year" style="width:18%;display: -webkit-inline-box;"  ng-options="year for year in get_year(prog.duration)" class="form-control">
-                    <option value="">YEAR</option>
-                </select>
-                <button ng-disabled="!name || !stud_id || !gen || !batch || !prog || !year" type="submit" style="width:14%;height:36px;" ng-click="add_student(name,stud_id,email,address,gen,prog,year,batch)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
-            </div>
-            <div style="text-align:center;">Or</div>
-            <div class="form-group" for="csv_file">
-                <label style="display: inline-block;width: 20%;float: left;height: 36px;" for="csv_file" class="btn-sm btn btn-primary">
-                    <a style="color: white;text-decoration: none;float: left;margin: 5px 15px;" href="/static/csv/import_student.csv"><i class="fa fa-cloud-download"></i> Download Sample CSV 
-                    </a>
-                </label>
-                <input style="display: inline-block;width: 55%;float: left;" class="custom-file-upload" accept=".xls,.xlsx,.csv,.csvx" file-model="csv_file" type="file">
-                <label style="display: inline-block;width: 13%;float: left;height: 36px;" class="btn-sm btn btn-primary" ng-click="upload_csv(csv_file,'students')"><i class="fa fa-cloud-upload"></i> Upload CSV
-                </label>
-            </div>
-            <br>
-            <br>
-            <table class="table table-striped table-bordered table-hover ng-scope">
-                <thead>
-                    <tr class="ng-scope">
-                        <th>S.No</th>
-                        <th>Student ID</th>
-                        <th>Student Name</th>
-                        <th>Email</th>
-                        <th>Gender</th>
-                        <th>Program</th>
-                        <th>Batch</th>
-                        <th>Year</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-show="student_data.length==0">
-                        <td colspan="9" style="text-align:center;" class="ng-binding">No Course Data Found!</td>
-                    </tr>
-                    <tr ng-show="student_data.length!=0" ng-repeat="student in student_data" class="ng-scope">
-                        <td>{{$index+1}}</td>
-                        <td class="ng-binding">{{student.student_id}}</td>
-                        <td class="ng-binding">{{student.name}}</td>
-                        <td class="ng-binding">{{student.email}}</td>
-                        <td class="ng-binding">{{student.gender}}</td>
-                        <td class="ng-binding">{{student.program}}</td>
-                        <td class="ng-binding">{{student.batch}}</td>
-                        <td class="ng-binding">{{student.year}}</td>
-                        <td class="ng-binding"><input type="checkbox" ng-model="student.status"><span ng-show="student.status" >&nbsp; active</span><span ng-show="!student.status" >&nbsp; Inactive</span></td>
-                        <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </script>
-    <script type="text/ng-template" id="role.html">
-        <div class="row">
-            <div style="padding-top: 15px;" class="col-lg-12">
-                <h1 style="display: inline-block;width: 10%;float: left;margin: 0px" class="page-header">Roles</h1>
-                <select style="width: 50%;display: inline-block;float: left;margin: 5px 50px;" class="form-control" ng-model="role" ng-change="choose_role(role)" ng-options="role for role in create_role">
-                    <option value="">Select Role</option>
-                </select>
-            </div>
-            <!-- /.col-lg-12 -->
-        </div>
-        <div class="row">
-            <span class="form-group">
-                <input style="display: inline-block;width: 15%;float: left;" type="text" placeholder="Enter Username" ng-model="username" required="required" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <input style="display: inline-block;width: 20%;float: left;" type="text" placeholder="Enter Staff name" ng-model="name" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <input style="display: inline-block;width: 20%;float: left;" type="text" placeholder="Enter Email" ng-model="email" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <input valid-number style="display: inline-block;width: 10%;float: left;" type="text" placeholder="Mobile Number" ng-model="mobile" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <input style="display: inline-block;width: 20%;float: left;" type="text" placeholder="Enter Address" ng-change="address=address" ng-model="address" ng-enter="add_staff(role,username,name,email,mobile,address)"  class="input-sm form-control ng-pristine">
-                <button ng-disabled="!role || !username" type="submit" ng-click="add_staff(role,username,name,email,mobile,address)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button> 
-            </span>
-            <br>
-            <br>
-            <br>
-            <table class="table table-striped table-bordered table-hover ng-scope">
-                <thead>
-                    <tr>
-                        <th>S.No</th>
-                        <th>Staff Name</th>
-                        <th>Email</th>
-                        <th>Mobile</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody style="overflow-y:scroll;height:400px;">
-                    <!-- ngRepeat: cat in categorys track by $index| filter:searchText -->
-                    <tr class="ng-scope" ng-show="!staff_data_alert && !staff_data">
-                        <td colspan="5" style="text-align:center;" class="ng-binding">Role Data shown here.</td>
-                    </tr>
-                    <tr class="ng-scope" ng-show="staff_data_alert && !staff_data">
-                        <td colspan="5" style="text-align:center;" class="ng-binding">{{staff_data_alert}}</td>
-                    </tr>
-                    <tr ng-show="staff_data && !staff_data_alert" ng-repeat="cat in staff_data" class="ng-scope">
-                        <td class="ng-binding">{{$index+1}}</td>
-                        <td class="ng-binding">{{cat.name}}</td>
-                        <td class="ng-binding">{{cat.email}}</td>
-                        <td class="ng-binding">{{cat.mobile}}</td>
-                        <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
-                    </tr>
-                    <!-- end ngRepeat: cat in categorys track by $index| filter:searchText -->
-                </tbody>
-            </table>
-        </div>
-        <!-- /.row -->
-    </script>
-    <script type="text/ng-template" id="staffalot.html">
-        <div class="row">
-            <div class="col-lg-12">
-                <h1 class="page-header">Staff Allotment</h1>
-            </div>
-            <!-- /.col-lg-12 -->
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="form-group">
-                    <div class="row" ng-init="fetch_data()"> 
-                        <div  class="form-group">
-                <select style="display: inline-block;width: 13%;float: left;" ng-model="person" ng-options="person.name for person in staff_data" class="form-control">
-                    <option value="">SELECT STAFF</option>
-                </select>
-                <select style="display: inline-block;width: 12%;float: left;margin:0 auto;" ng-model="prog" ng-change="get_semester=get_sem(prog.duration)" ng-options="prog as prog.name for prog in get_program()" class="form-control">
-                    <option value="">SELECT PROGRAM</option>
-                </select>
-                <select style="display: inline-block;width: 10%;float: left;" ng-change="get_Semcourse(prog.name,semester);" ng-model="semester" ng-options="semester for semester in get_semester" class="form-control">
-                    <option value="">SELECT SEMESTER</option>
-                </select>
-                <select style="display: inline-block;width: 14%;float: left;" ng-model="group" ng-options="group as group for group in get_group_staff(prog,semester)" class="form-control">
-                    <option value="">SELECT GROUP</option>
-                </select>
-                <select style="display: inline-block;width: 13%;float: left;" ng-model="course_type" ng-options="gen for gen in SemcTypeData" class="form-control">
-                    <option value="">COURSE TYPE</option>
-                </select>  
-                <select style="display: inline-block;width: 13%;float: left;" ng-model="course" ng-options="a for a in SemcourseData[course_type]" class="form-control">
-                    <option value="">SELECT COURSE</option>
-                </select>                      
-                <input style="display: inline-block;width: 15%;height: 34px;float: left;" type="text" placeholder="Description(Optional)" ng-model="description" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <button  ng-disabled="!person || !course_type || !course || !group" type="submit" style="width:10%;height: 34px;" ng-click="postStaffAllotData(person,semester,prog,course_type,course,group,description)" class="btn-sm btn btn-primary"><i class="fa fa-check fa-fw"></i> Save</button>
-            </div>                          
-            </div>
-                    <br>
-                    <div class="row">
-                        <table class="table table-striped table-bordered table-hover ng-scope">
-                            <thead>
-                                <tr>
-                                    <th>S.No</th>
-                                    <th>Staff Name</th>
-                                    <th>Program</th>
-                                    <th>Semester</th>
-                                    <th>Group</th>
-                                    <th>Course Allotted</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody ng-init="getStaffAllotData()" style="overflow-y:scroll;height:400px;">
-                                <tr class="ng-scope" ng-show="!staff_data_alert && !getStaffData">
-                                    <td colspan="7" style="text-align:center;" class="ng-binding">Role Data shown here.</td>
-                                </tr>
-                                <tr class="ng-scope" ng-show="staff_data_alert && !getStaffData">
-                                    <td colspan="7" style="text-align:center;" class="ng-binding">{{staff_data_alert}}</td>
-                                </tr>
-                                <tr ng-show="getStaffData && !staff_data_alert" ng-repeat="(key,val) in getStaffData" class="ng-scope">
-                                    <td class="ng-binding">{{$index+1}}</td>
-                                    <td class="ng-binding" ng-repeat="(a,b) in val">{{a}}</td>
-                                    <td class="ng-binding" ng-repeat="(a,b) in val">{{b['program']}}</td>
-                                    <td class="ng-binding" ng-repeat="(a,b) in val">{{b['semester']}}</td>
-                                    <td class="ng-binding" ng-repeat="(a,b) in val">{{b['group']}}</td>
-                                    <td class="ng-binding" ng-repeat="(a,b) in val">
-                                    <span style="display:block;" ng-repeat="k in b['courses']">{{k}}</span>
-                                    </td>
-                                    <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
-                                </tr>                            
-                            </tbody>
-                        </table>
-                    </div>
-            </div>
-        </div>
-    </script>
-    <script type="text/ng-template" id="timetable.html">
-        <div class="row">
-            <div class="col-lg-12">
-                <h1 class="page-header">Time Table</h1>
-            </div>
-            <!-- /.col-lg-12 -->
-        </div>
-        <div class="row" ng-init="fetch_data();">
-            <div class="col-md-12">
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <label> From</label>
-                                <input class="form-control" type="date">
-                        </div>
-                        <div class="col-md-3">
-                            <label> To</label>
-                                <input class="form-control" type="date">
-                        </div>
-                        <div class="col-md-3">
-                            <label></label>
-                            <span class="form-control"><input type="checkbox"> Apply to all weeks in the Semester.</span>
-                        </div>
-                    </div>       
-                    <div class="row">                        
-                        <div class="col-md-4">
-                            <label> Program</label>
-                            <select class="form-control" ng-model="subjectAllocData.program" ng-options="a as a.name for a in get_program()" ng-init="">
-                                <option value="">--Choose Program--</option></select>
-                        </div>
-                        <div class="col-md-4">
-                            <label> Semester </label>
-                            <select class="form-control" ng-model="subjectAllocData.semester" ng-options="sem for sem in get_sem(subjectAllocData.program.duration)">
-                                <option value="">--Select Semester--</option></select>
-                        </div>
-                        <div class="col-md-4">
-                            <label> Group </label>
-                            <select class="form-control" ng-model="subjectAllocData.group" ng-change="fetchSubjectAllocData()" ng-options="a as a for a in get_group_staff(subjectAllocData.program,subjectAllocData.semester)" ng-init=""> 
-                                <option value="">--Select Group--</option></select>
-                        </div>
-                    </div>
-                    <div class="row">
-                        <div class="col-md-3">
-                                <label> Select Day
-                                </label>
-                                <select class="form-control" id="selectedDay" ng-model="selectedDay" ng-options="day.day for day in subjectAllocData.days" ng-change="getSelectedDay()">
-                                <option value="">--Select Day--</option>option></select>
-                            </div>
-                        
-                        <div class="col-md-2" style="margin-left: 10%;">
-                            <label> Add
-                            </label>
-                            <br>
-                            <button ng-disabled="!selectedDay" class="btn btn-success" ng-click="addNewPeriod(selectedDay,selectedSession)"><i class="fa fa-plus fa-fw"></i>Period</button>
-                        </div>
-                        <div class="col-md-2" style="margin-left: -10%;">
-                            <label> Select Period</label>
-                            <select class="form-control" id="selectedSession" ng-model="selectedSession" ng-options="alloc.name for alloc in selectedDay.allocs" ></select>
-                            <!-- <input class="form-control" ng-model="selectedSession.name" type="text"></input> -->
-                        </div>
-                        <div class="col-md-2" style="margin-left: -2%;">
-                            <label> Remove</label>
-                            <br>
-                            <button ng-disabled="!selectedSession" class="btn btn-danger" ng-click="removeNewPeriod(selectedDay,selectedSession)"><i class="fa fa-minus fa-fw"></i>Period</button>
-                        </div>
-                        <div class="col-md-3" style="margin-left: 2%;">
-                            <label> Session length</label>
-                            <select class="form-control" ng-model="selectedSession.session_length" ng-options="a for a in [1,1.5,2,2.5]" ng-change="sizeUpdated(selectedDay,selectedSession)"></select>
-                        </div>    
-                    </div>
-                    <div class="row">
-                        <div class="col-md-12" style="margin-left: 20%;">
-                                <br>
-                                <label> Start from</label>
-                                <br>
-                                <label ng-repeat="a in [0,1,1.5,2,2.5,3,3.5,4,4.5,5,5.5,6,6.5,7] track by $index" style="margin-left:25px;">
-                                    <input ng-disabled="!selectedDay || !selectedSession" name="start" ng-model="selectedSession.session_start" type="radio" value="{{a}}" ng-change="positionUpdated(selectedDay,selectedSession)"></input>
-                                    {{a}}
-                                </label>
-                        </div>
-                    </div>        
-                    <br/>
-                    <div class="row">
-                        <div class="col-md-3">
-                            <label> Course Type</label>
-                            <select ng-model="subjectAllocData.course_type" ng-change="get_grp_ctype(subjectAllocData);" ng-options="gen for gen in ['LECTURES','LABORATORY','CLINICAL STUDIES','HOSPITAL']" class="form-control">
-                            <option value="">--Select Course Type--</option></select>
-                        </div>          
-                        <div class="col-md-3" ng-show="sub_group">
-                            <label> Sub Group</label>
-                            <select ng-change="get_group_staff_course(subjectAllocData)" ng-model="subjectAllocData.sub_group" ng-options="a for a in sub_group" class="form-control">
-                            <option value="">--Select Sub Group--</option></select>
-                        </div>
-                        <div class="col-md-3">
-                            <label> Session staff</label>
-                            <ui-select ng-change="get_course(subjectAllocData,selectedSession.staff)" ng-model="selectedSession.staff" theme="bootstrap" ng-disabled="disabled" style="min-width: 300px;">
-                                <ui-select-match placeholder="Select or search person in the list...">{{$select.selected.name}}</ui-select-match>
-                                <ui-select-choices repeat="person in get_curr_staff | propsFilter: {name: $select.search, age: $select.search}">
-                                    <div ng-bind-html="person.name | highlight: $select.search"></div>
-                                    <small>
-                                email: {{person.email}}
-                                user: <span ng-bind-html="''+person.user | highlight: $select.search"></span>
-                            </small>
-                                </ui-select-choices>
-                            </ui-select>
-                        </div>
-                        <div class="col-md-3">
-                            <label> Session subject</label>
-                            <ui-select ng-model="selectedSession.subject" theme="bootstrap" ng-disabled="disabled" style="min-width: 99px;">
-                                <ui-select-match placeholder="Select or search subject in the list...">{{$select.selected.name}}</ui-select-match>
-                                <ui-select-choices repeat="subject in course_list | propsFilter: {name: $select.search, age: $select.search}">
-                                    <div ng-bind-html="subject.name | highlight: $select.search"></div>
-                                    <small>
-                                Course Type: <span ng-bind-html="''+subject.course_type | highlight: $select.search"></span>
-                            </small>
-                                </ui-select-choices>
-                            </ui-select>
-                        </div>
-                    </div>
-                    <div class="row" ng-init="getStaffAllotData()">
-                        <div class="col-md-2">
-                            <label> Save</label>
-                            <br>
-                        <span class="btn btn-primary" ng-click="postSubjectAllocData(subjectAllocData)"><i class="fa fa-check fa-fw"></i> Save</span>
-                        </div>
-                    </div>    
-                </div>
-                <div class="table-responsive">
-                    {{attendanceData.sesssions}}
-                    <table class="table table-bordered table-hover table-striped">
-                        <thead>
-                            <tr style="text-align:center;vertical-align:middle;">
-                                <th style="text-align:center;vertical-align:middle;">Name</th>
-                                <th>
-                                    <div style="width:900px;">
-                                        <div ng-repeat="a in subjectAllocData['hours'] track by $index" style="text-align:center;vertical-align:middle;width:100px;display:inline-block;border-right:1px solid #ccc;">{{a}}</div>
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="day in subjectAllocData['days']" style="height:75px;" >
-                                <td>{{day.day}}</td>
-                                <td>
-                                    <div style="width:900px;position:relative;">
-                                        <div ng-repeat="a in day['allocs'] track by $index" style="text-align:center;vertical-align:middle;position:absolute;left:{{a.session_start*100}}px;width:{{a.session_length*100}}px;border:1px solid #337ab7;border-radius:3px;height:60px;background: rgba(51, 122, 183, 0.55);" ng-click="periodClicked(day,a)">
-                                            <span ng-show="!a.subject.name">{{a.subject}}</span>
-                                            <span ng-show="a.subject.name">{{a.subject.name}}</span>
-                                            <br> 
-                                            <span ng-show="!a.staff.name">{{a.staff}}</span>
-                                            <span ng-show="a.staff.name">{{a.staff.name}}</span>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <!-- /.table-responsive -->
-            </div>
-            <!-- /.col-lg-4 (nested) -->
-        </div>
-        <!-- /.row -->
-    </script>
-    <script type="text/ng-template" id="callenderview.html">
-        <div class="row">
-            <div class="col-lg-12">
-                <h1 class="page-header">Calender View</h1>
-            </div>
-            <!-- /.col-lg-12 -->
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="form-group">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <label> Session staff ss</label>
-                            <ui-select ng-model="selectedStaff.selected" theme="bootstrap" ng-disabled="disabled" style="min-width: 300px;" ng-change="fetchCallenderAllocData()">
-                                <ui-select-match placeholder="Select a person in the list or search his name/age...">{{$select.selected.name}}</ui-select-match>
-                                <ui-select-choices repeat="person in staff_data | propsFilter: {name: $select.search, age: $select.search}">
-                                    <div ng-bind-html="person.name | highlight: $select.search"></div>
-                                    <small>
-                                email: {{person.email}}
-                                user: <span ng-bind-html="''+person.user | highlight: $select.search"></span>
-                            </small>
-                                </ui-select-choices>
-                            </ui-select>
-                        </div>
-                    </div>
-                </div>
-                <div class="table-responsive">
-                    {{attendanceData.sesssions}}
-                    <table class="table table-bordered table-hover table-striped">
-                        <thead>
-                            <tr style="text-align:center;vertical-align:middle;">
-                                <th style="text-align:center;vertical-align:middle;">Name</th>
-                                <th>
-                                    <div style="width:900px;">
-                                        <div ng-repeat="a in subjectAllocData['hours'] track by $index" style="text-align:center;vertical-align:middle;width:100px;display:inline-block;border-right:1px solid #ccc;">{{a}}</div>
-                                    </div>
-                                </th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-show="!callenderAllocDatas" ng-repeat="day in callenderAllocData['days']" style="height:125px;">
-                                <td>{{day.day}}</td>
-                                <td>
-                                    <div style="width:900px;position:relative;">
-                                        <div ng-repeat="a in day['allocs'] track by $index" style="text-align:center;vertical-align:middle;position:absolute;left:{{a.session_start*100}}px;width:{{a.session_length*100}}px;border:1px solid #337ab7;border-radius:3px;height:100px;background: rgba(51, 122, 183, 0.55);">
-                                            <span class="badge"> <i class="fa fa-book"></i> {{a.subject}} </span>
-                                            <br> <span class="badge"> <i class="fa fa-user"></i> {{a.group}} </span>
-                                            <br> <span class="badge"> <i class="fa fa-graduation-cap"></i> {{a.program}} </span>
-                                            <br> <span class="badge">  <i class="fa fa-calendar-check-o"></i> {{a.semester}} </span>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                            <tr ng-show="!callenderAllocData" ng-repeat="(key,val) in callenderAllocDatas" style="height:125px;">
-                                <td rowspan="val.length" >{{key}}</td>
-                                <td>
-                                    <div style="width:900px;position:relative;">
-                                        <div ng-repeat="a in val" style="text-align:center;vertical-align:middle;position:absolute;left:{{a.session_start*100}}px;width:{{a.session_length*100}}px;border:1px solid #337ab7;border-radius:3px;height:100px;background: rgba(51, 122, 183, 0.55);">
-                                            <span class="badge"> <i class="fa fa-book"></i> {{a.subject}} </span>
-                                            <br> <span class="badge"> <i class="fa fa-user"></i> {{a.group}} </span>
-                                            <br> <span class="badge"> <i class="fa fa-graduation-cap"></i> {{a.program}} </span>
-                                            <br> <span class="badge">  <i class="fa fa-calendar-check-o"></i> {{a.semester}} </span>
-                                        </div>
-                                    </div>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <!-- /.table-responsive -->
-            </div>
-            <!-- /.col-lg-4 (nested) -->
-        </div>
-        <!-- /.row -->
-    </script>
-    <script type="text/ng-template" id="attendance.html">
-        <div class="row">
-            <div class="col-lg-6">
-                <h1 class="page-header">Attendance</h1>
-            </div>
-            <!-- /.col-lg-12 -->
-        </div>
-        <div class="row">
-        <div class="col-md-6" style="margin-left:25%;">
-                <label> Staff</label>
-                    <select ng-change="getStaffStudentData(person)" class="form-control" ng-model="person" ng-options="person as person.name for person in staff_data" ng-init="">
-                    <option value="">--Select Course Instrutor--</option>
-                    </select>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md-12">
-                <div class="form-group">
-                    <div class="row">                        
-                        <div class="col-md-3">
-                            <label> Program</label>
-                            <select class="form-control" ng-model="program" ng-options="program as program for program in staff_student_program" ng-init="">
-                            <option value="">--Select Program--</option></select>
-                        </div>
-                        <div class="col-md-3">
-                            <label> Group </label>
-                            <select ng-change="getStudentData(person,program,group)" class="form-control" ng-model="group" ng-options="group as group.group for group in staff_student_data[program]" ng-init="">
-                            <option value="">--Select Group--</option></select>
-                        </div>
-                        <div class="col-md-3">
-                            <label> Semester </label>
-                            <input class="form-control" type="text" ng-model="group.semester" readonly>
-                        </div>
-                        <div class="col-md-3">
-                            <label> Course </label>
-                            <input class="form-control" type="text" ng-model="group.subject" readonly>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>                
-        <div class="row">
-            <div class="col-md-12">
-                <div class="table-responsive">
-                    {{attendanceData.sesssions}}
-                    <table class="table table-bordered table-hover table-striped">
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th ng-repeat="a in attendanceData['sessions']">{{a}}</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr ng-repeat="student in student_list">
-                                <td>{{student.name}}</td>
-                                <td ng-repeat="a in attendanceData['sessions']" style="text-align:center;vertical-align:middle;">
-                                    <label>
-                                        <input type="radio" ng-model="student.sessions[a]" value="present"> <i class="fa fa-check-circle-o"></i>
-                                    </label>
-                                    </br>
-                                    <label>
-                                        <input type="radio" ng-model="student.sessions[a]" value="abbsent"> <i class="fa fa-times-circle-o"></i>
-                                    </label>
-                                    </br>
-                                    <label>
-                                        <input type="radio" ng-model="student.sessions[a]" value="permission"> <i class="fa fa-minus-circle"></i>
-                                    </label>
-                                    </br>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                <!-- /.table-responsive -->
-            </div>
-            <!-- /.col-lg-4 (nested) -->
-        </div>
-        <!-- /.row -->
-    </script>
     <script type="text/ng-template" id="dashboard.html">
         <div class="row">
             <div class="col-lg-12">
                 <h1 class="page-header">Dashboard</h1>
             </div>
-            <!-- /.col-lg-12 -->
         </div>
-        <!-- /.row -->
         <div class="row">
             <div class="col-lg-3 col-md-6">
                 <div class="panel panel-primary">
@@ -1260,7 +624,6 @@
                 </div>
             </div>
         </div>
-        <!-- /.row -->
         <div class="row">
             <div class="col-lg-8">
                 <div class="panel panel-default">
@@ -1286,7 +649,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- /.panel-heading -->
                     <div class="panel-body">
                         <div id="morris-area-chart" style="position: relative; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
                             <svg height="342" version="1.1" width="701" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="overflow: hidden; position: relative;">
@@ -1369,9 +731,7 @@
                             </div>
                         </div>
                     </div>
-                    <!-- /.panel-body -->
                 </div>
-                <!-- /.panel -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <i class="fa fa-bar-chart-o fa-fw"></i> Bar Chart Example
@@ -1395,7 +755,6 @@
                             </div>
                         </div>
                     </div>
-                    <!-- /.panel-heading -->
                     <div class="panel-body">
                         <div class="row">
                             <div class="col-lg-4">
@@ -1461,9 +820,7 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                <!-- /.table-responsive -->
                             </div>
-                            <!-- /.col-lg-4 (nested) -->
                             <div class="col-lg-8">
                                 <div id="morris-bar-chart" style="position: relative; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
                                     <svg height="342" version="1.1" width="457" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="overflow: hidden; position: relative; left: -0.546875px;">
@@ -1527,18 +884,13 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- /.col-lg-8 (nested) -->
                         </div>
-                        <!-- /.row -->
                     </div>
-                    <!-- /.panel-body -->
                 </div>
-                <!-- /.panel -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <i class="fa fa-clock-o fa-fw"></i> Responsive Timeline
                     </div>
-                    <!-- /.panel-heading -->
                     <div class="panel-body">
                         <ul class="timeline">
                             <li>
@@ -1702,12 +1054,9 @@
                                     </span>
                             </a>
                         </div>
-                        <!-- /.list-group -->
                         <a href="#" class="btn btn-default btn-block">View All Alerts</a>
                     </div>
-                    <!-- /.panel-body -->
                 </div>
-                <!-- /.panel -->
                 <div class="panel panel-default">
                     <div class="panel-heading">
                         <i class="fa fa-bar-chart-o fa-fw"></i> Donut Chart Example
@@ -1733,9 +1082,7 @@
                         </div>
                         <a href="#" class="btn btn-default btn-block">View Details</a>
                     </div>
-                    <!-- /.panel-body -->
                 </div>
-                <!-- /.panel -->
                 <div class="chat-panel panel panel-default">
                     <div class="panel-heading">
                         <i class="fa fa-comments fa-fw"></i> Chat
@@ -1773,7 +1120,6 @@
                             </ul>
                         </div>
                     </div>
-                    <!-- /.panel-heading -->
                     <div class="panel-body">
                         <ul class="chat">
                             <li class="left clearfix">
@@ -1839,7 +1185,6 @@
                             </li>
                         </ul>
                     </div>
-                    <!-- /.panel-body -->
                     <div class="panel-footer">
                         <div class="input-group">
                             <input id="btn-input" type="text" class="form-control input-sm" placeholder="Type your message here...">
@@ -1850,13 +1195,9 @@
                                 </span>
                         </div>
                     </div>
-                    <!-- /.panel-footer -->
                 </div>
-                <!-- /.panel .chat-panel -->
             </div>
-            <!-- /.col-lg-4 -->
         </div>
-        <!-- /.row -->
     </script>
     {% endverbatim %}
     <!-- Bootstrap core JavaScript
