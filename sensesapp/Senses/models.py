@@ -5,6 +5,13 @@ from django.contrib.auth.models import User
 STATUS = (('Male', 'Male'), ('Female', 'Female'))
 FINANCIAL = (('Male', 'Male'), ('Female', 'Female'))
 
+class District(models.Model):
+    district_name = models.CharField(max_length=50,unique=True)
+
+class Taluk(models.Model):
+    district = models.ForeignKey(District)
+    taluk_name = models.CharField(max_length=30)
+
 class Family(models.Model):
     ration_card_id =  models.CharField(max_length=20)
     address = models.CharField(max_length=50)
@@ -19,7 +26,7 @@ class Family(models.Model):
 class Scheme(models.Model):
     scheme_type = models.CharField(max_length=20)
     name = models.CharField(max_length=20)
-    description = models.CharField()# Create your views here.
+    description = models.CharField(max_length=30,null=True)# Create your views here.
     
 class Member(models.Model):
     govt_id = models.CharField(max_length=20)

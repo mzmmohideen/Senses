@@ -120,30 +120,34 @@ app.controller('dashboardCtrl', function($scope,_, $http, $location,studentSelec
             }    
         }
     }
-    $scope.get_group_staff = function(prog,sem) {
-        if(prog != undefined || sem != undefined) {
-           
-            var group_list =  _.without(_.pluck(_.filter($scope.group_data, function(num) { return num.program == prog.name && parseInt(num.semester) == sem }),"name"),"");        
-            return group_list
+    $scope.district_val = 'SELECT DISTRICT';
+    $scope.get_district = function(district) {
+        if(!district) {
+            $scope.district_val = 'SELECT DISTRICT';
+        }
+        else {
+            console.log('val',district)
+            $scope.district_val = district;
         }
     }
-   
-
-   
-    $scope.get_year = function(prog) {
-        var year_list = [];
-        // var sem_list = ['first','second','third','fourth','fifth','sixth','seven'];
-        for(i=0;i<prog;i++){
-            year_list.push(i+1)
+    $scope.taluk_val = 'SELECT TALUK';
+    $scope.get_taluk = function(taluk) {
+        if(!taluk) {
+            $scope.taluk_val = 'SELECT TALUK';
         }
-        return year_list;
+        else {
+            $scope.taluk_val = taluk;
+        }
     }
-    $scope.generate_year = function() {
-        var year = [];
-        for(i=2010;i<2110;i++){
-            year.push(i+1)
-        }
-        return year;
+    $scope.add_location = function(district,taluk) {
+        console.log('val',district,'taluk',taluk)
+        $http.post('/addLocation/',{
+            district: district,
+            taluk: taluk,
+        }).success(function(data) {
+            console.log('data',data)
+            alert(data.data)
+        })
     }
 
     $scope.positionUpdated = function(module,session) {
@@ -158,173 +162,6 @@ app.controller('dashboardCtrl', function($scope,_, $http, $location,studentSelec
         }
     }
     $scope.periods = ['Period 1','Period 2','Period 3','Period 4','Period 5','Period 6','Period 7','Period 8'];
-
-    $scope.add_student = function(name,stud_id,email,address,gender,program,year,batch) {
-        $http.post('/add_new_student/', {
-            name: name,
-            stud_id: stud_id,
-            address: address,
-            email: email,
-            gender: gender,
-            program: program.name,
-            year: year,
-            batch: batch,
-        }).success(function(data) {
-            console.log(data)
-            alert(data.data)
-            $scope.fetch_data();
-        })
-    }
-    $scope.description = '';
-    $scope.add_program = function(prog_name, duration, description) {
-        $http.post('/add_new_program/', {
-            prog_name: prog_name,
-            duration: duration,
-            description: description,
-        }).success(function(data) {
-            console.log(data)
-            alert(data.data)
-            $scope.fetch_data();
-            $scope.prog_name = '';
-            $scope.duration = '';
-            $scope.description = '';
-        })
-    }
-    $scope.course_map = function(semester, prog,course_type, course, description) {
-        $http.post('/CourseMap/',{
-            semester: semester,
-            prog: prog.name,
-            course_type: course_type,
-            course: course.name,
-            description: description,
-        }).success(function(data) {
-            console.log(data)
-            alert(data.data)
-            $scope.fetch_data();
-        })
-    }
-    $scope.get_student_list = function(gen,prog,semester) {
-        console.log('gen',gen)
-        if(semester % 2 == 0) {
-            var year = semester /2 ;
-        }
-        else {
-            var year = (semester+1) /2;
-        }
-        $http.post('/get_studentList/',{
-            gender: gen,
-            program: prog.name,
-            semester: semester,
-            year: year,
-        }).success(function(data){
-            console.log(data.data)
-            $scope.getStudent = data.data;
-        })
-    }
-    var list_selected_studs = [];
-    $scope.add_selected_users = function(check,group){
-        console.log(check,group)
-        // studentSelected.get_students_name();
-        
-        if(check){
-            // console.log(group.student_id)
-            list_selected_studs.push(group.student_id);
-        }
-        else{
-            list_selected_studs = _.without(list_selected_studs,group.student_id)
-            // console.log(group.student_id)
-        }
-        studentSelected.set_students_name(list_selected_studs);
-        // console.log(studentSelected.get_students_name())
-    }
-    $scope.get_group_students = function(group_name,prog,sem){
-        // console.log(group_name,prog,sem);
-        // //         group
-        // // prog_name
-        // // sem_name
-    $http.get('/get_studentList/?group='+group_name, {}).success(function(data) {
-            $scope.getStudent_group = data.data;
-        })
-    }
-    $scope.add_userto_group = function(group_name,prog,sem){
-        $http.post('/add_userto_group/',{
-            group_name: group_name,
-            prog: prog,
-            sem: sem,
-            list_student: studentSelected.get_students_name(),
-        }).success(function(data){
-            alert(data.data)
-            console.log(data.data)
-            // $scope.getStudent = data.data;
-        })
-
-    }
-    $scope.check_students = function(value){
-        console.log(value)
-        var check_list = studentSelected.get_students_name();
-        console.log(check_list)
-        if(check_list.length != 0 && value){
-            return false;
-        }
-        else{
-            return true;
-        }
-    }
-    $scope.gen = '';
-    $scope.group_name = '';
-    $scope.add_group = function(group_name,gender,semester,prog,student,description) {
-        if(semester % 2 == 0) {
-            var year = semester /2 ;
-        }
-        else {
-            var year = (semester+1) /2;
-        }
-        console.log('year',group_name,year)
-        $http.post('/add_new_group/', {
-            group_name: group_name,
-            semester: semester,
-            year: year,
-            gender: gender,
-            prog: prog.name,
-            student: student.name,
-            description: description,
-        }).success(function(data) {
-            alert(data.data)
-            $scope.fetch_data();
-        })
-    }
-    $scope.get_course_val = function(sel) {
-    //     if ( sel.search==val && ! sel.clickTriggeredSelect ) {
-    //         console.log(sel.search,val)
-    //         $scope.val_course = true;
-    //         $scope.course_val = val;
-    //     }
-    //     else if( !sel.search && sel.selected) {
-    //         $scope.course_val = val;
-    //         console.log(val,'val')
-    //     }  
-    //   console.log('callenderview',$scope.course_val)
-    // };
-    // $scope.course_val = "";
-    $scope.course_val = sel;
-    $scope.course_value = sel;
-    };
-    $scope.add_course = function(course_type,module_name,course_name, description) {
-        console.log(module_name,'module_name')
-        $http.post('/add_new_course/', {
-            course_type: course_type,
-            course_name: course_name,
-            module_name: module_name,
-            description: description,
-        }).success(function(data) {
-            alert(data.data)
-            $scope.fetch_data();
-        })
-    }
-    $scope.get_group_val = function(group) {
-        console.log('????',group)
-        return group;
-    }
     $scope.get_unique_ctype = function(course_type) {
         return  _.without(_.uniq(_.pluck($scope.courses, 'course_type')),"");
     }

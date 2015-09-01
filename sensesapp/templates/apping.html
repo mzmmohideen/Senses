@@ -300,31 +300,27 @@
 
             </div>
         </div>
-        <div class=" col-lg-6" ng-init="fetch_data()" style="padding-right: 20px;border-right: 1px solid #E2E2E2;height: 400px;">
+        <div class=" col-lg-12" ng-init="fetch_data()" style="padding-right: 20px;border-right: 1px solid #E2E2E2;height: 400px;">
             <div class="form-group" style="padding-bottom: 34px;">
-                
-                <select style="display: inline-block;width: 25%;float: left;" ng-change="get_student_list(gen,prog,sem)" ng-model="gen" ng-options="gen as gen for gen in gender" class="form-control">
-                    <option value="">SELECT GENDER</option>
-                </select>
-                <select ng-disabled="!gen" ng-change="get_student_list(gen,prog,sem)" style="display: inline-block;width: 28%;float: left;" ng-model="prog" ng-options="prog as prog.name for prog in program" class="form-control">
-                    <option value="">SELECT PROGRAM</option>
-                </select>
-                <select ng-disabled="!prog" ng-change="get_student_list(gen,prog,sem)" style="display: inline-block;width: 18%;float: left;" ng-model="sem" ng-options="sem for sem in get_sem(prog.duration)" class="form-control">
-                    <option value="">SEMESTER</option>
-                </select>                
-                <!-- <input style="display: inline-block;width: 20%;height: 34px;float: left;" type="text" placeholder="Description about Group(Optional)" ng-model="description" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"> -->
-                <button  ng-disabled="check_students(group_name);" type="submit" style="width:25%;height: 34px;float:right;" ng-click="add_userto_group(group_name,prog,sem)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add To {{group_name}}</button>
+                <ui-select style="display: inline-block;height: 34px;width: 30%;float: left;" on-select="getDis=district;get_district(getDis)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="district">
+                    <ui-select-match placeholder="{{district_val}}">{{district_val}}</ui-select-match>
+                    <ui-select-choices refresh="getDis=$select.search;get_district(getDis)" repeat="mod in district_list | filter:$select.search">
+                        <div ng-bind-html="mod | highlight: $select.search"></div>
+                    </ui-select-choices>
+                </ui-select>
+                <ui-select ng-model="taluk" style="display: inline-block;height: 34px;width: 30%;float: left;" on-select="getTal=taluk;get_taluk(getTal)" reset-search-input="false" theme="bootstrap" ng-disabled="district_val=='' || district_val=='SELECT DISTRICT'">
+                    <ui-select-match placeholder="{{taluk_val}}">{{taluk_val}}</ui-select-match>
+                    <ui-select-choices refresh="getTal=$select.search;get_taluk(getTal)" repeat="mod in taluk_list | filter:$select.search">
+                        <div ng-bind-html="mod | highlight: $select.search"></div>
+                    </ui-select-choices>
+                </ui-select>
+                <button  ng-disabled="district_val=='' || district_val=='SELECT DISTRICT' || taluk_val=='' || taluk_val=='SELECT TALUK'" type="submit" style="width:25%;height: 34px;float:right;" ng-click="add_location(district_val,taluk_val)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
             </div>
             <table class="table table-striped table-bordered table-hover ng-scope">
                 <thead>
                     <tr class="ng-scope">
-                        <th>Select</th>
                         <th>S.No</th>
-                        <th>Student ID</th>
-                        <th>Student name</th>
-                        <th>Program</th>
-                        <th>YEAR</th>
-                        <th>Status</th>
+                        <th>TALUK in {{district}}</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -335,68 +331,14 @@
                     <tr ng-show="getStudent.length==0">
                         <td colspan="8" style="text-align:center;" class="ng-binding">No Students Data Found!</td>
                     </tr>
-                    <tr ng-show="getStudent.length!=0" ng-repeat="group in getStudent" class="ng-scope">
-                        <td><input type="checkbox" ng-model="group.check" ng-change="add_selected_users(group.check,group);"></td>
+                    <tr ng-show="getStudent.length!=0" ng-repeat="taluk in getTaluk" class="ng-scope">
                         <td>{{$index+1}}</td>
-                        <td class="ng-binding">{{group.student_id}}</td>
-                        <td class="ng-binding">{{group.name}}</td>
-                        <td class="ng-binding">{{group.program}}</td>
-                        <td class="ng-binding">{{group.year}}</td>
-                        <td class="ng-binding">{{group.status}}</td>
+                        <td class="ng-binding">{{taluk}}</td>
                         <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
                     </tr>
                 </tbody>
             </table>
         </div>
-         <div class=" col-lg-6" style="padding-left: 20px;">
-             <!-- <select style="display: inline-block;width: 28%;float: left;" ng-model="prog_group" ng-options="prog as prog.name for prog in program" class="form-control">
-                    <option value="">SELECT PROGRAM</option>
-                </select>
-                <select ng-change="get_student_list(gen,prog,sem)" style="display: inline-block;width: 18%;float: left;" ng-model="sem_group" ng-options="sem for sem in get_sem(prog_group.duration)" class="form-control">
-                    <option value="">SEMESTER</option>
-                </select> -->
-                <select ng-show="!gen" ng-disabled="!gen" style="display: inline-block;width: 30%;float: right;margin-bottom: 15px;position: relative;" class="form-control">
-                    <option value="">PLEASE SELECT GENDER</option>
-                </select>   
-                <select ng-show="gen=='MALE'" style="display: inline-block;width: 25%;float: right;margin-bottom: 15px;position: relative;" ng-model="group_name" ng-options="group as group for group in ['MALE G1','MALE G2']" class="form-control" ng-change="get_group_students(group_name,prog,sem)">
-                    <option value="">SELECT GROUP</option>
-                </select>
-                <select ng-show="gen=='FEMALE'" style="display: inline-block;width: 25%;float: right;margin-bottom: 15px;position: relative;" ng-model="group_name" ng-options="group as group for group in ['FEMALE G1','FEMALE G2']" class="form-control" ng-change="get_group_students(group_name,prog,sem)">
-                    <option value="">SELECT GROUP</option>
-                </select>
-            <table class="table table-striped table-bordered table-hover ng-scope">
-                <thead>
-                    <tr class="ng-scope">
-                        <th>Select</th>
-                        <th>S.No</th>
-                        <th>Student ID</th>
-                        <th>Student name</th>
-                        <th>Program</th>
-                        <th>YEAR</th>
-                        <th>Status</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-show="!getStudent_group">
-                        <td colspan="8" style="text-align:center;" class="ng-binding">Please Select Any Group !</td>
-                    </tr>
-                    <tr ng-show="getStudent_group.length==0">
-                        <td colspan="8" style="text-align:center;" class="ng-binding">No Students Data Found!</td>
-                    </tr>
-                    <tr ng-show="getStudent_group.length!=0" ng-repeat="group in getStudent_group" class="ng-scope">
-                        <td><input type="checkbox"></td>
-                        <td>{{$index+1}}</td>
-                        <td class="ng-binding">{{group.student_id}}</td>
-                        <td class="ng-binding">{{group.name}}</td>
-                        <td class="ng-binding">{{group.program}}</td>
-                        <td class="ng-binding">{{group.year}}</td>
-                        <td class="ng-binding">{{group.status}}</td>
-                        <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
-                    </tr>
-                </tbody>
-            </table>
-         </div>
     </script>
     <script type="text/ng-template" id="masjid.html">
         <div class="row">
@@ -404,15 +346,7 @@
                 <h1 class="page-header">Masjids</h1>
             </div>
         </div>
-        <div class="row" ng-init="fetch_data();positionUpdated('without')">
-             <div class="row">
-                <div class="col-md-12" style="padding-left:35%;">
-                        <label ng-repeat="a in ['with','without'] track by $index" style="margin-left:5%;">
-                            <input name="sub" ng-model="a" type="radio" value="{{a}}" ng-click="positionUpdated(a)"></input>
-                            {{a}} Module 
-                        </label>
-                </div>
-            </div>                
+        <div class="row" ng-init="fetch_data();">                
             <div ng-show="course_module" class="form-group">
                 <select ng-model="course_type" style="display: inline-block;height: 34px;width: 20%;float: left;" ng-options="gen for gen in ['LECTURES','LABORATORY','CLINICAL STUDIES','HOSPITAL']" class="form-control">
                     <option value="">COURSE TYPE</option>
