@@ -1,5 +1,5 @@
 from django.conf.urls import patterns, include, url
-from Senses.views import *
+from senses.views import *
 from django.contrib import admin
 
 admin.autodiscover()
@@ -17,6 +17,8 @@ urlpatterns = patterns('',
     url(r'^home/$', apping),
     url(r'^addLocation/$',addLocation),
     url(r'^admin/', include(admin.site.urls)),
+    url(r'^add_masjid/',add_masjid),
+    url(r'^masjid_member/',masjid_member),
     # Examples:
     # url(r'^$', 'sensesapp.views.home', name='home'),
     # url(r'^sensesapp/', include('sensesapp.foo.urls')),

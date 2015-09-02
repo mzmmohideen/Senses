@@ -1,5 +1,5 @@
 from django.shortcuts import render_to_response, HttpResponse, render
-from Senses.models import *
+from senses.models import *
 from django.contrib.auth.models import User
 from django.core.context_processors import csrf
 from django.contrib.auth import authenticate, login
@@ -43,13 +43,50 @@ def signup(request):
     return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
 
 def addLocation(request):
-    data = json.loads(request.body)
-    try:
-        district = District.objects.get(district_name=data['district'])
-        taluk = taluk.objects.create(district=district,taluk=data['taluk'])
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        try:
+            district = District.objects.get(district_name=data['district'])
+            if Taluk.objects.filter(district=district,taluk_name=data['taluk']):
+                return HttpResponse(content=json.dumps({'data':'District and Taluk Exist!'}), content_type='Application/json')
+            else:
+                taluk = Taluk.objects.create(district=district,taluk_name=data['taluk'])
+                return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
+        except:
+            print '?????',repr(format_exc())
+            district = District.objects.create(district_name=data['district'])
+            taluk = Taluk.objects.create(district=district,taluk_name=data['taluk'])
+        return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
+    else:
+        print request.GET
+        data = defaultdict(list)
+        for i in Taluk.objects.all():
+            data[i.district.district_name].append(i.taluk_name)
+        # taluk = map(lambda x:{'district'}    Taluk.objects.all())
         print 'data',data
-    except:
-        print '?????',data
-        district = District.objects.create(district_name=data['district'])
-        taluk = Taluk.objects.create(district=district,taluk=data['taluk'])
-    return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
+        return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
+
+def add_masjid(request):
+    if request.method == 'POST':        
+        data = json.loads(request.body)
+        taluk = Taluk.objects.get(district=District.objects.get(district_name=data['district']),taluk_name=data['taluk'])
+        if Masjid.objects.filter(taluk=taluk,name=data['masjid_name']):
+            masjid = Masjid.objects.filter(taluk=taluk,name=data['masjid_name']).update(name=data['masjid'],musallas=data['musallas'],location=data['address'])
+            return HttpResponse(content=json.dumps({'data':'updated!'}),content_type='Application/json')
+        else:
+            masjid = Masjid.objects.create(taluk=taluk,name=data['masjid_name'],musallas=data['musallas'],location=data['address'])
+            return HttpResponse(content=json.dumps({'data':'success!'}),content_type='Application/json')
+    else:
+        get_members = map(lambda x:{'name':x.name,'taluk':x.taluk.taluk_name,'district':x.taluk.district.district_name,'musallas':x.musallas,'location':x.location},Masjid.objects.all())
+        print 'get_members',get_members
+        return HttpResponse(content=json.dumps({'data':get_members}),content_type='Application/json')
+
+def masjid_member(request):
+    data = request.GET
+    taluk = Taluk.objects.get(taluk_name=data['taluk'],district=District.objects.get(district_name=data['district']))
+    if Masjid.objects.filter(taluk=taluk,name=data['masjid']):
+        masjid = Masjid.objects.get(taluk=taluk,name=data['masjid'])
+        get_members = map(lambda x:{'name':x.member_name,'age':x.age,'mobile':x.mobile,'address':x.address,'designation':x.designation},Masjid_members.objects.filter(masjid=masjid))
+        print 'get_members',get_members
+    return HttpResponse(content=json.dumps({'data':get_members}),content_type='Application/json')    
+    

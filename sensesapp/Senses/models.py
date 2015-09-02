@@ -12,6 +12,20 @@ class Taluk(models.Model):
     district = models.ForeignKey(District)
     taluk_name = models.CharField(max_length=30)
 
+class Masjid(models.Model):
+    taluk = models.ForeignKey(Taluk)
+    name = models.CharField(max_length=30)
+    musallas = models.CharField(max_length=20)
+    location = models.CharField(max_length=30)
+
+class Masjid_members(models.Model):
+    masjid = models.ForeignKey(Masjid)
+    member_name = models.CharField(max_length=30)
+    age = models.CharField(max_length=30)
+    mobile = models.CharField(max_length=20)
+    address = models.CharField(max_length=50)
+    designation = models.CharField(max_length=20)
+
 class Family(models.Model):
     ration_card_id =  models.CharField(max_length=20)
     address = models.CharField(max_length=50)

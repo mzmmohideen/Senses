@@ -310,28 +310,28 @@
                 </ui-select>
                 <ui-select ng-model="taluk" style="display: inline-block;height: 34px;width: 30%;float: left;" on-select="getTal=taluk;get_taluk(getTal)" reset-search-input="false" theme="bootstrap" ng-disabled="district_val=='' || district_val=='SELECT DISTRICT'">
                     <ui-select-match placeholder="{{taluk_val}}">{{taluk_val}}</ui-select-match>
-                    <ui-select-choices refresh="getTal=$select.search;get_taluk(getTal)" repeat="mod in taluk_list | filter:$select.search">
+                    <ui-select-choices refresh="getTal=$select.search;get_taluk(getTal)" repeat="mod in getTaluk[district_val] | filter:$select.search">
                         <div ng-bind-html="mod | highlight: $select.search"></div>
                     </ui-select-choices>
                 </ui-select>
                 <button  ng-disabled="district_val=='' || district_val=='SELECT DISTRICT' || taluk_val=='' || taluk_val=='SELECT TALUK'" type="submit" style="width:25%;height: 34px;float:right;" ng-click="add_location(district_val,taluk_val)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
             </div>
-            <table class="table table-striped table-bordered table-hover ng-scope">
+            <table class="table table-striped table-bordered table-hover ng-scope" ng-init="getLocation()">
                 <thead>
                     <tr class="ng-scope">
                         <th>S.No</th>
-                        <th>TALUK in {{district}}</th>
+                        <th>TALUK in {{district_val}}</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-show="!getStudent">
+                    <tr ng-show="!getTaluk[district_val]">
                         <td colspan="8" style="text-align:center;" class="ng-binding">Please Select Above Details !</td>
                     </tr>
-                    <tr ng-show="getStudent.length==0">
+                    <tr ng-show="getTaluk[district_val].length==0">
                         <td colspan="8" style="text-align:center;" class="ng-binding">No Students Data Found!</td>
                     </tr>
-                    <tr ng-show="getStudent.length!=0" ng-repeat="taluk in getTaluk" class="ng-scope">
+                    <tr ng-show="getTaluk[district_val].length!=0" ng-repeat="taluk in getTaluk[district_val]" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td class="ng-binding">{{taluk}}</td>
                         <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
@@ -341,64 +341,56 @@
         </div>
     </script>
     <script type="text/ng-template" id="masjid.html">
-        <div class="row">
+        <div class="row" ng-init="getMasjidData();getLocation()">
             <div class="col-lg-12">
                 <h1 class="page-header">Masjids</h1>
             </div>
+            <div class=" col-lg-12" ng-init="fetch_data()" style="padding-right: 20px;border-right: 1px solid #E2E2E2;">
+                <div class="form-group" style="padding-bottom: 34px;">
+                    <ui-select style="display: inline-block;height: 34px;width: 50%;float: left;" on-select="getmasjid=MasjidAddValue.masjid_name;get_masjid(getmasjid)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="MasjidAddValue.masjid_name">
+                        <ui-select-match placeholder="{{masjid_val}}">{{masjid_val}}</ui-select-match>
+                        <ui-select-choices refresh="getmasjid=$select.search;get_masjid(getmasjid)" repeat="mod in masjidList | filter:$select.search">
+                            <div ng-bind-html="mod | highlight: $select.search"></div>
+                        </ui-select-choices>
+                    </ui-select>
+                    <button ng-disabled="masjidList.indexOf(masjid_val)==-1" type="submit" style="width:13%;height: 34px;" ng-click="addMasjid(masjid_val,MasjidAddValue)" class="btn-sm btn btn-primary">Update</button>
+                    <button ng-disabled="masjidList.indexOf(masjid_val)!=-1" type="submit" style="width:13%;height: 34px;" ng-click="addMasjid(masjid_val,MasjidAddValue)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Save New</button>
+                </div>
+            </div>
+        <div class=" col-lg-12" style="padding-bottom: 34px;">
+                <select style="display: inline-block;height: 34px;width: 30%;float: left;" ng-model="MasjidAddValue.district" ng-options="gen for gen in district_list" class="form-control">
+                    <option value="">SELECT DISTRICT</option>
+                </select>
+                <select ng-change="getMasjidMember(masjid_val,taluk,district)" style="display: inline-block;height: 34px;width: 30%;float: left;" ng-model="MasjidAddValue.taluk" ng-options="gen for gen in getTaluk[MasjidAddValue.district]" class="form-control">
+                    <option value="">SELECT TALUK</option>
+                </select>
         </div>
-        <div class="row" ng-init="fetch_data();">                
-            <div ng-show="course_module" class="form-group">
-                <select ng-model="course_type" style="display: inline-block;height: 34px;width: 20%;float: left;" ng-options="gen for gen in ['LECTURES','LABORATORY','CLINICAL STUDIES','HOSPITAL']" class="form-control">
-                    <option value="">COURSE TYPE</option>
-                </select>
-                <ui-select style="display: inline-block;height: 34px;width: 30%;float: left;" on-select="course_val=mod;get_course_val(course_val)" ng-model="mod" reset-search-input="false" theme="bootstrap" ng-disabled="disabled">
-                    <ui-select-match placeholder="{{course_value}}">{{course_val}}</ui-select-match>
-                    <ui-select-choices refresh="course_val=$select.search;get_course_val(course_val)" repeat="mod in get_unique_module() | filter:$select.search">
-                        <div ng-bind-html="mod | highlight: $select.search"></div>
-                    </ui-select-choices>
-                </ui-select>
-                <input style="display: inline-block;height: 34px;width: 20%;float: left;" placeholder="Enter Course Name" ng-model="course_name" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <input style="display: inline-block;width: 35%;height: 34px;float: left;" type="text" placeholder="Description" ng-model="description" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <button ng-disabled="!course_name || !course_type" type="submit" style="width:13%;height: 34px;" ng-click="add_course(course_type,course_val,course_name,description)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
-            </div>
-            <div ng-show="!course_module" class="form-group">
-                <select style="display: inline-block;height: 34px;width: 20%;float: left;" ng-model="course_type" ng-options="gen for gen in ['LECTURES','LABORATORY','CLINICAL STUDIES','HOSPITAL']" class="form-control">
-                    <option value="">COURSE TYPE</option>
-                </select>
-                <input style="display: inline-block;height: 34px;width: 20%;float: left;" placeholder="Enter Course Name" ng-model="course_name" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <input style="display: inline-block;width: 35%;height: 34px;float: left;" type="text" placeholder="Description(Optional)" ng-model="description" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <button ng-disabled="!course_name || !course_type" type="submit" style="width:13%;height: 34px;" ng-click="add_course(course_type,'',course_name,description)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
-            </div>
-            <div style="text-align:center;">Or</div>
-            <div class="form-group" for="csv_file">
-                <label style="display: inline-block;width: 20%;float: left;height: 36px;" for="csv_file" class="btn-sm btn btn-primary">
-                    <a style="color: white;text-decoration: none;float: left;margin: 5px 15px;" href="/static/csv/import_program.csv"><i class="fa fa-cloud-download"></i> Download Sample CSV 
-                    </a>
-                </label>
-                <input style="display: inline-block;width: 55%;float: left;" class="custom-file-upload" accept=".xls,.xlsx,.csv,.csvx" file-model="csv_file" type="file">
-                <label style="display: inline-block;width: 13%;float: left;height: 36px;" class="btn-sm btn btn-primary" ng-click="upload_csv(csv_file,'course')"><i class="fa fa-cloud-upload"></i><span style="margin: 5px 15px;"> Upload CSV</span>
-                </label>
-            </div>
-            <br><br>
-            <div class="form-group" ng-init="fetch_data();get_unique_course('LECTURES','');course_type='LECTURES'">
-                <select style="display: inline-block;height: 34px;width: 20%;margin-left:35%" ng-model="course_type" ng-change="get_unique_course(course_type,'')" ng-options="gen for gen in ['LECTURES','LABORATORY','CLINICAL STUDIES','HOSPITAL']" class="form-control">
-                    <option value="">COURSE TYPE</option>
-                </select>
-            </div>
+        <div class=" col-lg-12" style="padding-bottom: 34px;">
+            <input ng-show="masjidList.indexOf(masjid_val)!=-1" style="display: inline-block;height: 34px;width: 25%;float: left;" placeholder="Enter Masjid Name" ng-model="MasjidAddValue.masjid_name" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                    <input ng-show="masjidList.indexOf(masjid_val)==-1" style="display: inline-block;height: 34px;width: 25%;float: left;" placeholder="Enter Masjid Name" ng-model="masjid_val" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required" readonly>
+                    <input style="display: inline-block;width: 15%;height: 34px;float: left;" type="text" placeholder="Number of Musallas" ng-model="MasjidAddValue.musallas" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                    <input style="display: inline-block;width: 35%;height: 34px;float: left;" type="text" placeholder="Address" ng-model="MasjidAddValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+        </div>            
+        <div class="row">
             <table class="table table-striped table-bordered table-hover ng-scope">
                 <thead>
                     <tr>
                         <th>S.No</th>
-                        <th>Module</th>
-                        <th>Course Type</th>
-                        <th>Course Name</th>
-                        <th>Description</th>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Post</th>
+                        <th>Address</th>
+                        <th>Contact</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr ng-show="courses.length==0">
-                        <td colspan="6" style="text-align:center;" class="ng-binding">No Course Data Found!</td>
+                        <td colspan="6" style="text-align:center;" class="ng-binding">No Member Data Found!</td>
+                    </tr>
+                    <tr>
+                        <td class="ng-binding"><input type="text" placeholder="Member Name"> </td>
+                        <td class="ng-binding"><input type="text" placeholder="Age"> </td>
                     </tr>
                     <tr ng-show="courses.length!=0" ng-repeat="course in unique_course" class="ng-scope">
                         <td>{{$index+1}}</td>

@@ -48,16 +48,6 @@ app.filter('propsFilter', function() {
         return out;
     }
 });
-app.service('studentSelected', function($rootScope) {
-    var student = [];
-    this.get_students_name = function() {
-        return student;
-    };
-    this.set_students_name = function(name) {
-        student = name;
-    };
-
-});
 app.config(['$routeProvider',
     function($routeProvider) {
         $routeProvider.
@@ -92,7 +82,7 @@ app.directive('fileModel', ['$parse', function($parse) {
         }
     };
 }]);
-app.controller('dashboardCtrl', function($scope,_, $http, $location,studentSelected) {
+app.controller('dashboardCtrl', function($scope,_, $http, $location) {
     $scope.fetch_data = function() {
         $http.get('/fetchData/', {}).success(function(data) {
             $scope.courses = data.course;
@@ -139,6 +129,72 @@ app.controller('dashboardCtrl', function($scope,_, $http, $location,studentSelec
             $scope.taluk_val = taluk;
         }
     }
+    $scope.masjid_val = '';
+    $scope.get_masjid = function(masjid) {
+        if(!masjid) {
+            $scope.masjid_val = 'Select Masjid from the List';
+        }
+        else {
+            $scope.masjid_val = masjid;
+            $scope.getMasjidData();
+        }
+    }
+    $scope.MasjidAddValue = {
+        masjid_name: '',
+        musallas: '',
+        district: '',
+        taluk: '',
+        address: '',
+    }
+    $scope.getMasjidData = function() {
+        console.log('masjid',$scope.masjid_val)
+        $http.get('/add_masjid/').success(function(data){
+            $scope.masjidList = _.pluck(data.data,"name")
+            if($scope.masjidList.indexOf($scope.masjid_val)==-1) {
+                $scope.MasjidAddValue.masjid_name = '';
+                $scope.MasjidAddValue.musallas = '';
+                $scope.MasjidAddValue.district = '';
+                $scope.MasjidAddValue.taluk = '';
+                $scope.MasjidAddValue.address = '';
+            }
+            else {
+                $scope.getMasjidListData = _.filter(data.data,function(num) { return num.name==$scope.masjid_val})
+                $scope.MasjidAddValue.masjid_name = $scope.getMasjidListData[0].name;
+                $scope.MasjidAddValue.musallas = $scope.getMasjidListData[0].musallas;
+                $scope.MasjidAddValue.district = $scope.getMasjidListData[0].district;
+                $scope.MasjidAddValue.taluk = $scope.getMasjidListData[0].taluk;
+                $scope.MasjidAddValue.address = $scope.getMasjidListData[0].location;
+                console.log('data',$scope.getMasjidListData)
+            }
+        })
+    }
+    $scope.getMasjidMember = function(masjid_name,taluk,district) {
+        $http.get('/masjid_member/?masjid=' + masjid_name+'&taluk='+taluk+'&district='+ district).success(function(data){
+            console.log('data',data)
+        })
+    }
+
+    $scope.addMasjid = function(masjid,data) {
+        console.log(data,masjid)
+        if(data.masjid_name == "") {
+            var masjid_val = masjid
+        }
+        else {
+            var masjid_val = data.masjid_name
+        }
+        console.log('masjid',masjid,'a',data.masjid_name,'b',masjid_val)
+        $http.post('/add_masjid/',{
+            district: data.district,
+            taluk: data.taluk,
+            masjid_name: masjid,
+            masjid: masjid_val,
+            musallas: data.musallas,
+            address: data.address,
+        }).success(function(data) {
+            console.log('val',data)
+            alert(data.data)
+        })
+    }
     $scope.add_location = function(district,taluk) {
         console.log('val',district,'taluk',taluk)
         $http.post('/addLocation/',{
@@ -147,6 +203,15 @@ app.controller('dashboardCtrl', function($scope,_, $http, $location,studentSelec
         }).success(function(data) {
             console.log('data',data)
             alert(data.data)
+            $scope.getLocation();
+        })
+    }
+    $scope.getLocation = function() {
+        $http.get('/addLocation/',{}).success(function(data) {
+            $scope.district_list = _.keys(data.data)
+            $scope.getTaluk = data.data;
+
+            console.log('data',$scope.getTaluk)
         })
     }
 
