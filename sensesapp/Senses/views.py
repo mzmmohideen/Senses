@@ -82,11 +82,23 @@ def add_masjid(request):
         return HttpResponse(content=json.dumps({'data':get_members}),content_type='Application/json')
 
 def masjid_member(request):
-    data = request.GET
-    taluk = Taluk.objects.get(taluk_name=data['taluk'],district=District.objects.get(district_name=data['district']))
-    if Masjid.objects.filter(taluk=taluk,name=data['masjid']):
-        masjid = Masjid.objects.get(taluk=taluk,name=data['masjid'])
-        get_members = map(lambda x:{'name':x.member_name,'age':x.age,'mobile':x.mobile,'address':x.address,'designation':x.designation},Masjid_members.objects.filter(masjid=masjid))
-        print 'get_members',get_members
-    return HttpResponse(content=json.dumps({'data':get_members}),content_type='Application/json')    
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        taluk = Taluk.objects.get(district=District.objects.get(district_name=data['data']['district']),taluk_name=data['data']['taluk'])
+        masjid_val = Masjid.objects.get(taluk=taluk,name=data['data']['masjid_name'])
+        if Masjid_members.objects.filter(masjid=masjid_val,member_name=data['member_name'],designation=data['designation']):
+            masjid = Masjid_members.objects.filter(masjid=masjid_val,member_name=data['member_name'],designation=data['designation']).update(age=data['age'],mobile=data['mobile'],address=data['address'])
+            response = 'updated'
+        else:
+            masjid = Masjid_members.objects.create(masjid=masjid_val,member_name=data['member_name'],designation=data['designation'],age=data['age'],mobile=data['mobile'],address=data['address'])
+            response = 'success'
+        return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')
+    else:
+        data = request.GET
+        taluk = Taluk.objects.get(taluk_name=data['taluk'],district=District.objects.get(district_name=data['district']))
+        if Masjid.objects.filter(taluk=taluk,name=data['masjid']):
+            masjid = Masjid.objects.get(taluk=taluk,name=data['masjid'])
+            get_members = map(lambda x:{'name':x.member_name,'age':x.age,'mobile':x.mobile,'address':x.address,'designation':x.designation},Masjid_members.objects.filter(masjid=masjid))
+            print 'get_members',get_members
+        return HttpResponse(content=json.dumps({'data':get_members}),content_type='Application/json')    
     

@@ -3,7 +3,7 @@ underscore.factory('_', function() {
     'use strict';
     return window._; // assumes underscore has already been loaded on the page
 });
-var app = angular.module('senses', ['ngSanitize', 'ngCookies', 'ngRoute', 'ui.select', 'underscore']);
+var app = angular.module('senses', ['ngSanitize', 'ngCookies', 'ui.bootstrap', 'ngRoute', 'ui.select', 'underscore']);
 app.run(function($http, $cookies) {
     console.log($cookies.csrftoken)
     $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
@@ -20,6 +20,17 @@ app.directive('ngEnter', function() {
             }
         });
     };
+});
+
+app.service('masjid_data', function($rootScope) {
+    var data = [];
+    this.get_MasjidData = function() {
+        return data;
+    };
+    this.set_MasjidData = function(masjid_data) {
+        data = masjid_data;
+    };
+
 });
 
 app.filter('propsFilter', function() {
@@ -82,7 +93,7 @@ app.directive('fileModel', ['$parse', function($parse) {
         }
     };
 }]);
-app.controller('dashboardCtrl', function($scope,_, $http, $location) {
+app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,$modal) {
     $scope.fetch_data = function() {
         $http.get('/fetchData/', {}).success(function(data) {
             $scope.courses = data.course;
@@ -213,6 +224,35 @@ app.controller('dashboardCtrl', function($scope,_, $http, $location) {
 
             console.log('data',$scope.getTaluk)
         })
+    }
+    $scope.add_members = function(data) {
+        console.log('masjid_data',data)
+        masjid_data.set_MasjidData(data);
+        var modalInstance = $modal.open({
+            templateUrl: 'add_members_modal',
+            controller: add_members_ctrl,
+            backdrop: 'true',
+        });
+    }
+    var add_members_ctrl=function($scope,$http,masjid_data,$rootScope,$timeout,$location,$modalInstance) {
+        $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+        };
+        var data = masjid_data.get_MasjidData();
+        $scope.add_member = function(member_name,age,designation,mobile,address) {
+            console.log('member_name',member_name,data)
+            $http.post('/masjid_member/',{
+                member_name: member_name,
+                data: data,
+                age: age,
+                designation: designation,
+                mobile: mobile,
+                address: address,
+            }).success(function(response) {
+                alert(response.data)
+                console.log('response',response)
+            })
+        }
     }
 
     $scope.positionUpdated = function(module,session) {

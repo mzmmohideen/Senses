@@ -347,31 +347,39 @@
             </div>
             <div class=" col-lg-12" ng-init="fetch_data()" style="padding-right: 20px;border-right: 1px solid #E2E2E2;">
                 <div class="form-group" style="padding-bottom: 34px;">
-                    <ui-select style="display: inline-block;height: 34px;width: 50%;float: left;" on-select="getmasjid=MasjidAddValue.masjid_name;get_masjid(getmasjid)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="MasjidAddValue.masjid_name">
+                    <ui-select ng-show="!new_masjid" style="display: inline-block;height: 34px;width: 50%;float: left;" on-select="getmasjid=MasjidAddValue.masjid_name;get_masjid(getmasjid)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="MasjidAddValue.masjid_name">
                         <ui-select-match placeholder="{{masjid_val}}">{{masjid_val}}</ui-select-match>
                         <ui-select-choices refresh="getmasjid=$select.search;get_masjid(getmasjid)" repeat="mod in masjidList | filter:$select.search">
                             <div ng-bind-html="mod | highlight: $select.search"></div>
                         </ui-select-choices>
                     </ui-select>
-                    <button ng-disabled="masjidList.indexOf(masjid_val)==-1" type="submit" style="width:13%;height: 34px;" ng-click="addMasjid(masjid_val,MasjidAddValue)" class="btn-sm btn btn-primary">Update</button>
-                    <button ng-disabled="masjidList.indexOf(masjid_val)!=-1" type="submit" style="width:13%;height: 34px;" ng-click="addMasjid(masjid_val,MasjidAddValue)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Save New</button>
+                    <input ng-show="new_masjid" style="display: inline-block;height: 34px;width: 50%;float: left;" placeholder="Enter Masjid Name" ng-model="MasjidAddValue.masjid_name" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                    <button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)==-1" type="submit" style="width:13%;height: 34px;" ng-click="addMasjid(masjid_val,MasjidAddValue)" class="btn-sm btn btn-primary">Update</button>
+                    <button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)==-1" type="submit" style="width:13%;height: 34px;" ng-click="new_masjid=true;MasjidAddValue.musallas='';MasjidAddValue.district='';MasjidAddValue.taluk='';MasjidAddValue.address='';MasjidAddValue.masjid_name=''" class="btn-sm btn btn-primary">Cancel</button>
+                    <button ng-show="new_masjid" type="submit" style="width:13%;height: 34px;" ng-click="addMasjid(masjid_val,MasjidAddValue)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Save New</button>
+                    <button ng-show="new_masjid" type="submit" style="width:13%;height: 34px;" ng-click="new_masjid=false" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Cancel</button>
+                    <button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)!=-1" type="submit" style="width:13%;height: 34px;" ng-click="new_masjid=true" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New</button>
                 </div>
             </div>
         <div class=" col-lg-12" style="padding-bottom: 34px;">
-                <select style="display: inline-block;height: 34px;width: 30%;float: left;" ng-model="MasjidAddValue.district" ng-options="gen for gen in district_list" class="form-control">
+                <select style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="MasjidAddValue.district" ng-options="gen for gen in district_list" class="form-control">
                     <option value="">SELECT DISTRICT</option>
                 </select>
-                <select ng-change="getMasjidMember(masjid_val,taluk,district)" style="display: inline-block;height: 34px;width: 30%;float: left;" ng-model="MasjidAddValue.taluk" ng-options="gen for gen in getTaluk[MasjidAddValue.district]" class="form-control">
+                <select ng-change="getMasjidMember(masjid_val,taluk,district)" style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="MasjidAddValue.taluk" ng-options="gen for gen in getTaluk[MasjidAddValue.district]" class="form-control">
                     <option value="">SELECT TALUK</option>
                 </select>
+                <input style="display: inline-block;width: 15%;height: 34px;float: left;" type="text" placeholder="Number of Musallas" ng-model="MasjidAddValue.musallas" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                <input style="display: inline-block;width: 35%;height: 34px;float: left;" type="text" placeholder="Address" ng-model="MasjidAddValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
         </div>
-        <div class=" col-lg-12" style="padding-bottom: 34px;">
-            <input ng-show="masjidList.indexOf(masjid_val)!=-1" style="display: inline-block;height: 34px;width: 25%;float: left;" placeholder="Enter Masjid Name" ng-model="MasjidAddValue.masjid_name" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+        <!--<div class=" col-lg-12" style="padding-bottom: 34px;">
                     <input ng-show="masjidList.indexOf(masjid_val)==-1" style="display: inline-block;height: 34px;width: 25%;float: left;" placeholder="Enter Masjid Name" ng-model="masjid_val" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required" readonly>
                     <input style="display: inline-block;width: 15%;height: 34px;float: left;" type="text" placeholder="Number of Musallas" ng-model="MasjidAddValue.musallas" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
                     <input style="display: inline-block;width: 35%;height: 34px;float: left;" type="text" placeholder="Address" ng-model="MasjidAddValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-        </div>            
+        </div>-->            
         <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Members <button ng-disabled="masjidList.indexOf(masjid_val)==-1" type="submit" style="width: 55px;height: 55px;float: right;border-radius: 30px;margin-top: -5px;" ng-click="add_members(MasjidAddValue)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New</button></h1>
+            </div>
             <table class="table table-striped table-bordered table-hover ng-scope">
                 <thead>
                     <tr>
@@ -388,11 +396,7 @@
                     <tr ng-show="courses.length==0">
                         <td colspan="6" style="text-align:center;" class="ng-binding">No Member Data Found!</td>
                     </tr>
-                    <tr>
-                        <td class="ng-binding"><input type="text" placeholder="Member Name"> </td>
-                        <td class="ng-binding"><input type="text" placeholder="Age"> </td>
-                    </tr>
-                    <tr ng-show="courses.length!=0" ng-repeat="course in unique_course" class="ng-scope">
+                    <tr ng-repeat="course in unique_course" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td class="ng-binding">{{course.module}}</td>
                         <td class="ng-binding">{{course.course_type}}</td>
@@ -405,6 +409,50 @@
             </table>
         </div>
         <!-- /.row -->
+    </script>
+    <script type="text/ng-template" id="add_members_modal">
+     <div id="add_watchlist_popup" style="">
+            <div class="popup-header">
+                <span style="margin-left:35%">Add New Member</span>
+                <span class="ng-modal-close" ng-click="cancel()"><i id="closing" style="font-size:14px;float:right;cursor:pointer;" class="fa fa-times"></i></span>
+            </div>
+             <form class="form-horizontal">
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-3">Member Name</label>
+                            <div class="col-xs-9">
+                                <input class="form-control" type="text" ng-model="member_name" custom-validation ng-change="clear_error()" placeholder="Member Name" />
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-3">Age</label>
+                            <div class="col-xs-9">
+                                <input class="form-control" type="text" ng-model="age" valid-number ng-change="clear_error()" placeholder="Age" />
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-3">Designation</label>
+                            <div class="col-xs-9">
+                                <input class="form-control" type="text" ng-model="designation" ng-change="clear_error()" placeholder="Designation" />
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-3">Mobile</label>
+                            <div class="col-xs-9">
+                                <input class="form-control" type="text" ng-model="mobile" ng-change="clear_error()" placeholder="Mobile Number" />
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-3">Address</label>
+                            <div class="col-xs-9">
+                                <input class="form-control" type="text" ng-model="address" ng-change="clear_error()" placeholder="Address" />
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:5px;">
+                            <input type="submit" class="btn btn-primary" ng-click="add_member(member_name,age,designation,mobile,address);" value="Save and Continue" />
+                            <input type="submit" class="btn btn-primary" ng-click="add_member(member_name,age,designation,mobile,address);" value="Save and Exit" />
+                        </div>
+                    </form>
+    </div>
     </script>
     <script type="text/ng-template" id="family.html">
         <div class="row">
