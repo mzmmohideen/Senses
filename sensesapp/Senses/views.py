@@ -101,4 +101,18 @@ def masjid_member(request):
             get_members = map(lambda x:{'name':x.member_name,'age':x.age,'mobile':x.mobile,'address':x.address,'designation':x.designation},Masjid_members.objects.filter(masjid=masjid))
             print 'get_members',get_members
         return HttpResponse(content=json.dumps({'data':get_members}),content_type='Application/json')    
-    
+
+def familyData(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)['value']
+        print 'data',data
+        taluk = Taluk.objects.get(taluk_name=data['taluk'],district=District.objects.get(district_name=data['district']))
+        print 'taluk',taluk
+        masjid = Masjid.objects.get(name=data['masjid']['name'],taluk=taluk)
+        print 'masjid',masjid
+        if Family.objects.filter(family_id=data['familyid']):
+            family = Family.objects.filter(family_id=data['familyid'])
+        else:
+            family = Family.objects.create(family_id=data['familyid'])
+        return HttpResponse(content=json.dumps({'data':data}),content_type='Application/json')
+

@@ -19,6 +19,7 @@ urlpatterns = patterns('',
     url(r'^admin/', include(admin.site.urls)),
     url(r'^add_masjid/',add_masjid),
     url(r'^masjid_member/',masjid_member),
+    url(r'^familyData/',familyData),
     # Examples:
     # url(r'^$', 'sensesapp.views.home', name='home'),
     # url(r'^sensesapp/', include('sensesapp.foo.urls')),

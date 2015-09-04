@@ -2,8 +2,8 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
-STATUS = (('Male', 'Male'), ('Female', 'Female'))
-FINANCIAL = (('Male', 'Male'), ('Female', 'Female'))
+STATUS = (('Own', 'Own'), ('Rent', 'Rent'))
+FINANCIAL = (('A - Well Settled', 'A - Well Settled'), ('B - Full Filled', 'B - Full Filled'), ('C - Middle Class', 'C - Middle Class'), ('D - Poor', 'D - Poor'), ('E - Very Poor', 'E - Very Poor'))
 
 class District(models.Model):
     district_name = models.CharField(max_length=50,unique=True)
@@ -27,12 +27,11 @@ class Masjid_members(models.Model):
     designation = models.CharField(max_length=20)
 
 class Family(models.Model):
-    ration_card_id =  models.CharField(max_length=20)
+    muhalla = models.ForeignKey(Masjid)
+    family_id = models.CharField(max_length=20,unique=True)
+    ration_card =  models.CharField(max_length=20)
     address = models.CharField(max_length=50)
-    city = models.CharField(max_length=20)
-    state = models.CharField(max_length=20)
     mobile = models.CharField(max_length=20)
-    mother_tongue = models.CharField(max_length=20)
     house_type = models.CharField(max_length=50, choices=STATUS)
     toilet = models.BooleanField(default=True)
     financial_status = models.CharField(max_length=50, choices=FINANCIAL)
@@ -49,6 +48,7 @@ class Member(models.Model):
     age = models.CharField(max_length=10)
     Relation = models.CharField(max_length=20)
     marital_status = models.CharField(max_length=20)
+    mother_tongue = models.CharField(max_length=20)
     voter_status = models.BooleanField(default=False)
     family = models.ForeignKey(Family)
     job_status = models.CharField(max_length=20)
