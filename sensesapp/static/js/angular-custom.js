@@ -74,6 +74,9 @@ app.config(['$routeProvider',
         when('/family', {
             templateUrl: 'family.html',
         }).
+        when('/schemes', {
+            templateUrl: 'schemes.html',
+        }).
         otherwise({
             redirectTo: '/dashboard'
         });
@@ -121,6 +124,25 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             }    
         }
     }
+    $scope.scheme_val = 'SELECT SCHEMES';
+    $scope.get_scheme = function(scheme) {
+        if(!scheme) {
+            $scope.scheme_val = 'SELECT SCHEMES';
+        }
+        else {
+            console.log('val',scheme)
+            $scope.scheme_val = scheme;
+        }
+    }
+    $scope.sub_scheme_val = 'SELECT SUB SCHEME';
+    $scope.get_sub_scheme = function(scheme) {
+        if(!scheme) {
+            $scope.sub_scheme_val = 'SELECT SUB SCHEME';
+        }
+        else {
+            $scope.sub_scheme_val = scheme;
+        }
+    }
     $scope.district_val = 'SELECT DISTRICT';
     $scope.get_district = function(district) {
         if(!district) {
@@ -149,6 +171,16 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.masjid_val = masjid;
             $scope.getMasjidData();
         }
+    }
+    $scope.value = '';
+    $scope.get_val = function(val) {
+        if(!val) {
+            $scope.value = 'Select or Enter Value'
+        }
+        else {
+            $scope.value = val;
+        }
+
     }
     $scope.MasjidAddValue = {
         masjid_name: '',
@@ -222,6 +254,20 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.getLocation();
         })
     }
+    $scope.add_schemes = function(scheme,sub,field,condition,value) {
+        console.log('val',scheme,'taluk',sub)
+        $http.post('/SchemeData/',{
+            scheme: scheme,
+            sub: sub,
+            field: field,
+            condition: condition,
+            value: value,
+        }).success(function(data) {
+            console.log('data',data)
+            alert(data.data)
+            $scope.getLocation();
+        })
+    }
     $scope.getMahallaData = function(val) {
         $scope.muhallaData = _.filter($scope.mahallaList, function(data){ return data.district == val.district && data.taluk == val.taluk })
     }
@@ -274,11 +320,19 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
 
     $scope.family_val = '';
     $scope.get_family = function(family) {
+        console.log(family,'family')
         if(!family) {
             $scope.family_val = 'Type or Select Family ID from the List';
         }
         else {
-            $scope.family_val = family;
+            $scope.family_val = family.family_id;
+            $scope.FamilyValue.ration_card = family.ration_card;
+            $scope.FamilyValue.mobile_no = family.mobile;
+            $scope.FamilyValue.address = family.address;
+            $scope.FamilyValue.ration_card = family.ration_card;
+            $scope.FamilyValue.house = family.house;
+            $scope.FamilyValue.toilet = family.toilet;
+            $scope.FamilyValue.financial = family.financial;
             $scope.getMasjidData();
         }
     }
@@ -308,6 +362,15 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         }).success(function(data) {
             console.log('val',data)
             alert(data.data)
+            $scope.getFamilyinfo();
+        })
+    }
+
+    $scope.getFamilyinfo = function() {
+        console.log('get')
+        $http.get('/familyData/', {}).success(function(data) {
+            $scope.familyList = data.data;
+            console.log('val',data)
         })
     }
 

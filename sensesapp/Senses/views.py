@@ -66,6 +66,29 @@ def addLocation(request):
         print 'data',data
         return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
 
+def SchemeData(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        try:
+            if Scheme.objects.filter(scheme_type=data['scheme'],name=data['sub']):
+                return HttpResponse(content=json.dumps({'data':'Scheme and Sub Scheme Exist!'}), content_type='Application/json')
+            else:
+                taluk = Scheme.objects.create(scheme_type=data['scheme'],name=data['sub'])
+                return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
+        except:
+            print '?????',repr(format_exc())
+            district = District.objects.create(district_name=data['district'])
+            taluk = Taluk.objects.create(district=district,taluk_name=data['taluk'])
+        return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
+    else:
+        print request.GET
+        data = defaultdict(list)
+        for i in Taluk.objects.all():
+            data[i.district.district_name].append(i.taluk_name)
+        # taluk = map(lambda x:{'district'}    Taluk.objects.all())
+        print 'data',data
+        return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
+
 def add_masjid(request):
     if request.method == 'POST':        
         data = json.loads(request.body)
@@ -109,10 +132,17 @@ def familyData(request):
         taluk = Taluk.objects.get(taluk_name=data['taluk'],district=District.objects.get(district_name=data['district']))
         print 'taluk',taluk
         masjid = Masjid.objects.get(name=data['masjid']['name'],taluk=taluk)
+        toilet = True if data['toilet'] == 'Yes' else False
         print 'masjid',masjid
         if Family.objects.filter(family_id=data['familyid']):
-            family = Family.objects.filter(family_id=data['familyid'])
+            family = Family.objects.filter(family_id=data['familyid']).update(muhalla=masjid,ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'])
+            response = 'Family Data Saved Updated Successfully!'
         else:
-            family = Family.objects.create(family_id=data['familyid'])
-        return HttpResponse(content=json.dumps({'data':data}),content_type='Application/json')
+            family = Family.objects.create(family_id=data['familyid'],muhalla=masjid,ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'])
+            response = 'Family Data Saved Successfully!'
+        return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')
+    else:
+        family = map(lambda x:{'family_id':x.family_id,'muhalla':x.muhalla.name,'ration_card':x.ration_card,'address':x.address,'mobile':x.mobile,'house_type':x.house_type,'toilet':x.toilet,'financial_status':x.financial_status},Family.objects.all())
+        return HttpResponse(content=json.dumps({'data':family}),content_type='Application/json')
+        
 

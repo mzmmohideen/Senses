@@ -38,7 +38,13 @@ class Family(models.Model):
 
 class Scheme(models.Model):
     scheme_type = models.CharField(max_length=20)
+
+class SubScheme(models.Model):
+    scheme = models.ForeignKey(Scheme)    
     name = models.CharField(max_length=20)
+    field = models.CharField(max_length=20)
+    conditions = models.CharField(max_length=20)
+    value = models.CharField(max_length=20)
     description = models.CharField(max_length=30,null=True)# Create your views here.
     
 class Member(models.Model):
@@ -54,8 +60,10 @@ class Member(models.Model):
     job_status = models.CharField(max_length=20)
     curr_location = models.CharField(max_length=20)
     to_join_madarasa = models.BooleanField(max_length=20) 
-    schemes = models.ManyToManyField(Scheme)
 
-
+class Member_scheme(models.Model):
+    member = models.ForeignKey(Member,null=True)
+    scheme = models.ForeignKey(SubScheme,null=True)
+    status = models.BooleanField(default=False)
 
 # Create your models here.
