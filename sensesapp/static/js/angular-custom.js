@@ -136,12 +136,24 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
     }
     $scope.sub_scheme_val = 'SELECT SUB SCHEME';
     $scope.get_sub_scheme = function(scheme) {
+        console.log('val1',typeof(scheme))
         if(!scheme) {
             $scope.sub_scheme_val = 'SELECT SUB SCHEME';
         }
-        else {
+        else if(typeof(scheme) == 'string') {
             $scope.sub_scheme_val = scheme;
         }
+        else if(typeof(scheme) == 'object') {
+            $scope.sub_scheme_val = scheme.sub;
+        }
+        console.log('val',$scope.sub_scheme_val)
+    }
+    $scope.getScheme = function() {
+        $http.get('/SchemeData/',{}).success(function(data) {
+            console.log('datascheme',data)
+            $scope.scheme_list = _.keys(data.data)
+            $scope.getSubScheme = data.data;
+        })
     }
     $scope.district_val = 'SELECT DISTRICT';
     $scope.get_district = function(district) {
@@ -152,6 +164,38 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             console.log('val',district)
             $scope.district_val = district;
         }
+    }
+    $scope.scheme_values = {
+        scheme: '',
+        sub_scheme: '',
+        field: '',
+        condition: '',
+        value: '',
+    }
+    $scope.field_list = ['Age','Marital Status','Gender','Qualification','Voter ID','Physically Challenged','RelationShip','Occupation']
+    $scope.condition_list = function(field) {
+        if(field == 'Age' || field == 'Qualification') {
+            $scope.conditionsData = ['<=','>=','=','>','<','!=']
+        }
+        else if(field == 'Marital Status' || field == 'Gender' || field == 'Voter ID' || field == 'Physically Challenged' || field == 'RelationShip' || field == 'Occupation') {
+            $scope.conditionsData = ['=','!=']
+        }
+        if(field == 'Marital Status') {
+            $scope.getValue = ['Married','Unmarried','Widow','Devorced','Aged Unmarried Woman']
+        }
+        else if(field == 'Gender') {
+            $scope.getValue = ['Male','Female']
+        }
+        else if(field == 'Physically Challenged' || field == 'RelationShip') {
+            $scope.getValue = ['Yes','No']
+        }
+        else {
+            console.log('var',field)
+            $scope.get_val()
+            $scope.scheme_values.value = ''
+            $scope.getValue = []
+        }
+        
     }
     $scope.taluk_val = 'SELECT TALUK';
     $scope.get_taluk = function(taluk) {
@@ -254,17 +298,18 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.getLocation();
         })
     }
-    $scope.add_schemes = function(scheme,sub,field,condition,value) {
-        console.log('val',scheme,'taluk',sub)
+    $scope.add_schemes = function(scheme,sub,scheme_values) {
+        console.log('val',scheme,'taluk',sub,'scheme_values',scheme_values)
         $http.post('/SchemeData/',{
             scheme: scheme,
             sub: sub,
-            field: field,
-            condition: condition,
-            value: value,
+            field: scheme_values.field,
+            condition: scheme_values.condition,
+            value: scheme_values.value,
         }).success(function(data) {
             console.log('data',data)
             alert(data.data)
+            window.location.reload()
             $scope.getLocation();
         })
     }

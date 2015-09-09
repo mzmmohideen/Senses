@@ -67,26 +67,35 @@ def addLocation(request):
         return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
 
 def SchemeData(request):
+    print 'request'
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
-            if Scheme.objects.filter(scheme_type=data['scheme'],name=data['sub']):
+            print '//////'
+            scheme = Scheme.objects.get(scheme_type=data['scheme'])
+            if SubScheme.objects.filter(scheme=scheme,name=data['sub'],field=data['field'],conditions=data['condition'],value=data['value']):
                 return HttpResponse(content=json.dumps({'data':'Scheme and Sub Scheme Exist!'}), content_type='Application/json')
+            elif SubScheme.objects.filter(scheme=scheme,name=data['sub']):
+                sub_scheme = SubScheme.objects.filter(scheme=scheme,name=data['sub']).update(field=data['field'],conditions=data['condition'],value=data['value'])
+                return HttpResponse(content=json.dumps({'data':'Updated'}), content_type='Application/json')
             else:
-                taluk = Scheme.objects.create(scheme_type=data['scheme'],name=data['sub'])
+                print 'save',scheme
+                subScheme = SubScheme.objects.create(scheme=scheme,name=data['sub'],field=data['field'],conditions=data['condition'],value=data['value'])
                 return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
         except:
-            print '?????',repr(format_exc())
-            district = District.objects.create(district_name=data['district'])
-            taluk = Taluk.objects.create(district=district,taluk_name=data['taluk'])
+            print '????',repr(format_exc())
+            scheme = Scheme.objects.create(scheme_type=data['scheme'])
+            sub_scheme = SubScheme.objects.create(scheme=scheme,name=data['sub'],field=data['field'],conditions=data['condition'],value=data['value'])
+            print 'scheme',scheme,'sub_scheme',sub_scheme 
         return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
     else:
-        print request.GET
+        print 'request.GET'
         data = defaultdict(list)
-        for i in Taluk.objects.all():
-            data[i.district.district_name].append(i.taluk_name)
+        for i in SubScheme.objects.all():
+            print 'i',i
+            data[i.scheme.scheme_type].append({'sub':i.name,'field':i.field,'conditions':i.conditions,'value':i.value})
         # taluk = map(lambda x:{'district'}    Taluk.objects.all())
-        print 'data',data
+        print 'scheme',data
         return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
 
 def add_masjid(request):

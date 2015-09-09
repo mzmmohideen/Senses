@@ -2,8 +2,12 @@ from django.db import models
 from django.utils import timezone
 from django.contrib.auth.models import User
 
+GENDER = (('MALE','MALE'), ('FEMALE','FEMALE'))
 STATUS = (('Own', 'Own'), ('Rent', 'Rent'))
 FINANCIAL = (('A - Well Settled', 'A - Well Settled'), ('B - Full Filled', 'B - Full Filled'), ('C - Middle Class', 'C - Middle Class'), ('D - Poor', 'D - Poor'), ('E - Very Poor', 'E - Very Poor'))
+MARITAL = (('Married','Married'), ('Unmarried','Unmarried'), ('Widow','Widow'),('Devorced','Devorced'),('Aged Unmarried Woman','Aged Unmarried Woman'))
+LOCATION = (('Local','Local'), ('Outstation','Outstation'), ('Foreign','Foreign'))
+MADARASA = (('Boys For Makthab 4-15','Boys For Makthab 4-15'), ('Girls For Makthab 4-15','Girls For Makthab 4-15'), ('Adult Makthab','Adult Makthab'), ('Interest in Aalim/Hifz','Interest in Aalim/Hifz'), ('Interest in Niswan','Interest in Niswan'), ('Interest in 1yr Muallim','Interest in 1yr Muallim'))
 
 class District(models.Model):
     district_name = models.CharField(max_length=50,unique=True)
@@ -37,33 +41,60 @@ class Family(models.Model):
     financial_status = models.CharField(max_length=50, choices=FINANCIAL)
 
 class Scheme(models.Model):
-    scheme_type = models.CharField(max_length=20)
+    scheme_type = models.CharField(max_length=50,unique=True)
 
 class SubScheme(models.Model):
     scheme = models.ForeignKey(Scheme)    
-    name = models.CharField(max_length=20)
-    field = models.CharField(max_length=20)
-    conditions = models.CharField(max_length=20)
-    value = models.CharField(max_length=20)
+    name = models.CharField(max_length=50)
+    field = models.CharField(max_length=50,null=True)
+    conditions = models.CharField(max_length=20,null=True)
+    value = models.CharField(max_length=20,null=True)
     description = models.CharField(max_length=30,null=True)# Create your views here.
     
 class Member(models.Model):
-    govt_id = models.CharField(max_length=20)
-    name = models.CharField(max_length=20)
-    gender = models.CharField(max_length=10)
+    mem_id = models.CharField(max_length=20,unique=True)
+    name = models.CharField(max_length=30)
+    gender = models.CharField(max_length=10,choices=GENDER)
     age = models.CharField(max_length=10)
     Relation = models.CharField(max_length=20)
-    marital_status = models.CharField(max_length=20)
-    mother_tongue = models.CharField(max_length=20)
+    marital_status = models.CharField(max_length=20,choices=MARITAL)
+    mother_tongue = models.CharField(max_length=20,null=True)
+    disability = models.BooleanField(default=False)
     voter_status = models.BooleanField(default=False)
     family = models.ForeignKey(Family)
-    job_status = models.CharField(max_length=20)
-    curr_location = models.CharField(max_length=20)
-    to_join_madarasa = models.BooleanField(max_length=20) 
+    occupation = models.CharField(max_length=30,null=True)
+    curr_location = models.CharField(max_length=20,choices=LOCATION)
+    Makthab = models.BooleanField(default=False)
+    madarasa_details = models.CharField(max_length=50,choices=MADARASA,null=True) 
 
 class Member_scheme(models.Model):
     member = models.ForeignKey(Member,null=True)
     scheme = models.ForeignKey(SubScheme,null=True)
     status = models.BooleanField(default=False)
 
+class Disease(models.Model):
+    disease_name = models.CharField(max_length=50,unique=True)
+
+class Surgery(models.Model):
+    member = models.ForeignKey(Member)
+    disease = models.ForeignKey(Disease)
+    hospital_name = models.CharField(max_length=50,null=True)
+    cost = models.CharField(max_length=20,null=True)
+    cash_inHand = models.CharField(max_length=20,null=True)
+
+class Medical(models.Model):
+    member = models.ForeignKey(Member)
+    disorder_name = models.CharField(max_length=50,null=True)
+    medicine_needs = models.CharField(max_length=200,null=True)
+    cost = models.CharField(max_length=20,null=True)
+
+class ChronicDisease(models.Model):
+    member = models.ForeignKey(Member)
+    disease_name = models.ForeignKey(Disease)
+    doctor_name = models.CharField(max_length=50,null=True)
+    cost = models.CharField(max_length=20,null=True)
+    status = models.BooleanField(default=False)
+    details = models.CharField(max_length=300,null=True)
+
+    
 # Create your models here.
