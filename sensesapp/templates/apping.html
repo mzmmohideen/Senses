@@ -532,22 +532,26 @@
                         </ui-select-choices>
                     </ui-select>
                     <input ng-show="new_family" style="display: inline-block;height: 34px;width: 50%;float: left;" placeholder="Enter Family ID" ng-model="FamilyValue.familyid" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                    <button ng-show="!new_family" ng-disabled="familyList.indexOf(family_val)==-1" type="submit" style="width:13%;height: 34px;" ng-click="addFamily(family_val,FamilyValue)" class="btn-sm btn btn-primary">Update</button>
-                    <button ng-show="!new_family" ng-disabled="familyList.indexOf(family_val)==-1" type="submit" style="width:13%;height: 34px;" ng-click="new_family=true;FamilyValue.ration_card='';FamilyValue.address='';FamilyValue.familyid='';FamilyValue.mobile='';FamilyValue.house='';FamilyValue.toilet='';FamilyValue.financial='';" class="btn-sm btn btn-primary">Cancel</button>
-                    <button ng-show="new_family" type="submit" style="width:13%;height: 34px;" ng-click="addFamily(family_val,FamilyValue)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Save New</button>
-                    <button ng-show="new_family" type="submit" style="width:13%;height: 34px;" ng-click="new_family=false" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Cancel</button>
-                    <button ng-show="!new_family" ng-disabled="familyList.indexOf(family_val)!=-1" type="submit" style="width:13%;height: 34px;" ng-click="new_family=true" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New</button>
+                    <button ng-show="!new_family" ng-disabled="family_val=='' || family_val=='Type or Select Family ID from the List'" type="submit" style="width:13%;height: 34px;" ng-click="addFamily(family_val,FamilyValue,'update')" class="btn-sm btn btn-primary">Update</button>
+                    <button ng-show="!new_family" ng-disabled="family_val=='' || family_val=='Type or Select Family ID from the List'" type="submit" style="width:13%;height: 34px;" ng-click="new_family=true;get_family();" class="btn-sm btn btn-primary">Cancel</button>
+                    <!--<button ng-show="!new_family" ng-disabled="familyList.indexOf(family_val)==-1">-->
+                    <button ng-show="new_family" type="submit" style="width:13%;height: 34px;" ng-click="addFamily(family_val,FamilyValue,'new')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Save New</button>
+                    <button ng-show="new_family" type="submit" style="width:13%;height: 34px;" ng-click="new_family=false;get_family()" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Cancel</button>
+                    <button ng-show="!new_family" ng-disabled="familyList.indexOf(family_val)!=-1" type="submit" style="width:13%;height: 34px;" ng-click="new_family=true;get_family()" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New</button>
                 </div>
             </div>
         <div class=" col-lg-12" style="padding-bottom: 34px;">
                 <select style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="FamilyValue.district" ng-options="gen for gen in district_list" class="form-control">
                     <option value="">SELECT DISTRICT</option>
                 </select>
-                <select ng-change="getMahallaData(FamilyValue)" style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="FamilyValue.taluk" ng-options="gen for gen in getTaluk[FamilyValue.district]" class="form-control">
+                <select ng-change="getMahallaData(FamilyValue);FamilyValue.masjid=''" style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="FamilyValue.taluk" ng-options="gen for gen in getTaluk[FamilyValue.district]" class="form-control">
                     <option value="">SELECT TALUK</option>
                 </select>
-                <select style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="FamilyValue.masjid" ng-options="gen.name for gen in muhallaData" class="form-control">
-                    <option value="">SELECT MUHALLA</option>
+                <select ng-if="!FamilyValue.masjid"  style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="FamilyValue.masjid" ng-options="gen.name for gen in muhallaData" class="form-control">
+                    <option value="">SELECT MUHALLA </option>
+                </select>
+                <select ng-if="FamilyValue.masjid"  style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="FamilyValue.masjid" ng-options="gen.name for gen in muhallaData" class="form-control">
+                    <option value="">{{FamilyValue.masjid}} </option>
                 </select>
         </div>
         <div class=" col-lg-12" style="padding-bottom: 34px;">
@@ -557,12 +561,22 @@
                 <select style="display: inline-block;height: 34px;width: 15%;float: left;" ng-model="FamilyValue.house" ng-options="house for house in ['Rent','Own']" class="form-control">
                     <option value="">House Type</option>
                 </select>
+                <select style="display: inline-block;height: 34px;width: 15%;float: left;" ng-model="FamilyValue.donor" ng-options="donor for donor in ['Yes','No']" class="form-control">
+                    <option value="">Willing to be a Financial Donor?</option>
+                </select>
+                <select style="display: inline-block;height: 34px;width: 15%;float: left;" ng-model="FamilyValue.volunteer" ng-options="volunteer for volunteer in ['Yes','No']" class="form-control">
+                    <option value="">Want to be a Volunteer?</option>
+                </select>               
+                <select style="display: inline-block;height: 34px;width: 15%;float: left;" ng-model="FamilyValue.health_insurance" ng-options="health for health in ['Yes','No']" class="form-control">
+                    <option value="">Health Insurance Scheme Card Available?</option>
+                </select>
                 <select style="display: inline-block;height: 34px;width: 15%;float: left;" ng-model="FamilyValue.toilet" ng-options="toilet for toilet in ['Yes','No']" class="form-control">
                     <option value="">Toilet Available?</option>
                 </select>
                 <select style="display: inline-block;height: 34px;width: 15%;float: left;" ng-model="FamilyValue.financial" ng-options="financial for financial in ['A - Well Settled','B - Full Filled','C - Middle Class','D - Poor','E - Very Poor']" class="form-control">
-                    <option value="">House Type</option>
+                    <option value="">Financial Status</option>
                 </select>
+                <input style="display: inline-block;width: 25%;height: 34px;float: left;" type="text" placeholder="Any Emergency Needs in this Family?" ng-model="FamilyValue.family_needs" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
         </div>
         <!--<div class=" col-lg-12" style="padding-bottom: 34px;">
                     <input ng-show="masjidList.indexOf(masjid_val)==-1" style="display: inline-block;height: 34px;width: 25%;float: left;" placeholder="Enter Masjid Name" ng-model="masjid_val" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required" readonly>

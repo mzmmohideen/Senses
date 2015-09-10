@@ -58,12 +58,10 @@ def addLocation(request):
             taluk = Taluk.objects.create(district=district,taluk_name=data['taluk'])
         return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
     else:
-        print request.GET
         data = defaultdict(list)
         for i in Taluk.objects.all():
             data[i.district.district_name].append(i.taluk_name)
         # taluk = map(lambda x:{'district'}    Taluk.objects.all())
-        print 'data',data
         return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
 
 def SchemeData(request):
@@ -71,7 +69,6 @@ def SchemeData(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
-            print '//////'
             scheme = Scheme.objects.get(scheme_type=data['scheme'])
             if SubScheme.objects.filter(scheme=scheme,name=data['sub'],field=data['field'],conditions=data['condition'],value=data['value']):
                 return HttpResponse(content=json.dumps({'data':'Scheme and Sub Scheme Exist!'}), content_type='Application/json')
@@ -83,19 +80,14 @@ def SchemeData(request):
                 subScheme = SubScheme.objects.create(scheme=scheme,name=data['sub'],field=data['field'],conditions=data['condition'],value=data['value'])
                 return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
         except:
-            print '????',repr(format_exc())
             scheme = Scheme.objects.create(scheme_type=data['scheme'])
             sub_scheme = SubScheme.objects.create(scheme=scheme,name=data['sub'],field=data['field'],conditions=data['condition'],value=data['value'])
-            print 'scheme',scheme,'sub_scheme',sub_scheme 
         return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
     else:
-        print 'request.GET'
         data = defaultdict(list)
         for i in SubScheme.objects.all():
-            print 'i',i
             data[i.scheme.scheme_type].append({'sub':i.name,'field':i.field,'conditions':i.conditions,'value':i.value})
         # taluk = map(lambda x:{'district'}    Taluk.objects.all())
-        print 'scheme',data
         return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
 
 def add_masjid(request):
@@ -110,7 +102,6 @@ def add_masjid(request):
             return HttpResponse(content=json.dumps({'data':'success!'}),content_type='Application/json')
     else:
         get_members = map(lambda x:{'name':x.name,'taluk':x.taluk.taluk_name,'district':x.taluk.district.district_name,'musallas':x.musallas,'location':x.location},Masjid.objects.all())
-        print 'get_members',get_members
         return HttpResponse(content=json.dumps({'data':get_members}),content_type='Application/json')
 
 def masjid_member(request):
@@ -131,27 +122,31 @@ def masjid_member(request):
         if Masjid.objects.filter(taluk=taluk,name=data['masjid']):
             masjid = Masjid.objects.get(taluk=taluk,name=data['masjid'])
             get_members = map(lambda x:{'name':x.member_name,'age':x.age,'mobile':x.mobile,'address':x.address,'designation':x.designation},Masjid_members.objects.filter(masjid=masjid))
-            print 'get_members',get_members
         return HttpResponse(content=json.dumps({'data':get_members}),content_type='Application/json')    
 
 def familyData(request):
     if request.method == 'POST':
         data = json.loads(request.body)['value']
-        print 'data',data
+        print 'data',len(data['mobile_no'])
         taluk = Taluk.objects.get(taluk_name=data['taluk'],district=District.objects.get(district_name=data['district']))
-        print 'taluk',taluk
-        masjid = Masjid.objects.get(name=data['masjid']['name'],taluk=taluk)
+        masjid = Masjid.objects.get(name=data['masjid'],taluk=taluk)
         toilet = True if data['toilet'] == 'Yes' else False
-        print 'masjid',masjid
-        if Family.objects.filter(family_id=data['familyid']):
-            family = Family.objects.filter(family_id=data['familyid']).update(muhalla=masjid,ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'])
-            response = 'Family Data Saved Updated Successfully!'
-        else:
-            family = Family.objects.create(family_id=data['familyid'],muhalla=masjid,ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'])
-            response = 'Family Data Saved Successfully!'
-        return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')
+        donor = True if data['donor'] == 'Yes' else False
+        volunteer = True if data['volunteer'] == 'Yes' else False
+        insurance = True if data['health_insurance'] == 'Yes' else False
+        try:            
+            if Family.objects.filter(family_id=data['familyid']):
+                family = Family.objects.filter(family_id=data['familyid']).update(muhalla=masjid,ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],donor=donor,volunteer=volunteer,health_insurance=insurance,family_needs=data['family_needs'])
+                response = 'Family Data Saved Updated Successfully!'
+            else:
+                family = Family.objects.create(family_id=data['familyid'],muhalla=masjid,ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],donor=donor,volunteer=volunteer,health_insurance=insurance,family_needs=data['family_needs'])
+                response = 'Family Data Saved Successfully!'
+            return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')
+        except:
+            print repr(format_exc())
+            
     else:
-        family = map(lambda x:{'family_id':x.family_id,'muhalla':x.muhalla.name,'ration_card':x.ration_card,'address':x.address,'mobile':x.mobile,'house_type':x.house_type,'toilet':x.toilet,'financial_status':x.financial_status},Family.objects.all())
+        family = map(lambda x:{'family_id':x.family_id,'muhalla':x.muhalla.name,'taluk':x.muhalla.taluk.taluk_name,'district_name':x.muhalla.taluk.district.district_name,'ration_card':x.ration_card,'address':x.address,'mobile':x.mobile,'house_type':x.house_type,'donor':x.donor,'volunteer':x.volunteer,'health_insurance':x.health_insurance,'family_needs':x.family_needs,'toilet':x.toilet,'financial_status':x.financial_status},Family.objects.all())
         return HttpResponse(content=json.dumps({'data':family}),content_type='Application/json')
         
 

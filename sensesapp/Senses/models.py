@@ -11,6 +11,7 @@ MADARASA = (('Boys For Makthab 4-15','Boys For Makthab 4-15'), ('Girls For Makth
 
 class District(models.Model):
     district_name = models.CharField(max_length=50,unique=True)
+    district_code = models.CharField(max_length=10,unique=True)
 
 class Taluk(models.Model):
     district = models.ForeignKey(District)
@@ -32,10 +33,14 @@ class Masjid_members(models.Model):
 
 class Family(models.Model):
     muhalla = models.ForeignKey(Masjid)
-    family_id = models.CharField(max_length=20,unique=True)
-    ration_card =  models.CharField(max_length=20)
+    family_id = models.CharField(max_length=30,unique=True)
+    ration_card =  models.CharField(max_length=30)
     address = models.CharField(max_length=50)
     mobile = models.CharField(max_length=20)
+    donor = models.BooleanField(default=False) 
+    volunteer = models.BooleanField(default=False)
+    health_insurance = models.BooleanField(default=False)
+    family_needs = models.TextField(null=True)
     house_type = models.CharField(max_length=50, choices=STATUS)
     toilet = models.BooleanField(default=True)
     financial_status = models.CharField(max_length=50, choices=FINANCIAL)
