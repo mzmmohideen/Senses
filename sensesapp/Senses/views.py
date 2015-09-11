@@ -127,7 +127,7 @@ def masjid_member(request):
 def familyData(request):
     if request.method == 'POST':
         data = json.loads(request.body)['value']
-        print 'data',len(data['mobile_no'])
+        print 'data',data
         taluk = Taluk.objects.get(taluk_name=data['taluk'],district=District.objects.get(district_name=data['district']))
         masjid = Masjid.objects.get(name=data['masjid'],taluk=taluk)
         toilet = True if data['toilet'] == 'Yes' else False
@@ -137,7 +137,7 @@ def familyData(request):
         try:            
             if Family.objects.filter(family_id=data['familyid']):
                 family = Family.objects.filter(family_id=data['familyid']).update(muhalla=masjid,ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],donor=donor,volunteer=volunteer,health_insurance=insurance,family_needs=data['family_needs'])
-                response = 'Family Data Saved Updated Successfully!'
+                response = 'Family Data Updated Successfully!'
             else:
                 family = Family.objects.create(family_id=data['familyid'],muhalla=masjid,ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],donor=donor,volunteer=volunteer,health_insurance=insurance,family_needs=data['family_needs'])
                 response = 'Family Data Saved Successfully!'

@@ -592,16 +592,41 @@
                     <tr>
                         <th>S.No</th>
                         <th>Name</th>
-                        <th>Age</th>
-                        <th>Post</th>
-                        <th>Contact</th>
-                        <th>Address</th>
+                        <th>Gender</th>
+                        <th>Age</th>                        
+                        <th>Relationship</th>
+                        <th>Qualification</th>
+                        <th>Marital Status</th>
+                        <th>Having Voter ID?</th>
+                        <th>Occupation</th>
+                        <th>Current Location</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr ng-show="masjid_member_list.length==0">
-                        <td colspan="7" style="text-align:center;" class="ng-binding">No Member Data Found!</td>
+                        <td colspan="10" style="text-align:center;" class="ng-binding">No Member Data Found!</td>
+                    </tr>
+                    <tr class="ng-scope">
+                        <td><input type="text" placeholder="1" ng-model="FamilyValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required" readonly></td>
+                        <td><input type="text" placeholder="Name" ng-model="FamilyValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                        <td><select ng-model="FamilyValue.gender" ng-options="gen for gen in ['MALE','FEMALE']" class="form-control">
+                            <option value="">SELECT GENDER</option>
+                        </select></td>
+                        <td><input type="text" placeholder="Age" ng-model="FamilyValue.age" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                        <td><input type="text" placeholder="Relationship" ng-model="FamilyValue.relationship" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                        <td><input type="text" placeholder="Qualification" ng-model="FamilyValue.qualification" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                        <td><select ng-model="FamilyValue.marital_status" ng-options="gen for gen in ['Married','Unmarried','Widow','Devorced','Aged Unmarried Woman']" class="form-control">
+                            <option value="">MARITAL STATUS</option>
+                        </select>
+                        <td><select ng-model="FamilyValue.voter" ng-options="gen for gen in ['Yes','No']" class="form-control">
+                            <option value="">VOTER ID?</option>
+                        </select></td>
+                        <td><input type="text" placeholder="Occupation" ng-model="FamilyValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                        <td><select ng-model="FamilyValue.location" ng-options="gen for gen in ['Local','Outstation','Foreign']" class="form-control">
+                            <option value="">LOCATION</option>
+                        </select></td>
+                        <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
                     </tr>
                     <tr ng-repeat="member in masjid_member_list" class="ng-scope">
                         <td>{{$index+1}}</td>

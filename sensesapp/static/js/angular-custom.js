@@ -372,36 +372,32 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.FamilyValue.ration_card = '';
             $scope.FamilyValue.mobile_no = '';
             $scope.FamilyValue.address = '';
-            $scope.FamilyValue.ration_card = '';
             $scope.FamilyValue.house = '';
-            $scope.FamilyValue.toilet = '';            
+            $scope.FamilyValue.toilet = '';
             $scope.FamilyValue.financial = '';
             $scope.FamilyValue.district = '';
             $scope.FamilyValue.taluk = '';
             $scope.FamilyValue.masjid = '';
-            $scope.FamilyValue.donor = ''; 
-            $scope.FamilyValue.volunteer = ''; 
-            $scope.FamilyValue.health_insurance = ''; 
-            $scope.FamilyValue.family_needs = ''; 
+            $scope.FamilyValue.donor = '';
+            $scope.FamilyValue.volunteer = '';
+            $scope.FamilyValue.health_insurance = '';
+            $scope.FamilyValue.family_needs = '';
         }
         else {
             $scope.family_val = family.family_id;
             $scope.FamilyValue.ration_card = family.ration_card;
             $scope.FamilyValue.mobile_no = family.mobile;
             $scope.FamilyValue.address = family.address;
-            $scope.FamilyValue.ration_card = family.ration_card;
             $scope.FamilyValue.house = family.house_type;
-            if(family.toilet == true) {
-                $scope.FamilyValue.toilet = 'Yes';
-            }
-            else if(family.toilet == false) {
-                $scope.FamilyValue.toilet = 'No';
-            }
+            if(family.toilet == true) { $scope.FamilyValue.toilet = 'Yes'; } else if(family.toilet == false) { $scope.FamilyValue.toilet = 'No'; }
             $scope.FamilyValue.financial = family.financial_status;
             $scope.FamilyValue.district = family.district_name
-            $scope.FamilyValue.taluk = family.taluk
-            $scope.FamilyValue.masjid = family.muhalla
-            console.log('muhalla',family.muhalla,'valmuhal',$scope.FamilyValue.masjid)
+            $scope.FamilyValue.taluk = family.taluk;
+            $scope.FamilyValue.masjid = family.muhalla;
+            if(family.donor == true) { $scope.FamilyValue.donor = 'Yes'; } else if(family.donor == false) { $scope.FamilyValue.donor = 'No'; }
+            if(family.health_insurance == true) { $scope.FamilyValue.health_insurance = 'Yes'; } else if(family.health_insurance == false) { $scope.FamilyValue.health_insurance = 'No'; }
+            if(family.volunteer == true) { $scope.FamilyValue.volunteer = 'Yes'; } else if(family.volunteer == false) { $scope.FamilyValue.volunteer = 'No'; }
+            $scope.FamilyValue.family_needs = family.family_needs;
             // $scope.getMasjidData();
         }
     }
@@ -445,15 +441,16 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             address: value.address,
             family_needs: value.family_needs,
             house: value.house,
-            financial: financial,
+            financial: value.financial,
         }
+        console.log('val',data,familyid,masjid)
         // if(data.masjid_name == "") {
         //     var masjid_val = masjid
         // }
         // else {
         //     var masjid_val = data.masjid_name
         // }
-        console.log('masjid',masjid,'a',data.masjid_name,'b',masjid_val)
+        console.log('masjid',masjid,'a',data,'b')
         $http.post('/familyData/',{
             value: data,
         }).success(function(data) {
