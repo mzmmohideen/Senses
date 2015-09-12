@@ -607,9 +607,6 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-show="masjid_member_list.length==0">
-                        <td colspan="10" style="text-align:center;" class="ng-binding">No Member Data Found!</td>
-                    </tr>
                     <tr class="ng-scope">
                         <td><input type="text" placeholder="1" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required" readonly></td>
                         <td><input type="text" placeholder="Name" ng-model="FamilyMember.name" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
@@ -631,13 +628,23 @@
                         </select></td>
                         <td><button ng-disabled="!FamilyValue.familyid" type="submit" ng-click="add_Familymembers(FamilyMember,FamilyValue,'new')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>Add</button></td>
                     </tr>
-                    <tr ng-repeat="member in masjid_member_list" class="ng-scope">
+                    <tr ng-show="FamilyMembersList.length==0">
+                        <td colspan="11" style="text-align:center;" class="ng-binding">No Member Data Found!</td>
+                    </tr>
+                    <tr ng-show="!FamilyMembersList">
+                        <td colspan="11" style="text-align:center;" class="ng-binding">Please Select Family First!</td>
+                    </tr>
+                    <tr ng-repeat="member in FamilyMembersList" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td class="ng-binding">{{member.name}}</td>
+                        <td class="ng-binding">{{member.gender}}</td>
                         <td class="ng-binding">{{member.age}}</td>
-                        <td class="ng-binding">{{member.designation}}</td>
-                        <td class="ng-binding">{{member.mobile}}</td>
-                        <td class="ng-binding">{{member.address}}</td>
+                        <td class="ng-binding">{{member.relationship}}</td>
+                        <td class="ng-binding">{{member.qualification}}</td>
+                        <td class="ng-binding">{{member.marital_status}}</td>
+                        <td class="ng-binding">{{get_booleanval(member.voter_status)}}</td>
+                        <td class="ng-binding">{{member.occupation}}</td>
+                        <td class="ng-binding">{{member.curr_location}}</td>
                         <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
                     </tr>
                     <!-- end ngRepeat: cat in categorys track by $index| filter:searchText -->

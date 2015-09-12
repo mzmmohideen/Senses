@@ -404,6 +404,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             if(family.volunteer == true) { $scope.FamilyValue.volunteer = 'Yes'; } else if(family.volunteer == false) { $scope.FamilyValue.volunteer = 'No'; }
             $scope.FamilyValue.family_needs = family.family_needs;
             // $scope.getMasjidData();
+            $scope.getFamilyMembers(family.family_id)
         }
     }
     $scope.FamilyValue = {
@@ -508,14 +509,26 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
     }
     $scope.add_Familymembers = function(data,family,status) {
         console.log('data',data,family)
+        var family_id = family.familyid.family_id;
         $http.post('/FamilyMemberData/',{
             data: data,
             status: status,
-            familyid: family.familyid.family_id,
+            familyid: family_id,
         }).success(function(response) {
             alert(response.data)
+            $scope.getFamilyMembers(family_id)
             console.log('response',response)
         })
+    }
+    $scope.getFamilyMembers = function(familyid) {
+        console.log('value',familyid)
+        $http.get('/FamilyMemberData/?family_id='+ familyid, {}).success(function(data) {
+            $scope.FamilyMembersList = data;
+            console.log(data)
+        })
+    }
+    $scope.get_booleanval = function(val) {
+        if(val == true) { return 'Yes' } else if(val == false) { return 'No' }
     }
 
     $scope.positionUpdated = function(module,session) {

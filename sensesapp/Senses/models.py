@@ -83,20 +83,20 @@ class Disease(models.Model):
     disease_name = models.CharField(max_length=50,unique=True)
 
 class Surgery(models.Model):
-    member = models.ForeignKey(Member)
+    member = models.ForeignKey(Member,null=True)
     disease = models.ForeignKey(Disease)
     hospital_name = models.CharField(max_length=50,null=True)
     cost = models.CharField(max_length=20,null=True)
     cash_inHand = models.CharField(max_length=20,null=True)
 
 class Medical(models.Model):
-    member = models.ForeignKey(Member)
+    member = models.ForeignKey(Member,null=True)
     disorder_name = models.CharField(max_length=50,null=True)
     medicine_needs = models.CharField(max_length=200,null=True)
     cost = models.CharField(max_length=20,null=True)
 
 class ChronicDisease(models.Model):
-    member = models.ForeignKey(Member)
+    member = models.ForeignKey(Member,null=True)
     disease_name = models.ForeignKey(Disease)
     doctor_name = models.CharField(max_length=50,null=True)
     cost = models.CharField(max_length=20,null=True)

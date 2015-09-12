@@ -161,15 +161,15 @@ def FamilyMemberData(request):
         family = Family.objects.get(family_id=familyid)
         voter = True if data['voter'] == 'Yes' else False
         print 'data',familyid
-        try:            
-            if Member.objects.filter(mem_id=data['mem_id']):
-                member = Member.objects.filter(mem_id=data['mem_id']).update()
-            else:
-                member = Member.objects.create(mem_id=data['mem_id'],family=family,name=data['name'],gender=data['gender'],age=data['age'],Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
-                print 'member',member.mem_id
-                member.mem_id= '%s / %s' (familyid,member.id)
-                print 'member2',member.mem_id
-                member.save()     
-        except:
-            print repr(format_exc()),'???'                       
+        if Member.objects.filter(mem_id=data['mem_id']):
+            member = Member.objects.filter(mem_id=data['mem_id']).update(family=family,name=data['name'],gender=data['gender'],age=data['age'],Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
+        else:
+            member = Member.objects.create(mem_id=data['mem_id'],family=family,name=data['name'],gender=data['gender'],age=data['age'],Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
+            member.mem_id= '%s / %s' %(familyid,member.id)
+            member.save()         
         return HttpResponse(content=json.dumps({'data':'success'}),content_type='Application/json')
+    else:
+        member = map(lambda x:{'mem_id':x.mem_id,'family':x.family.family_id,'name':x.name,'gender':x.gender,'age':x.age,'relationship':x.Relation,'qualification':x.qualification,'marital_status':x.marital_status,'voter_status':x.voter_status,'curr_location':x.curr_location,'occupation':x.occupation},Member.objects.filter(family=Family.objects.get(family_id=request.GET['family_id'])))
+        print 'member',member
+        return HttpResponse(content=json.dumps(member),content_type='Application/json')
+        
