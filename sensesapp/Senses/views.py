@@ -94,21 +94,21 @@ def add_masjid(request):
     if request.method == 'POST':        
         data = json.loads(request.body)
         taluk = Taluk.objects.get(district=District.objects.get(district_name=data['district']),taluk_name=data['taluk'])
-        if Masjid.objects.filter(taluk=taluk,name=data['masjid_name']):
-            masjid = Masjid.objects.filter(taluk=taluk,name=data['masjid_name']).update(name=data['masjid'],musallas=data['musallas'],location=data['address'])
+        if Masjid.objects.filter(mohalla_id=data['mohalla_id']):
+            masjid = Masjid.objects.filter(mohalla_id=data['mohalla_id']).update(taluk=taluk,name=data['masjid_name'],musallas=data['musallas'],location=data['address'])
             return HttpResponse(content=json.dumps({'data':'updated!'}),content_type='Application/json')
         else:
-            masjid = Masjid.objects.create(taluk=taluk,name=data['masjid_name'],musallas=data['musallas'],location=data['address'])
+            masjid = Masjid.objects.create(mohalla_id=data['mohalla_id'],taluk=taluk,name=data['masjid_name'],musallas=data['musallas'],location=data['address'])
             return HttpResponse(content=json.dumps({'data':'success!'}),content_type='Application/json')
     else:
-        get_members = map(lambda x:{'name':x.name,'taluk':x.taluk.taluk_name,'district':x.taluk.district.district_name,'musallas':x.musallas,'location':x.location},Masjid.objects.all())
+        get_members = map(lambda x:{'name':x.name,'mohalla_id':x.mohalla_id,'taluk':x.taluk.taluk_name,'district':x.taluk.district.district_name,'musallas':x.musallas,'location':x.location},Masjid.objects.all())
         return HttpResponse(content=json.dumps({'data':get_members}),content_type='Application/json')
 
 def masjid_member(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        taluk = Taluk.objects.get(district=District.objects.get(district_name=data['data']['district']),taluk_name=data['data']['taluk'])
-        masjid_val = Masjid.objects.get(taluk=taluk,name=data['data']['masjid_name'])
+        # taluk = Taluk.objects.get(district=District.objects.get(district_name=data['data']['district']),taluk_name=data['data']['taluk'])
+        masjid_val = Masjid.objects.get(mohalla_id=data['data']['masjid_id'])
         if Masjid_members.objects.filter(masjid=masjid_val,member_name=data['member_name'],designation=data['designation']):
             masjid = Masjid_members.objects.filter(masjid=masjid_val,member_name=data['member_name'],designation=data['designation']).update(age=data['age'],mobile=data['mobile'],address=data['address'])
             response = 'updated'
@@ -118,9 +118,9 @@ def masjid_member(request):
         return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')
     else:
         data = request.GET
-        taluk = Taluk.objects.get(taluk_name=data['taluk'],district=District.objects.get(district_name=data['district']))
-        if Masjid.objects.filter(taluk=taluk,name=data['masjid']):
-            masjid = Masjid.objects.get(taluk=taluk,name=data['masjid'])
+        # taluk = Taluk.objects.get(taluk_name=data['taluk'],district=District.objects.get(district_name=data['district']))
+        if Masjid.objects.filter(mohalla_id=data['masjid_id']):
+            masjid = Masjid.objects.get(mohalla_id=data['masjid_id'])
             get_members = map(lambda x:{'name':x.member_name,'age':x.age,'mobile':x.mobile,'address':x.address,'designation':x.designation},Masjid_members.objects.filter(masjid=masjid))
         return HttpResponse(content=json.dumps({'data':get_members}),content_type='Application/json')    
 
@@ -135,18 +135,41 @@ def familyData(request):
         volunteer = True if data['volunteer'] == 'Yes' else False
         insurance = True if data['health_insurance'] == 'Yes' else False
         try:            
-            if Family.objects.filter(family_id=data['familyid']):
+            if data['familyid'] != '':
                 family = Family.objects.filter(family_id=data['familyid']).update(muhalla=masjid,ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],donor=donor,volunteer=volunteer,health_insurance=insurance,family_needs=data['family_needs'])
+                # family_data = Family.objects.get(id=family)
+                # family_data.family_id = '%s / %s%s / %s' %(taluk.district.district_code,'%02d'%taluk.id,'%02d'%masjid.id,family_data.id)
+                # family_data.save()
                 response = 'Family Data Updated Successfully!'
             else:
                 family = Family.objects.create(family_id=data['familyid'],muhalla=masjid,ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],donor=donor,volunteer=volunteer,health_insurance=insurance,family_needs=data['family_needs'])
+                # family.family_id = '%s / %s%s / %s' %(taluk.district.district_code,'%02d'%taluk.id,'%02d'%masjid.id,family.id)
+                family.family_id = '%s / %s / %s' %(taluk.district.district_code,masjid.mohalla_id,family.id)
+                family.save()
                 response = 'Family Data Saved Successfully!'
             return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')
         except:
-            print repr(format_exc())
-            
+            print repr(format_exc())            
     else:
         family = map(lambda x:{'family_id':x.family_id,'muhalla':x.muhalla.name,'taluk':x.muhalla.taluk.taluk_name,'district_name':x.muhalla.taluk.district.district_name,'ration_card':x.ration_card,'address':x.address,'mobile':x.mobile,'house_type':x.house_type,'donor':x.donor,'volunteer':x.volunteer,'health_insurance':x.health_insurance,'family_needs':x.family_needs,'toilet':x.toilet,'financial_status':x.financial_status},Family.objects.all())
         return HttpResponse(content=json.dumps({'data':family}),content_type='Application/json')
         
-
+def FamilyMemberData(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)['data']
+        familyid = json.loads(request.body)['familyid']
+        family = Family.objects.get(family_id=familyid)
+        voter = True if data['voter'] == 'Yes' else False
+        print 'data',familyid
+        try:            
+            if Member.objects.filter(mem_id=data['mem_id']):
+                member = Member.objects.filter(mem_id=data['mem_id']).update()
+            else:
+                member = Member.objects.create(mem_id=data['mem_id'],family=family,name=data['name'],gender=data['gender'],age=data['age'],Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
+                print 'member',member.mem_id
+                member.mem_id= '%s / %s' (familyid,member.id)
+                print 'member2',member.mem_id
+                member.save()     
+        except:
+            print repr(format_exc()),'???'                       
+        return HttpResponse(content=json.dumps({'data':'success'}),content_type='Application/json')

@@ -356,23 +356,26 @@
                             <div ng-bind-html="mod | highlight: $select.search"></div>
                         </ui-select-choices>
                     </ui-select>
-                    <input ng-show="new_masjid" style="display: inline-block;height: 34px;width: 50%;float: left;" placeholder="Enter Masjid Name" ng-model="MasjidAddValue.masjid_name" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                    <input ng-show="new_masjid" style="display: inline-block;height: 34px;width: 50%;float: left;" placeholder="Enter Mohalla ID" ng-model="MasjidAddValue.mohalla_id" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                    <span style="position: absolute;float: left;left: 20%;top: 10%;color: red;" ng-show="masjidList.indexOf(MasjidAddValue.mohalla_id)!=-1 && new_masjid">* Mohalla ID Exist!</span>
+                    
                     <button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)==-1" type="submit" style="width:13%;height: 34px;" ng-click="addMasjid(masjid_val,MasjidAddValue)" class="btn-sm btn btn-primary">Update</button>
-                    <button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)==-1" type="submit" style="width:13%;height: 34px;" ng-click="new_masjid=true;MasjidAddValue.musallas='';MasjidAddValue.district='';MasjidAddValue.taluk='';MasjidAddValue.address='';MasjidAddValue.masjid_name=''" class="btn-sm btn btn-primary">Cancel</button>
-                    <button ng-show="new_masjid" type="submit" style="width:13%;height: 34px;" ng-click="addMasjid(masjid_val,MasjidAddValue)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Save New</button>
-                    <button ng-show="new_masjid" type="submit" style="width:13%;height: 34px;" ng-click="new_masjid=false" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Cancel</button>
+                    <button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)==-1" type="submit" style="width:13%;height: 34px;" ng-click="new_masjid=true;getMasjidData();" class="btn-sm btn btn-primary">Cancel</button>
+                    <button ng-show="new_masjid" ng-disabled="masjidList.indexOf(MasjidAddValue.mohalla_id)!=-1 || MasjidAddValue.mohalla_id==''" type="submit" style="width:13%;height: 34px;" ng-click="addMasjid(masjid_val,MasjidAddValue)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Save New</button>
+                    <button ng-show="new_masjid" type="submit" style="width:13%;height: 34px;" ng-click="new_masjid=false;getMasjidData();" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Cancel</button>
                     <button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)!=-1" type="submit" style="width:13%;height: 34px;" ng-click="new_masjid=true" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New</button>
                 </div>
             </div>
         <div class=" col-lg-12" style="padding-bottom: 34px;">
-                <select style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="MasjidAddValue.district" ng-options="gen for gen in district_list" class="form-control">
+                <select style="display: inline-block;height: 34px;width: 50%;float: left;" ng-model="MasjidAddValue.district" ng-options="gen for gen in district_list" class="form-control">
                     <option value="">SELECT DISTRICT</option>
                 </select>
-                <select style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="MasjidAddValue.taluk" ng-options="gen for gen in getTaluk[MasjidAddValue.district]" class="form-control">
+                <select style="display: inline-block;height: 34px;width: 50%;float: left;" ng-model="MasjidAddValue.taluk" ng-options="gen for gen in getTaluk[MasjidAddValue.district]" class="form-control">
                     <option value="">SELECT TALUK</option>
                 </select>
+                <input style="display: inline-block;width: 35%;height: 34px;float: left;" type="text" placeholder="Masjid Name" ng-model="MasjidAddValue.masjid_name" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
                 <input style="display: inline-block;width: 15%;height: 34px;float: left;" type="text" placeholder="Number of Musallas" ng-model="MasjidAddValue.musallas" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <input style="display: inline-block;width: 35%;height: 34px;float: left;" type="text" placeholder="Address" ng-model="MasjidAddValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                <input style="display: inline-block;width: 50%;height: 34px;float: left;" type="text" placeholder="Address" ng-model="MasjidAddValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
         </div>
         <!--<div class=" col-lg-12" style="padding-bottom: 34px;">
                     <input ng-show="masjidList.indexOf(masjid_val)==-1" style="display: inline-block;height: 34px;width: 25%;float: left;" placeholder="Enter Masjid Name" ng-model="masjid_val" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required" readonly>
@@ -531,7 +534,7 @@
                             <div ng-bind-html="mod.family_id | highlight: $select.search"></div>
                         </ui-select-choices>
                     </ui-select>
-                    <input ng-show="new_family" style="display: inline-block;height: 34px;width: 50%;float: left;" placeholder="Enter Family ID" ng-model="FamilyValue.familyid" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                    <!--<input ng-show="new_family" style="display: inline-block;height: 34px;width: 50%;float: left;" placeholder="Enter Family ID" ng-model="FamilyValue.familyid" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">-->
                     <button ng-show="!new_family" ng-disabled="family_val=='' || family_val=='Type or Select Family ID from the List'" type="submit" style="width:13%;height: 34px;" ng-click="addFamily(family_val,FamilyValue,'update')" class="btn-sm btn btn-primary">Update</button>
                     <button ng-show="!new_family" ng-disabled="family_val=='' || family_val=='Type or Select Family ID from the List'" type="submit" style="width:13%;height: 34px;" ng-click="new_family=true;get_family();" class="btn-sm btn btn-primary">Cancel</button>
                     <!--<button ng-show="!new_family" ng-disabled="familyList.indexOf(family_val)==-1">-->
@@ -585,7 +588,7 @@
         </div>-->            
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Members <button ng-disabled="masjidList.indexOf(masjid_val)==-1" type="submit" style="width: 55px;height: 55px;float: right;border-radius: 30px;margin-top: -5px;" ng-click="add_members(FamilyValue)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New</button></h1>
+                <h1 class="page-header">Members </h1>
             </div>
             <table class="table table-striped table-bordered table-hover ng-scope">
                 <thead>
@@ -608,25 +611,25 @@
                         <td colspan="10" style="text-align:center;" class="ng-binding">No Member Data Found!</td>
                     </tr>
                     <tr class="ng-scope">
-                        <td><input type="text" placeholder="1" ng-model="FamilyValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required" readonly></td>
-                        <td><input type="text" placeholder="Name" ng-model="FamilyValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
-                        <td><select ng-model="FamilyValue.gender" ng-options="gen for gen in ['MALE','FEMALE']" class="form-control">
+                        <td><input type="text" placeholder="1" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required" readonly></td>
+                        <td><input type="text" placeholder="Name" ng-model="FamilyMember.name" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                        <td><select ng-model="FamilyMember.gender" ng-options="gen for gen in ['MALE','FEMALE']" class="form-control">
                             <option value="">SELECT GENDER</option>
                         </select></td>
-                        <td><input type="text" placeholder="Age" ng-model="FamilyValue.age" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
-                        <td><input type="text" placeholder="Relationship" ng-model="FamilyValue.relationship" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
-                        <td><input type="text" placeholder="Qualification" ng-model="FamilyValue.qualification" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
-                        <td><select ng-model="FamilyValue.marital_status" ng-options="gen for gen in ['Married','Unmarried','Widow','Devorced','Aged Unmarried Woman']" class="form-control">
+                        <td><input type="text" placeholder="Age" ng-model="FamilyMember.age" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                        <td><input type="text" placeholder="Relationship" ng-model="FamilyMember.relationship" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                        <td><input type="text" placeholder="Qualification" ng-model="FamilyMember.qualification" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                        <td><select ng-model="FamilyMember.marital_status" ng-options="gen for gen in ['Married','Unmarried','Widow','Devorced','Aged Unmarried Woman']" class="form-control">
                             <option value="">MARITAL STATUS</option>
                         </select>
-                        <td><select ng-model="FamilyValue.voter" ng-options="gen for gen in ['Yes','No']" class="form-control">
+                        <td><select ng-model="FamilyMember.voter" ng-options="gen for gen in ['Yes','No']" class="form-control">
                             <option value="">VOTER ID?</option>
                         </select></td>
-                        <td><input type="text" placeholder="Occupation" ng-model="FamilyValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
-                        <td><select ng-model="FamilyValue.location" ng-options="gen for gen in ['Local','Outstation','Foreign']" class="form-control">
+                        <td><input type="text" placeholder="Occupation" ng-model="FamilyMember.occupation" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                        <td><select ng-model="FamilyMember.location" ng-options="gen for gen in ['Local','Outstation','Foreign']" class="form-control">
                             <option value="">LOCATION</option>
                         </select></td>
-                        <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
+                        <td><button ng-disabled="!FamilyValue.familyid" type="submit" ng-click="add_Familymembers(FamilyMember,FamilyValue,'new')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>Add</button></td>
                     </tr>
                     <tr ng-repeat="member in masjid_member_list" class="ng-scope">
                         <td>{{$index+1}}</td>
@@ -643,7 +646,7 @@
         </div>
         <!-- /.row -->
     </script>
-    <script type="text/ng-template" id="add_members_modal">
+    <script type="text/ng-template" id="add_Familymembers_modal">
      <div id="add_watchlist_popup" style="">
             <div class="popup-header">
                 <span style="margin-left:35%">Add New Member</span>

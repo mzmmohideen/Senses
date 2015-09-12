@@ -19,6 +19,7 @@ class Taluk(models.Model):
 
 class Masjid(models.Model):
     taluk = models.ForeignKey(Taluk)
+    mohalla_id = models.CharField(max_length=10,unique=True)
     name = models.CharField(max_length=30)
     musallas = models.CharField(max_length=20)
     location = models.CharField(max_length=30)
@@ -63,6 +64,7 @@ class Member(models.Model):
     age = models.CharField(max_length=10)
     Relation = models.CharField(max_length=20)
     marital_status = models.CharField(max_length=20,choices=MARITAL)
+    qualification = models.CharField(max_length=100,null=True)
     mother_tongue = models.CharField(max_length=20,null=True)
     disability = models.BooleanField(default=False)
     voter_status = models.BooleanField(default=False)
