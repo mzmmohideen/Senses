@@ -173,3 +173,11 @@ def FamilyMemberData(request):
         print 'member',member
         return HttpResponse(content=json.dumps(member),content_type='Application/json')
         
+def UpdateFamily_member(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        if Member.objects.filter(mem_id=data['mem_id']):
+            member = Member.objects.filter(mem_id=data['mem_id']).update(family=family,name=data['name'],gender=data['gender'],age=data['age'],Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
+        print '???',data        
+        return HttpResponse(content=json.dumps('success'),content_type='Application/json')
+

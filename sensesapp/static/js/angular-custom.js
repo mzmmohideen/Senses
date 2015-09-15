@@ -376,46 +376,55 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         }
     }
 
-    // $scope.Familymembersupdate = function(data) {
-    //     console.log('masjid_data',data)
-    //     masjid_data.set_MasjidData(data);
-    //     var modalInstance = $modal.open({
-    //         templateUrl: 'add_Familymembers_modal',
-    //         controller: add_Familymembers_ctrl,
-    //         backdrop: 'true',
-    //     });
-    // }
-    // var add_Familymembers_ctrl=function($scope,$http,masjid_data,$rootScope,$timeout,$location,$modalInstance) {
-    //     $scope.cancel = function() {
-    //         $modalInstance.dismiss('cancel');
-    //     };
-    //     var data = masjid_data.get_MasjidData();
-    //     $scope.add_member = function(member_name,age,designation,mobile,address,status) {
-    //         console.log('member_name',member_name,data)
-    //         $http.post('/masjid_member/',{
-    //             member_name: member_name,
-    //             data: data,
-    //             age: age,
-    //             designation: designation,
-    //             mobile: mobile,
-    //             address: address,
-    //         }).success(function(response) {
-    //             alert(response.data)
-    //             if(status == 'continue') {
-    //                $scope.member_name = '';
-    //                $scope.age = '';
-    //                $scope.designation = '';
-    //                $scope.mobile = '';
-    //                $scope.address = '';
-    //             }
-    //             else if(status == 'exit') {
-    //                 $modalInstance.dismiss('cancel');
-    //                 window.location.reload();
-    //             }
-    //             console.log('response',response)
-    //         })
-    //     }
-    // }
+    $scope.Familymembersupdate = function(data) {
+        console.log('masjid_data',data)
+        masjid_data.set_MasjidData(data);
+        var modalInstance = $modal.open({
+            templateUrl: 'add_Familymembers_modal',
+            controller: add_Familymembers_ctrl,
+            backdrop: 'true',
+        });
+    }
+    var add_Familymembers_ctrl=function($scope,$http,masjid_data,$rootScope,$timeout,$location,$modalInstance) {
+        $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+        };
+        $scope.Mem_ID = masjid_data.get_MasjidData();
+        $scope.MemberUpdate = {
+            volunteer : '', 
+            donor : '', 
+            language : '', 
+            mobile : '', 
+            physical : '', 
+            alive : '', 
+        }
+        $scope.update_member = function(data,status) {
+            console.log('member_name',status,data,$scope.Mem_ID)
+            $http.post('/UpdateFamily_member/',{
+                // member_name: member_name,
+                data: data,
+                mem_id: $scope.Mem_ID,
+                // age: age,
+                // designation: designation,
+                // mobile: mobile,
+                // address: address,
+            }).success(function(response) {
+                alert(response.data)
+                if(status == 'continue') {
+                   $scope.member_name = '';
+                   $scope.age = '';
+                   $scope.designation = '';
+                   $scope.mobile = '';
+                   $scope.address = '';
+                }
+                else if(status == 'exit') {
+                    $modalInstance.dismiss('cancel');
+                    window.location.reload();
+                }
+                console.log('response',response)
+            })
+        }
+    }
 
     $scope.family_val = '';
     $scope.get_family = function(family) {
@@ -432,8 +441,8 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.FamilyValue.district = '';
             $scope.FamilyValue.taluk = '';
             $scope.FamilyValue.masjid = '';
-            $scope.FamilyValue.donor = '';
-            $scope.FamilyValue.volunteer = '';
+            // $scope.FamilyValue.donor = '';
+            // $scope.FamilyValue.volunteer = '';
             $scope.FamilyValue.health_insurance = '';
             $scope.FamilyValue.family_needs = '';
         }
@@ -448,9 +457,9 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.FamilyValue.district = family.district_name
             $scope.FamilyValue.taluk = family.taluk;
             $scope.FamilyValue.masjid = family.muhalla;
-            if(family.donor == true) { $scope.FamilyValue.donor = 'Yes'; } else if(family.donor == false) { $scope.FamilyValue.donor = 'No'; }
+            // if(family.donor == true) { $scope.FamilyValue.donor = 'Yes'; } else if(family.donor == false) { $scope.FamilyValue.donor = 'No'; }
             if(family.health_insurance == true) { $scope.FamilyValue.health_insurance = 'Yes'; } else if(family.health_insurance == false) { $scope.FamilyValue.health_insurance = 'No'; }
-            if(family.volunteer == true) { $scope.FamilyValue.volunteer = 'Yes'; } else if(family.volunteer == false) { $scope.FamilyValue.volunteer = 'No'; }
+            // if(family.volunteer == true) { $scope.FamilyValue.volunteer = 'Yes'; } else if(family.volunteer == false) { $scope.FamilyValue.volunteer = 'No'; }
             $scope.FamilyValue.family_needs = family.family_needs;
             // $scope.getMasjidData();
             $scope.getFamilyMembers(family.family_id)
@@ -466,8 +475,8 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         taluk: '',
         house: '',
         toilet: '',
-        donor: '', 
-        volunteer: '', 
+        // donor: '', 
+        // volunteer: '', 
         health_insurance: '', 
         family_needs: '', 
         financial: '',
@@ -488,8 +497,8 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             district: value.district,
             masjid: masjid,
             toilet: value.toilet,
-            donor: value.donor,
-            volunteer: value.volunteer,
+            // donor: value.donor,
+            // volunteer: value.volunteer,
             health_insurance: value.health_insurance,
             familyid: familyid,
             ration_card: value.ration_card,

@@ -20,6 +20,7 @@ urlpatterns = patterns('',
     url(r'^add_masjid/',add_masjid),
     url(r'^masjid_member/',masjid_member),
     url(r'^familyData/',familyData),
+    url(r'^UpdateFamily_member/',UpdateFamily_member),
     url(r'^SchemeData/',SchemeData),
     url(r'^FamilyMemberData/',FamilyMemberData),
     # Examples:

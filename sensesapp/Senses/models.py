@@ -69,6 +69,8 @@ class Member(models.Model):
     disability = models.BooleanField(default=False)
     voter_status = models.BooleanField(default=False)
     family = models.ForeignKey(Family)
+    donor = models.BooleanField(default=False) 
+    volunteer = models.BooleanField(default=False)
     occupation = models.CharField(max_length=30,null=True)
     curr_location = models.CharField(max_length=20,choices=LOCATION)
     Makthab = models.BooleanField(default=False)
