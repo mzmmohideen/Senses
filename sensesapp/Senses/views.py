@@ -46,7 +46,7 @@ def addLocation(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
-            district = District.objects.get(district_name=data['district'])
+            district = District.objects.get(district_name=data['district'],district_code=data['district_code'])
             if Taluk.objects.filter(district=district,taluk_name=data['taluk']):
                 return HttpResponse(content=json.dumps({'data':'District and Taluk Exist!'}), content_type='Application/json')
             else:
@@ -54,7 +54,7 @@ def addLocation(request):
                 return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
         except:
             print '?????',repr(format_exc())
-            district = District.objects.create(district_name=data['district'])
+            district = District.objects.create(district_name=data['district'],district_code=data['district_code'])
             taluk = Taluk.objects.create(district=district,taluk_name=data['taluk'])
         return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
     else:
@@ -70,14 +70,20 @@ def SchemeData(request):
         data = json.loads(request.body)
         try:
             scheme = Scheme.objects.get(scheme_type=data['scheme'])
-            if SubScheme.objects.filter(scheme=scheme,name=data['sub'],field=data['field'],conditions=data['condition'],value=data['value']):
-                return HttpResponse(content=json.dumps({'data':'Scheme and Sub Scheme Exist!'}), content_type='Application/json')
+            if Condition.objects.filter(field=data['field'],conditions=data['condition'],value=data['value']):
+                condition = Condition.objects.get(field=data['field'],conditions=data['condition'],value=data['value'])
+            else:
+                condition = Condition.objects.create(field=data['field'],conditions=data['condition'],value=data['value'])                
+            if SubScheme.objects.filter(scheme=scheme,name=data['sub'],conditions=condition):
+                return HttpResponse(content=json.dumps({'data':'Given condition Exist under this Scheme!'}), content_type='Application/json')
             elif SubScheme.objects.filter(scheme=scheme,name=data['sub']):
-                sub_scheme = SubScheme.objects.filter(scheme=scheme,name=data['sub']).update(field=data['field'],conditions=data['condition'],value=data['value'])
+                sub_scheme = SubScheme.objects.filter(scheme=scheme,name=data['sub'])
+                # sub_scheme.conditions .update(field=data['field'],conditions=data['condition'],value=data['value'])
                 return HttpResponse(content=json.dumps({'data':'Updated'}), content_type='Application/json')
             else:
                 print 'save',scheme
-                subScheme = SubScheme.objects.create(scheme=scheme,name=data['sub'],field=data['field'],conditions=data['condition'],value=data['value'])
+                subScheme = SubScheme.objects.create(scheme=scheme,name=data['sub'])
+                    # ,field=data['field'],conditions=data['condition'],value=data['value'])
                 return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
         except:
             scheme = Scheme.objects.create(scheme_type=data['scheme'])
@@ -86,7 +92,8 @@ def SchemeData(request):
     else:
         data = defaultdict(list)
         for i in SubScheme.objects.all():
-            data[i.scheme.scheme_type].append({'sub':i.name,'field':i.field,'conditions':i.conditions,'value':i.value})
+            data[i.scheme.scheme_type].append({'sub':i.name})
+            # data[i.scheme.scheme_type].append({'sub':i.name,'field':i.field,'conditions':i.conditions,'value':i.value})
         # taluk = map(lambda x:{'district'}    Taluk.objects.all())
         return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
 
@@ -175,9 +182,27 @@ def FamilyMemberData(request):
         
 def UpdateFamily_member(request):
     if request.method == 'POST':
-        data = json.loads(request.body)
-        if Member.objects.filter(mem_id=data['mem_id']):
-            member = Member.objects.filter(mem_id=data['mem_id']).update(family=family,name=data['name'],gender=data['gender'],age=data['age'],Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
-        print '???',data        
-        return HttpResponse(content=json.dumps('success'),content_type='Application/json')
+        data = json.loads(request.body)['data']
+        mem_id = json.loads(request.body)['mem_id']
+        donor = True if data['donor'] == 'Yes' else False
+        volunteer = True if data['volunteer'] == 'Yes' else False
+        physical = True if data['physical'] == 'Yes' else False 
+        alive = True if data['alive'] == 'Yes' else False 
+        if Member.objects.filter(mem_id=mem_id):
+            member = Member.objects.filter(mem_id=mem_id).update(mother_tongue=data['language'],disability=physical,donor=donor,volunteer=volunteer,mobile=data['mobile'],alive=alive)
+            print 'mem_id',member
+            return HttpResponse(content=json.dumps('success'),content_type='Application/json')
+        else:
+            return HttpResponse(content=json.dumps('notfound'),content_type='Application/json')
+    else:
+        mem_id = request.GET['mem_id']
+        if Member.objects.filter(mem_id=mem_id):
+            member = Member.objects.get(mem_id=mem_id)
+            # .update(mother_tongue=data['language'],disability=physical,donor=donor,volunteer=volunteer,mobile=data['mobile'])
+            print 'mem_id',member
+            donor = 'Yes' if member.donor == True else 'No'
+            disability = 'Yes' if member.disability == True else 'No'
+            volunteer = 'Yes' if member.volunteer == True else 'No'
+            alive = 'Yes' if member.alive == True else 'No' 
+            return HttpResponse(content=json.dumps({'alive':alive,'language':member.mother_tongue,'disability':disability,'volunteer':volunteer,'mobile':member.mobile,'donor':donor}),content_type='Application/json')
 

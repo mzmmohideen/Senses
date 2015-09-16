@@ -282,8 +282,17 @@
                         <li>
                             <a href="#/family">Families</a>
                         </li>
-                         <li>
+                        <li>
                             <a href="#/schemes">Schemes</a>
+                        </li>
+                        <li>
+                            <a href="#/services">Services</a>
+                        </li>
+                        <li>
+                            <a href="#/diseases">Diseases</a>
+                        </li>
+                        <li>
+                            <a href="#/reports">Reports</a>
                         </li>
                     </ul>
                 </div>
@@ -305,19 +314,20 @@
         </div>
         <div class=" col-lg-12" style="padding-right: 20px;border-right: 1px solid #E2E2E2;height: 400px;">
             <div class="form-group" style="padding-bottom: 34px;">
-                <ui-select style="display: inline-block;height: 34px;width: 30%;float: left;" on-select="getDis=district;get_district(getDis)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="district">
+                <ui-select style="display: inline-block;height: 34px;width: 25%;float: left;" on-select="getDis=district;get_district(getDis)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="district">
                     <ui-select-match placeholder="{{district_val}}">{{district_val}}</ui-select-match>
                     <ui-select-choices refresh="getDis=$select.search;get_district(getDis)" repeat="mod in district_list | filter:$select.search">
                         <div ng-bind-html="mod | highlight: $select.search"></div>
                     </ui-select-choices>
                 </ui-select>
-                <ui-select ng-model="taluk" style="display: inline-block;height: 34px;width: 30%;float: left;" on-select="getTal=taluk;get_taluk(getTal)" reset-search-input="false" theme="bootstrap" ng-disabled="district_val=='' || district_val=='SELECT DISTRICT'">
+                <input type="text" style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="district_code" class="form-control" placeholder="DISTRICT CODE">
+                <ui-select ng-model="taluk" style="display: inline-block;height: 34px;width: 25%;float: left;" on-select="getTal=taluk;get_taluk(getTal)" reset-search-input="false" theme="bootstrap" ng-disabled="district_val=='' || district_val=='SELECT DISTRICT'">
                     <ui-select-match placeholder="{{taluk_val}}">{{taluk_val}}</ui-select-match>
                     <ui-select-choices refresh="getTal=$select.search;get_taluk(getTal)" repeat="mod in getTaluk[district_val] | filter:$select.search">
                         <div ng-bind-html="mod | highlight: $select.search"></div>
                     </ui-select-choices>
                 </ui-select>
-                <button  ng-disabled="district_val=='' || district_val=='SELECT DISTRICT' || taluk_val=='' || taluk_val=='SELECT TALUK'" type="submit" style="width:25%;height: 34px;float:right;" ng-click="add_location(district_val,taluk_val)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
+                <button  ng-disabled="district_val=='' || district_val=='SELECT DISTRICT' || !district_code || taluk_val=='' || taluk_val=='SELECT TALUK'" type="submit" style="width:25%;height: 34px;float:right;" ng-click="add_location(district_val,district_code,taluk_val)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
             </div>
             <table class="table table-striped table-bordered table-hover ng-scope" ng-init="getLocation()">
                 <thead>
@@ -346,7 +356,7 @@
     <script type="text/ng-template" id="masjid.html">
         <div class="row" ng-init="getMasjidData();getLocation()">
             <div class="col-lg-12">
-                <h1 class="page-header">Masjids</h1>
+                <h1 class="page-header">Muhallas</h1>
             </div>
             <div class=" col-lg-12">
                 <select style="display: inline-block;height: 34px;width: 50%;float: left;" ng-model="MasjidAddValue.district" ng-options="gen for gen in district_list" class="form-control">
@@ -428,6 +438,62 @@
             <div class="col-lg-12">
                 <h1 class="page-header">Schemes</h1>
             </div>
+            <div class="form-group" style="padding-bottom: 34px;">
+                <ui-select style="display: inline-block;height: 34px;width: 50%;float: left;" on-select="getDis=scheme_values.scheme;get_scheme(getDis)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="scheme_values.scheme">
+                    <ui-select-match placeholder="{{scheme_val}}">{{scheme_val}}</ui-select-match>
+                    <ui-select-choices refresh="getDis=$select.search;get_scheme(getDis)" repeat="mod in scheme_list | filter:$select.search">
+                        <div ng-bind-html="mod | highlight: $select.search"></div>
+                    </ui-select-choices>
+                </ui-select>
+                <ui-select ng-model="scheme_values.sub_scheme" style="display: inline-block;height: 34px;width: 50%;float: left;" on-select="getTal=scheme_values.sub_scheme;get_sub_scheme(getTal)" reset-search-input="false" theme="bootstrap" ng-disabled="scheme_val=='' || scheme_val=='SELECT SCHEMES'">
+                    <ui-select-match placeholder="{{sub_scheme_val}}">{{sub_scheme_val}}</ui-select-match>
+                    <ui-select-choices refresh="getTal=$select.search;get_sub_scheme(getTal)" repeat="mod in getSubScheme[scheme_val] | filter:$select.search">
+                        <div ng-bind-html="mod.sub | highlight: $select.search"></div>
+                    </ui-select-choices>
+                </ui-select>
+                <select ng-change="condition_list(scheme_values.field)" style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="scheme_values.field" ng-options="val for val in field_list" class="form-control">
+                    <option value="">SELECT FIELD</option>
+                </select>
+                <select style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="scheme_values.condition" ng-options="val for val in conditionsData" class="form-control">
+                    <option value="">SELECT CONDITION</option>
+                </select>
+                <ui-select ng-model="scheme_values.value" style="display: inline-block;height: 34px;width: 25%;float: left;" on-select="getVal=scheme_values.value;get_val(getVal)" reset-search-input="false" theme="bootstrap">
+                    <ui-select-match placeholder="{{value}}">{{value}}</ui-select-match>
+                    <ui-select-choices refresh="getVal=$select.search;get_val(getVal)" repeat="mod in getValue | filter:$select.search">
+                        <div ng-bind-html="mod | highlight: $select.search"></div>
+                    </ui-select-choices>
+                </ui-select>
+                <button  ng-disabled="scheme_val=='' || scheme_val=='SELECT SCHEMES' || sub_scheme_val=='' || sub_scheme_val=='SELECT SUB SCHEME'" type="submit" style="width:25%;height: 34px;float:right;" ng-click="add_schemes(scheme_val,sub_scheme_val,scheme_values)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
+            </div>
+            <table class="table table-striped table-bordered table-hover ng-scope" ng-init="getLocation()">
+                <thead>
+                    <tr class="ng-scope">
+                        <th>S.No</th>
+                        <th>Sub Schemes in {{scheme_val}}</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-show="!getSubScheme[scheme_val]">
+                        <td colspan="8" style="text-align:center;" class="ng-binding">Please Select Above Details !</td>
+                    </tr>
+                    <tr ng-show="getSubScheme[scheme_val].length==0">
+                        <td colspan="8" style="text-align:center;" class="ng-binding">No Sub Schemes Found!</td>
+                    </tr>
+                    <tr ng-show="getSubScheme[scheme_val].length!=0" ng-repeat="sub in getSubScheme[scheme_val]" class="ng-scope">
+                        <td>{{$index+1}}</td>
+                        <td class="ng-binding">{{sub.sub}}</td>
+                        <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </script>
+    <script type="text/ng-template" id="services.html">
+        <div class="row" ng-init="getScheme()">
+            <div class="col-lg-12">
+                <h1 class="page-header">Services</h1>
+            </div>
             <div class=" col-lg-12" style="padding-right: 20px;border-right: 1px solid #E2E2E2;height: 400px;">
             <div class="form-group" style="padding-bottom: 34px;">
                 <ui-select style="display: inline-block;height: 34px;width: 30%;float: left;" on-select="getDis=scheme_values.scheme;get_scheme(getDis)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="scheme_values.scheme">
@@ -442,25 +508,92 @@
                         <div ng-bind-html="mod.sub | highlight: $select.search"></div>
                     </ui-select-choices>
                 </ui-select>
-                <select ng-change="condition_list(scheme_values.field)" style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="scheme_values.field" ng-options="val for val in field_list" class="form-control">
+                <select ng-change="condition_list(scheme_values.field)" style="display: inline-block;height: 34px;width: 20%;float: left;" ng-model="scheme_values.field" ng-options="val for val in field_list" class="form-control">
                     <option value="">SELECT FIELD</option>
                 </select>
-                <select style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="scheme_values.condition" ng-options="val for val in conditionsData" class="form-control">
+                <select style="display: inline-block;height: 34px;width: 20%;float: left;" ng-model="scheme_values.condition" ng-options="val for val in conditionsData" class="form-control">
                     <option value="">SELECT CONDITION</option>
                 </select>
-                <ui-select ng-model="scheme_values.value" style="display: inline-block;height: 34px;width: 30%;float: left;" on-select="getVal=scheme_values.value;get_val(getVal)" reset-search-input="false" theme="bootstrap">
+                <select style="display: inline-block;height: 34px;width: 20%;float: left;" ng-model="scheme_values.apply_cond" ng-options="val for val in ['ALL,EITHER']" class="form-control">
+                    <option value="">APPLY CONDITION</option>
+                </select>
+                <ui-select ng-model="scheme_values.value" style="display: inline-block;height: 34px;width: 20%;float: left;" on-select="getVal=scheme_values.value;get_val(getVal)" reset-search-input="false" theme="bootstrap">
                     <ui-select-match placeholder="{{value}}">{{value}}</ui-select-match>
                     <ui-select-choices refresh="getVal=$select.search;get_val(getVal)" repeat="mod in getValue | filter:$select.search">
                         <div ng-bind-html="mod | highlight: $select.search"></div>
                     </ui-select-choices>
                 </ui-select>
-                <button  ng-disabled="scheme_val=='' || scheme_val=='SELECT SCHEMES' || sub_scheme_val=='' || sub_scheme_val=='SELECT SUB SCHEME'" type="submit" style="width:25%;height: 34px;float:right;" ng-click="add_schemes(scheme_val,sub_scheme_val,scheme_values)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
+                <button  ng-disabled="scheme_val=='' || scheme_val=='SELECT SCHEMES' || sub_scheme_val=='' || sub_scheme_val=='SELECT SUB SCHEME'" type="submit" style="width:20%;height: 34px;float:right;" ng-click="add_schemes(scheme_val,sub_scheme_val,scheme_values)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
             </div>
             <table class="table table-striped table-bordered table-hover ng-scope" ng-init="getLocation()">
                 <thead>
                     <tr class="ng-scope">
                         <th>S.No</th>
                         <th>Sub Schemes in {{scheme_val}}</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-show="!getSubScheme[scheme_val]">
+                        <td colspan="8" style="text-align:center;" class="ng-binding">Please Select Above Details !</td>
+                    </tr>
+                    <tr ng-show="getSubScheme[scheme_val].length==0">
+                        <td colspan="8" style="text-align:center;" class="ng-binding">No Sub Schemes Found!</td>
+                    </tr>
+                    <tr ng-show="getSubScheme[scheme_val].length!=0" ng-repeat="sub in getSubScheme[scheme_val]" class="ng-scope">
+                        <td>{{$index+1}}</td>
+                        <td class="ng-binding">{{sub.sub}}</td>
+                        <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </script>
+    <script type="text/ng-template" id="diseases.html">
+        <div class="row" ng-init="getScheme()">
+            <div class="col-lg-12">
+                <h1 class="page-header">Diseases</h1>
+            </div>
+            <div class="form-group" style="padding-bottom: 34px;">
+                <button  ng-disabled="scheme_val=='' || scheme_val=='SELECT SCHEMES' || sub_scheme_val=='' || sub_scheme_val=='SELECT SUB SCHEME'" type="submit" style="width:25%;height: 34px;float:right;" ng-click="add_schemes(scheme_val,sub_scheme_val,scheme_values)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
+            </div>
+            <table class="table table-striped table-bordered table-hover ng-scope" ng-init="getLocation()">
+                <thead>
+                    <tr class="ng-scope">
+                        <th>S.No</th>
+                        <th>Diseases</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr ng-show="!getSubScheme[scheme_val]">
+                        <td colspan="8" style="text-align:center;" class="ng-binding">Please Select Above Details !</td>
+                    </tr>
+                    <tr ng-show="getSubScheme[scheme_val].length==0">
+                        <td colspan="8" style="text-align:center;" class="ng-binding">No Sub Schemes Found!</td>
+                    </tr>
+                    <tr ng-show="getSubScheme[scheme_val].length!=0" ng-repeat="sub in getSubScheme[scheme_val]" class="ng-scope">
+                        <td>{{$index+1}}</td>
+                        <td class="ng-binding">{{sub.sub}}</td>
+                        <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </script>
+    <script type="text/ng-template" id="reports.html">
+        <div class="row" ng-init="getScheme()">
+            <div class="col-lg-12">
+                <h1 class="page-header">Reports</h1>
+            </div>
+            <div class="form-group" style="padding-bottom: 34px;">
+                <button  ng-disabled="scheme_val=='' || scheme_val=='SELECT SCHEMES' || sub_scheme_val=='' || sub_scheme_val=='SELECT SUB SCHEME'" type="submit" style="width:25%;height: 34px;float:right;" ng-click="add_schemes(scheme_val,sub_scheme_val,scheme_values)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
+            </div>
+            <table class="table table-striped table-bordered table-hover ng-scope" ng-init="getLocation()">
+                <thead>
+                    <tr class="ng-scope">
+                        <th>S.No</th>
+                        <th>Diseases</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
@@ -651,7 +784,7 @@
                         <td class="ng-binding">{{get_booleanval(member.voter_status)}}</td>
                         <td class="ng-binding">{{member.occupation}}</td>
                         <td class="ng-binding">{{member.curr_location}}</td>
-                        <td><a ng-click="Familymembersupdate(member.mem_id)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="fa fa-plus"></i></a><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
+                        <td><a ng-click="Familymembersupdate(member.mem_id);" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="fa fa-plus"></i></a><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
                     </tr>
                     <!-- end ngRepeat: cat in categorys track by $index| filter:searchText -->
                 </tbody>
@@ -660,9 +793,9 @@
         <!-- /.row -->
     </script>
     <script type="text/ng-template" id="add_Familymembers_modal">
-     <div id="add_watchlist_popup" style="">
+     <div ng-show="!next" id="add_watchlist_popup" style="">
             <div class="popup-header">
-                <span style="margin-left:35%">Update Member Details {{}}</span>
+                <span style="margin-left:35%">Update Member Details {{Mem_ID}}</span>
                 <span class="ng-modal-close" ng-click="cancel()"><i id="closing" style="font-size:14px;float:right;cursor:pointer;" class="fa fa-times"></i></span>
             </div>
              <form class="form-horizontal">
@@ -709,10 +842,48 @@
                             </div>
                         </div>
                         <div class="form-group" style="margin:5px;">
-                            <input type="submit" class="btn btn-primary" ng-click="update_member(MemberUpdate,'continue');" value="Save and Continue" />
+                            <input type="submit" class="btn btn-primary" ng-click="update_member(MemberUpdate,'continue');" value="Save" />
+                            <input type="submit" class="btn btn-primary" ng-click="next=true;get_memberUpdate(Mem_ID)" value="Next>>" />
                             <input type="submit" class="btn btn-primary" ng-click="update_member(MemberUpdate,'exit');" value="Save and Exit" />
                         </div>
                     </form>
+    </div>
+     <div ng-show="next" id="add_watchlist_popup" style="">
+            <div class="popup-header">
+                <span style="margin-left:35%">Update Member Details {{}}</span>
+                <span class="ng-modal-close" ng-click="cancel()"><i id="closing" style="font-size:14px;float:right;cursor:pointer;" class="fa fa-times"></i></span>
+            </div>
+            <accordion>
+                    <accordion-group>
+                          <div style="background-color:#F5F5F5 !important;">
+                            <accordion-heading>
+                                <h4 class="panel-title">
+                                            <a data-toggle="collapse" data-parent="#accordion"  aria-expanded="true" aria-controls="collapseOne">Offers</a>
+                                        </h4>
+                            </accordion-heading>
+                          </div>
+                          <div class="input-group" style="border-bottom:1px solid black;" ng-click="set_statuspage('offers');load_offers();">
+                                <span style="cursor:pointer;padding-left: 5px;display:block;" >Latest offers and Best sellers</span>
+                            </div>
+                    </accordion-group>
+                    <accordion-group ng-repeat="header in header_categories">
+                            <accordion-heading>
+                                <h4 class="panel-title">
+                                            <a data-toggle="collapse" data-parent="#accordion"  aria-expanded="true" aria-controls="collapseOne">{{header}}</a>
+                                        </h4>
+                                <!-- <div ng-show="clear_button_show(header,idea_feeds);" class="idea_filter_clear_btn" ng-click="$event.stopPropagation();$event.preventDefault();clear_filter(header,idea_feeds,idea_chang_status);"> <i class="fa fa-times"></i> Clear </div> -->
+                            </accordion-heading>
+                            <div class="input-group" ng-repeat="key in categories[header]" style="border-bottom:1px solid black;" ng-click="set_statuspage('individuals');subcategory_clicked(key);">
+                                <!-- <input type="checkbox" style="position: relative;top: -1px;" aria-label="..." ng-model="idea_feeds[header][key]">  -->
+                                <span style="cursor:pointer;padding-left: 5px;display:block;" >{{key}}</span>
+                            </div>
+                        </accordion-group>
+            </accordion>                        
+            <div class="form-group" style="margin:5px;">
+                <input type="submit" class="btn btn-primary" ng-click="next=false" value="<<Previous" />
+                <input type="submit" class="btn btn-primary" ng-click="update_member(MemberUpdate,'continue');" value="Save" />
+                <input type="submit" class="btn btn-primary" ng-click="update_member(MemberUpdate,'exit');" value="Save and Exit" />
+            </div>
     </div>
     </script>
     <script type="text/ng-template" id="dashboard.html">
@@ -731,7 +902,7 @@
                             </div>
                             <div class="col-xs-9 text-right">
                                 <div class="huge">26</div>
-                                <div>New Comments!</div>
+                                <div>New Volunteers!</div>
                             </div>
                         </div>
                     </div>
@@ -753,7 +924,7 @@
                             </div>
                             <div class="col-xs-9 text-right">
                                 <div class="huge">12</div>
-                                <div>New Tasks!</div>
+                                <div>New Donors!</div>
                             </div>
                         </div>
                     </div>
@@ -775,7 +946,7 @@
                             </div>
                             <div class="col-xs-9 text-right">
                                 <div class="huge">124</div>
-                                <div>New Orders!</div>
+                                <div>Todatl Mahallas!</div>
                             </div>
                         </div>
                     </div>
@@ -797,7 +968,7 @@
                             </div>
                             <div class="col-xs-9 text-right">
                                 <div class="huge">13</div>
-                                <div>Support Tickets!</div>
+                                <div>Todal Members!</div>
                             </div>
                         </div>
                     </div>
@@ -815,7 +986,7 @@
             <div class="col-lg-8">
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> Area Chart Example
+                        <i class="fa fa-bar-chart-o fa-fw"></i> New Family Entries
                         <div class="pull-right">
                             <div class="btn-group">
                                 <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
@@ -921,7 +1092,7 @@
                 </div>
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> Bar Chart Example
+                        <i class="fa fa-bar-chart-o fa-fw"></i> Mahallas
                         <div class="pull-right">
                             <div class="btn-group">
                                 <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
@@ -944,7 +1115,7 @@
                     </div>
                     <div class="panel-body">
                         <div class="row">
-                            <div class="col-lg-4">
+                            <!--<div class="col-lg-4">
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-hover table-striped">
                                         <thead>
@@ -1007,7 +1178,7 @@
                                         </tbody>
                                     </table>
                                 </div>
-                            </div>
+                            </div>-->
                             <div class="col-lg-8">
                                 <div id="morris-bar-chart" style="position: relative; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
                                     <svg height="342" version="1.1" width="457" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="overflow: hidden; position: relative; left: -0.546875px;">
@@ -1196,17 +1367,17 @@
                     <div class="panel-body">
                         <div class="list-group">
                             <a href="#" class="list-group-item">
-                                <i class="fa fa-comment fa-fw"></i> New Comment
+                                <i class="fa fa-comment fa-fw"></i> New Volunteer
                                 <span class="pull-right text-muted small"><em>4 minutes ago</em>
                                     </span>
                             </a>
                             <a href="#" class="list-group-item">
-                                <i class="fa fa-twitter fa-fw"></i> 3 New Followers
+                                <i class="fa fa-twitter fa-fw"></i> 3 New Families
                                 <span class="pull-right text-muted small"><em>12 minutes ago</em>
                                     </span>
                             </a>
                             <a href="#" class="list-group-item">
-                                <i class="fa fa-envelope fa-fw"></i> Message Sent
+                                <i class="fa fa-envelope fa-fw"></i> new Donor
                                 <span class="pull-right text-muted small"><em>27 minutes ago</em>
                                     </span>
                             </a>
@@ -1215,7 +1386,7 @@
                                 <span class="pull-right text-muted small"><em>43 minutes ago</em>
                                     </span>
                             </a>
-                            <a href="#" class="list-group-item">
+                            <!--<a href="#" class="list-group-item">
                                 <i class="fa fa-upload fa-fw"></i> Server Rebooted
                                 <span class="pull-right text-muted small"><em>11:32 AM</em>
                                     </span>
@@ -1239,14 +1410,14 @@
                                 <i class="fa fa-money fa-fw"></i> Payment Received
                                 <span class="pull-right text-muted small"><em>Yesterday</em>
                                     </span>
-                            </a>
+                            </a>-->
                         </div>
-                        <a href="#" class="btn btn-default btn-block">View All Alerts</a>
+                        <a href="#" class="btn btn-default btn-block">View All Datas</a>
                     </div>
                 </div>
                 <div class="panel panel-default">
                     <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> Donut Chart Example
+                        <i class="fa fa-bar-chart-o fa-fw"></i> Mahallas Chart
                     </div>
                     <div class="panel-body">
                         <div id="morris-donut-chart">
@@ -1260,7 +1431,7 @@
                                 <path fill="none" stroke="#679dc6" d="M70.09933662699727,129.4436062198517A99.66666666666667,99.66666666666667,0,0,0,159.4686887937342,273.16666174831386" stroke-width="2" opacity="0" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); opacity: 0;"></path>
                                 <path fill="#679dc6" stroke="#ffffff" d="M67.40834675958247,128.11749403248933A102.66666666666667,102.66666666666667,0,0,0,159.4677463159536,276.1666616002698L159.45460398690224,317.99999286921087A144.5,144.5,0,0,1,29.88398805285391,109.62559630871472Z" stroke-width="3" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
                                 <text x="159.5" y="163.5" text-anchor="middle" font-family="&quot;Arial&quot;" font-size="15px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: Arial; font-size: 15px; font-weight: 800;" font-weight="800" transform="matrix(1.7929,0,0,1.7929,-126.4643,-136.3753)" stroke-width="0.5577619843924192">
-                                    <tspan dy="5.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">In-Store Sales</tspan>
+                                    <tspan dy="5.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Mahallas Present</tspan>
                                 </text>
                                 <text x="159.5" y="183.5" text-anchor="middle" font-family="&quot;Arial&quot;" font-size="14px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: Arial; font-size: 14px;" transform="matrix(2.0764,0,0,2.0764,-171.684,-188.9063)" stroke-width="0.4816053511705686">
                                     <tspan dy="5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">30</tspan>

@@ -49,12 +49,15 @@ class Family(models.Model):
 class Scheme(models.Model):
     scheme_type = models.CharField(max_length=50,unique=True)
 
-class SubScheme(models.Model):
-    scheme = models.ForeignKey(Scheme)    
-    name = models.CharField(max_length=50)
+class Condition(models.Model):
     field = models.CharField(max_length=50,null=True)
     conditions = models.CharField(max_length=20,null=True)
     value = models.CharField(max_length=20,null=True)
+
+class SubScheme(models.Model):
+    scheme = models.ForeignKey(Scheme)    
+    name = models.CharField(max_length=50)
+    conditions = models.ManyToManyField(Condition,blank=True)
     description = models.CharField(max_length=30,null=True)# Create your views here.
     
 class Member(models.Model):
@@ -67,9 +70,11 @@ class Member(models.Model):
     qualification = models.CharField(max_length=100,null=True)
     mother_tongue = models.CharField(max_length=20,null=True)
     disability = models.BooleanField(default=False)
+    alive = models.BooleanField(default=True)
     voter_status = models.BooleanField(default=False)
     family = models.ForeignKey(Family)
     donor = models.BooleanField(default=False) 
+    mobile = models.CharField(max_length=20,null=True)
     volunteer = models.BooleanField(default=False)
     occupation = models.CharField(max_length=30,null=True)
     curr_location = models.CharField(max_length=20,choices=LOCATION)

@@ -77,6 +77,15 @@ app.config(['$routeProvider',
         when('/schemes', {
             templateUrl: 'schemes.html',
         }).
+        when('/services', {
+            templateUrl: 'services.html',
+        }).
+        when('/diseases', {
+            templateUrl: 'diseases.html',
+        }).
+        when('/reports', {
+            templateUrl: 'reports.html',
+        }).
         otherwise({
             redirectTo: '/dashboard'
         });
@@ -124,21 +133,21 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             }    
         }
     }
-    $scope.scheme_val = 'SELECT SCHEMES';
+    $scope.scheme_val = 'SELECT or ADD SCHEMES';
     $scope.get_scheme = function(scheme) {
         if(!scheme) {
-            $scope.scheme_val = 'SELECT SCHEMES';
+            $scope.scheme_val = 'SELECT or ADD SCHEMES';
         }
         else {
             console.log('val',scheme)
             $scope.scheme_val = scheme;
         }
     }
-    $scope.sub_scheme_val = 'SELECT SUB SCHEME';
+    $scope.sub_scheme_val = 'SELECT or ADD SUB SCHEME';
     $scope.get_sub_scheme = function(scheme) {
         console.log('val1',typeof(scheme))
         if(!scheme) {
-            $scope.sub_scheme_val = 'SELECT SUB SCHEME';
+            $scope.sub_scheme_val = 'SELECT or ADD SUB SCHEME';
         }
         else if(typeof(scheme) == 'string') {
             $scope.sub_scheme_val = scheme;
@@ -171,6 +180,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         field: '',
         condition: '',
         value: '',
+        apply: '',
     }
     $scope.field_list = ['Age','Marital Status','Gender','Qualification','Voter ID','Physically Challenged','RelationShip','Occupation']
     $scope.condition_list = function(field) {
@@ -299,10 +309,11 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.getMasjidData()
         })
     }
-    $scope.add_location = function(district,taluk) {
+    $scope.add_location = function(district,district_code,taluk) {
         console.log('val',district,'taluk',taluk)
         $http.post('/addLocation/',{
             district: district,
+            district_code: district_code,
             taluk: taluk,
         }).success(function(data) {
             console.log('data',data)
@@ -318,6 +329,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             field: scheme_values.field,
             condition: scheme_values.condition,
             value: scheme_values.value,
+            apply: scheme_values.apply,
         }).success(function(data) {
             console.log('data',data)
             alert(data.data)
@@ -398,6 +410,19 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             physical : '', 
             alive : '', 
         }
+        $scope.GetMemData = function() {
+            console.log('varll',$scope.Mem_ID)
+            $http.get('/UpdateFamily_member/?mem_id='+$scope.Mem_ID,{}).success(function(data){
+                console.log('data',data)
+                $scope.MemberUpdate.volunteer = data.volunteer;
+                $scope.MemberUpdate.mobile = data.mobile;
+                $scope.MemberUpdate.donor = data.donor;
+                $scope.MemberUpdate.language = data.language;
+                $scope.MemberUpdate.physical = data.disability;
+                $scope.MemberUpdate.alive = data.alive;
+            })
+        }
+        $scope.GetMemData()
         $scope.update_member = function(data,status) {
             console.log('member_name',status,data,$scope.Mem_ID)
             $http.post('/UpdateFamily_member/',{
@@ -409,20 +434,29 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
                 // mobile: mobile,
                 // address: address,
             }).success(function(response) {
-                alert(response.data)
-                if(status == 'continue') {
-                   $scope.member_name = '';
-                   $scope.age = '';
-                   $scope.designation = '';
-                   $scope.mobile = '';
-                   $scope.address = '';
+                console.log('response',status)
+                // alert(response)
+                if(response == '"success"') {
+                    console.log('success',status)
+                    if(status == 'continue') {
+                        alert('Updated successfully!')
+                       //  $scope.member_name = '';
+                       // $scope.age = '';
+                       // $scope.designation = '';
+                       // $scope.mobile = '';
+                       // $scope.address = '';
+                    }
+                    else if(status == 'exit') {
+                        $modalInstance.dismiss('cancel');
+                        window.location.reload();
+                    }
                 }
-                else if(status == 'exit') {
-                    $modalInstance.dismiss('cancel');
-                    window.location.reload();
-                }
+                else if (response == '"notfound"') { $modalInstance.dismiss('cancel');};
                 console.log('response',response)
             })
+        }
+        $scope.get_memberUpdate = function (id) {
+            console.log('mem_id',id)
         }
     }
 
@@ -473,6 +507,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         mobile: '',
         district: '',
         taluk: '',
+        district_code: '',
         house: '',
         toilet: '',
         // donor: '', 
