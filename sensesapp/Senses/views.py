@@ -114,8 +114,9 @@ def add_masjid(request):
 def masjid_member(request):
     if request.method == 'POST':
         data = json.loads(request.body)
+        print 'data',data
         # taluk = Taluk.objects.get(district=District.objects.get(district_name=data['data']['district']),taluk_name=data['data']['taluk'])
-        masjid_val = Masjid.objects.get(mohalla_id=data['data']['masjid_id'])
+        masjid_val = Masjid.objects.get(mohalla_id=data['data']['mohalla_id'])
         if Masjid_members.objects.filter(masjid=masjid_val,member_name=data['member_name'],designation=data['designation']):
             masjid = Masjid_members.objects.filter(masjid=masjid_val,member_name=data['member_name'],designation=data['designation']).update(age=data['age'],mobile=data['mobile'],address=data['address'])
             response = 'updated'
@@ -138,18 +139,18 @@ def familyData(request):
         taluk = Taluk.objects.get(taluk_name=data['taluk'],district=District.objects.get(district_name=data['district']))
         masjid = Masjid.objects.get(name=data['masjid'],taluk=taluk)
         toilet = True if data['toilet'] == 'Yes' else False
-        donor = True if data['donor'] == 'Yes' else False
-        volunteer = True if data['volunteer'] == 'Yes' else False
+        # donor = True if data['donor'] == 'Yes' else False
+        # volunteer = True if data['volunteer'] == 'Yes' else False
         insurance = True if data['health_insurance'] == 'Yes' else False
         try:            
             if data['familyid'] != '':
-                family = Family.objects.filter(family_id=data['familyid']).update(muhalla=masjid,ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],donor=donor,volunteer=volunteer,health_insurance=insurance,family_needs=data['family_needs'])
+                family = Family.objects.filter(family_id=data['familyid']).update(muhalla=masjid,ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
                 # family_data = Family.objects.get(id=family)
                 # family_data.family_id = '%s / %s%s / %s' %(taluk.district.district_code,'%02d'%taluk.id,'%02d'%masjid.id,family_data.id)
                 # family_data.save()
                 response = 'Family Data Updated Successfully!'
             else:
-                family = Family.objects.create(family_id=data['familyid'],muhalla=masjid,ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],donor=donor,volunteer=volunteer,health_insurance=insurance,family_needs=data['family_needs'])
+                family = Family.objects.create(family_id=data['familyid'],muhalla=masjid,ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
                 # family.family_id = '%s / %s%s / %s' %(taluk.district.district_code,'%02d'%taluk.id,'%02d'%masjid.id,family.id)
                 family.family_id = '%s / %s / %s' %(taluk.district.district_code,masjid.mohalla_id,family.id)
                 family.save()

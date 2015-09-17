@@ -472,11 +472,13 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.FamilyValue.house = '';
             $scope.FamilyValue.toilet = '';
             $scope.FamilyValue.financial = '';
-            $scope.FamilyValue.district = '';
-            $scope.FamilyValue.taluk = '';
-            $scope.FamilyValue.masjid = '';
+            // $scope.FamilyValue.district = '';
+            // $scope.FamilyValue.taluk = '';
+            // $scope.FamilyValue.masjid = '';
+            
             // $scope.FamilyValue.donor = '';
             // $scope.FamilyValue.volunteer = '';
+            
             $scope.FamilyValue.health_insurance = '';
             $scope.FamilyValue.family_needs = '';
         }
@@ -555,6 +557,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         }).success(function(data) {
             console.log('val',data)
             alert(data.data)
+            $scope.get_family()
             $scope.getFamilyinfo();
         })
     }
