@@ -53,7 +53,7 @@ def addLocation(request):
                 taluk = Taluk.objects.create(district=district,taluk_name=data['taluk'])
                 return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
         except:
-            print '?????',repr(format_exc())
+            # print '?????',repr(format_exc())
             district = District.objects.create(district_name=data['district'],district_code=data['district_code'])
             taluk = Taluk.objects.create(district=district,taluk_name=data['taluk'])
         return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')

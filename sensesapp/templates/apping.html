@@ -277,7 +277,7 @@
                             <a href="#/location">Locations</a>
                         </li>
                         <li>
-                            <a href="#/masjid">Masjids</a>
+                            <a href="#/masjid">Muhallas</a>
                         </li>
                         <li>
                             <a href="#/family">Families</a>
@@ -669,10 +669,10 @@
                 <select ng-change="getMahallaData(FamilyValue);FamilyValue.masjid=''" style="display: inline-block;height: 34px;width: 35%;float: left;" ng-model="FamilyValue.taluk" ng-options="gen for gen in getTaluk[FamilyValue.district]" class="form-control">
                     <option value="">SELECT TALUK</option>
                 </select>
-                <select ng-if="!FamilyValue.masjid" ng-change="getFamilyinfo();" style="display: inline-block;height: 34px;width: 30%;float: left;" ng-model="FamilyValue.masjid" ng-options="gen.name for gen in muhallaData" class="form-control">
+                <select ng-if="!FamilyValue.masjid" ng-change="getFamilyinfo();" style="display: inline-block;height: 34px;width: 30%;float: left;" ng-model="FamilyValue.masjid" ng-options="gen.mohalla_id for gen in muhallaData" class="form-control">
                     <option value="">SELECT MUHALLA </option>
                 </select>
-                <select ng-if="FamilyValue.masjid" ng-change="getFamilyinfo();" style="display: inline-block;height: 34px;width: 30%;float: left;" ng-model="FamilyValue.masjid" ng-options="gen.name for gen in muhallaData" class="form-control">
+                <select ng-if="FamilyValue.masjid" ng-change="getFamilyinfo();" style="display: inline-block;height: 34px;width: 30%;float: left;" ng-model="FamilyValue.masjid" ng-options="gen.mohalla_id for gen in muhallaData" class="form-control">
                     <option value="">{{FamilyValue.masjid}} </option>
                 </select>
             </div>
