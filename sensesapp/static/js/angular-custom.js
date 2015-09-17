@@ -158,6 +158,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         console.log('val',$scope.sub_scheme_val)
     }
     $scope.getScheme = function() {
+        console.log('vityasam')
         $http.get('/SchemeData/',{}).success(function(data) {
             console.log('datascheme',data)
             $scope.scheme_list = _.keys(data.data)
@@ -168,10 +169,20 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
     $scope.get_district = function(district) {
         if(!district) {
             $scope.district_val = 'SELECT DISTRICT';
+            $scope.district_code = ''
         }
         else {
             console.log('val',district)
             $scope.district_val = district;
+            if($scope.DisCode[district][0]) {
+                console.log('dis$scope.DisCode',$scope.DisCode[district][0])
+                $scope.district_code = $scope.DisCode[district][0]
+            }
+            else {
+                console.log('Elsesdis$scope.DisCode',district)
+                $scope.district_code = ''
+            }
+
         }
     }
     $scope.scheme_values = {
@@ -343,6 +354,8 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
     }
     $scope.getLocation = function() {
         $http.get('/addLocation/',{}).success(function(data) {
+            // console.log('val',data.district['CHENNAI'][0])
+            $scope.DisCode = data.district;
             $scope.district_list = _.keys(data.data)
             $scope.getTaluk = data.data;
         })
@@ -420,6 +433,15 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
                 $scope.MemberUpdate.language = data.language;
                 $scope.MemberUpdate.physical = data.disability;
                 $scope.MemberUpdate.alive = data.alive;
+            })
+        }
+        $scope.getScheme = function() {
+            console.log('vityasam')
+            $http.get('/SchemeData/',{}).success(function(data) {
+                console.log('datascheme',data)
+                $scope.scheme_list = _.keys(data.data)
+                $scope.getSubScheme = data.data;
+                console.log('datascheme',$scope.getSubScheme)
             })
         }
         $scope.GetMemData()

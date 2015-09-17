@@ -59,27 +59,33 @@ def addLocation(request):
         return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
     else:
         data = defaultdict(list)
+        district = defaultdict(list)
+        for k in District.objects.all():
+            district[k.district_name].append(k.district_code)
         for i in Taluk.objects.all():
             data[i.district.district_name].append(i.taluk_name)
         # taluk = map(lambda x:{'district'}    Taluk.objects.all())
-        return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
+        return HttpResponse(content=json.dumps({'data':data,'district':district}), content_type='Application/json')
 
 def SchemeData(request):
     print 'request'
     if request.method == 'POST':
         data = json.loads(request.body)
         try:
-            scheme = Scheme.objects.get(scheme_type=data['scheme'])
-            if Condition.objects.filter(field=data['field'],conditions=data['condition'],value=data['value']):
-                condition = Condition.objects.get(field=data['field'],conditions=data['condition'],value=data['value'])
+            if Scheme.objects.filter(scheme_type=data['scheme']):
+                scheme = Scheme.objects.get(scheme_type=data['scheme'])
             else:
-                condition = Condition.objects.create(field=data['field'],conditions=data['condition'],value=data['value'])                
-            if SubScheme.objects.filter(scheme=scheme,name=data['sub'],conditions=condition):
+                scheme = Scheme.objects.create(scheme_type=data['scheme'])
+            # if Condition.objects.filter(field=data['field'],conditions=data['condition'],value=data['value']):
+            #     condition = Condition.objects.get(field=data['field'],conditions=data['condition'],value=data['value'])
+            # else:
+            #     condition = Condition.objects.create(field=data['field'],conditions=data['condition'],value=data['value'])                
+            if SubScheme.objects.filter(scheme=scheme,name=data['sub']):
                 return HttpResponse(content=json.dumps({'data':'Given condition Exist under this Scheme!'}), content_type='Application/json')
-            elif SubScheme.objects.filter(scheme=scheme,name=data['sub']):
-                sub_scheme = SubScheme.objects.filter(scheme=scheme,name=data['sub'])
+            # elif SubScheme.objects.filter(scheme=scheme,name=data['sub']):
+            #     sub_scheme = SubScheme.objects.filter(scheme=scheme,name=data['sub'])
                 # sub_scheme.conditions .update(field=data['field'],conditions=data['condition'],value=data['value'])
-                return HttpResponse(content=json.dumps({'data':'Updated'}), content_type='Application/json')
+                # return HttpResponse(content=json.dumps({'data':'Updated'}), content_type='Application/json')
             else:
                 print 'save',scheme
                 subScheme = SubScheme.objects.create(scheme=scheme,name=data['sub'])
@@ -92,7 +98,7 @@ def SchemeData(request):
     else:
         data = defaultdict(list)
         for i in SubScheme.objects.all():
-            data[i.scheme.scheme_type].append({'sub':i.name})
+            data[i.scheme.scheme_type].append({'sub':i.name,'scheme_id':i.subscheme_id})
             # data[i.scheme.scheme_type].append({'sub':i.name,'field':i.field,'conditions':i.conditions,'value':i.value})
         # taluk = map(lambda x:{'district'}    Taluk.objects.all())
         return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')

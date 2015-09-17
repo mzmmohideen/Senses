@@ -56,6 +56,7 @@ class Condition(models.Model):
 
 class SubScheme(models.Model):
     scheme = models.ForeignKey(Scheme)    
+    subscheme_id = models.CharField(max_length=10,unique=True)
     name = models.CharField(max_length=50)
     conditions = models.ManyToManyField(Condition,blank=True)
     description = models.CharField(max_length=30,null=True)# Create your views here.

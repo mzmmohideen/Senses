@@ -44,7 +44,7 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="index.html">Attendance app</a>
+                <a class="navbar-brand" href="#">Senses app</a>
             </div>
             <!-- /.navbar-header -->
             <ul class="nav navbar-top-links navbar-right">
@@ -320,7 +320,7 @@
                         <div ng-bind-html="mod | highlight: $select.search"></div>
                     </ui-select-choices>
                 </ui-select>
-                <input type="text" style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="district_code" class="form-control" placeholder="DISTRICT CODE">
+                <input ng-disabled="DisCode[district_val][0]==district_code" type="text" style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="district_code" class="form-control" placeholder="DISTRICT CODE">
                 <ui-select ng-model="taluk" style="display: inline-block;height: 34px;width: 25%;float: left;" on-select="getTal=taluk;get_taluk(getTal)" reset-search-input="false" theme="bootstrap" ng-disabled="district_val=='' || district_val=='SELECT DISTRICT'">
                     <ui-select-match placeholder="{{taluk_val}}">{{taluk_val}}</ui-select-match>
                     <ui-select-choices refresh="getTal=$select.search;get_taluk(getTal)" repeat="mod in getTaluk[district_val] | filter:$select.search">
@@ -439,19 +439,19 @@
                 <h1 class="page-header">Schemes</h1>
             </div>
             <div class="form-group" style="padding-bottom: 34px;">
-                <ui-select style="display: inline-block;height: 34px;width: 50%;float: left;" on-select="getDis=scheme_values.scheme;get_scheme(getDis)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="scheme_values.scheme">
+                <ui-select style="display: inline-block;height: 34px;width: 40%;float: left;" on-select="getDis=scheme_values.scheme;get_scheme(getDis)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="scheme_values.scheme">
                     <ui-select-match placeholder="{{scheme_val}}">{{scheme_val}}</ui-select-match>
                     <ui-select-choices refresh="getDis=$select.search;get_scheme(getDis)" repeat="mod in scheme_list | filter:$select.search">
                         <div ng-bind-html="mod | highlight: $select.search"></div>
                     </ui-select-choices>
                 </ui-select>
-                <ui-select ng-model="scheme_values.sub_scheme" style="display: inline-block;height: 34px;width: 50%;float: left;" on-select="getTal=scheme_values.sub_scheme;get_sub_scheme(getTal)" reset-search-input="false" theme="bootstrap" ng-disabled="scheme_val=='' || scheme_val=='SELECT SCHEMES'">
+                <ui-select ng-model="scheme_values.sub_scheme" style="display: inline-block;height: 34px;width: 40%;float: left;" on-select="getTal=scheme_values.sub_scheme;get_sub_scheme(getTal)" reset-search-input="false" theme="bootstrap" ng-disabled="scheme_val=='' || scheme_val=='SELECT SCHEMES'">
                     <ui-select-match placeholder="{{sub_scheme_val}}">{{sub_scheme_val}}</ui-select-match>
                     <ui-select-choices refresh="getTal=$select.search;get_sub_scheme(getTal)" repeat="mod in getSubScheme[scheme_val] | filter:$select.search">
                         <div ng-bind-html="mod.sub | highlight: $select.search"></div>
                     </ui-select-choices>
                 </ui-select>
-                <select ng-change="condition_list(scheme_values.field)" style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="scheme_values.field" ng-options="val for val in field_list" class="form-control">
+                <!--<select ng-change="condition_list(scheme_values.field)" style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="scheme_values.field" ng-options="val for val in field_list" class="form-control">
                     <option value="">SELECT FIELD</option>
                 </select>
                 <select style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="scheme_values.condition" ng-options="val for val in conditionsData" class="form-control">
@@ -462,8 +462,8 @@
                     <ui-select-choices refresh="getVal=$select.search;get_val(getVal)" repeat="mod in getValue | filter:$select.search">
                         <div ng-bind-html="mod | highlight: $select.search"></div>
                     </ui-select-choices>
-                </ui-select>
-                <button  ng-disabled="scheme_val=='' || scheme_val=='SELECT SCHEMES' || sub_scheme_val=='' || sub_scheme_val=='SELECT SUB SCHEME'" type="submit" style="width:25%;height: 34px;float:right;" ng-click="add_schemes(scheme_val,sub_scheme_val,scheme_values)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
+                </ui-select>-->
+                <button  ng-disabled="scheme_val=='' || scheme_val=='SELECT SCHEMES' || sub_scheme_val=='' || sub_scheme_val=='SELECT SUB SCHEME'" type="submit" style="width:20%;height: 34px;float:right;" ng-click="add_schemes(scheme_val,sub_scheme_val,scheme_values)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
             </div>
             <table class="table table-striped table-bordered table-hover ng-scope" ng-init="getLocation()">
                 <thead>
@@ -850,15 +850,15 @@
     </div>
      <div ng-show="next" id="add_watchlist_popup" style="">
             <div class="popup-header">
-                <span style="margin-left:35%">Update Member Details {{}}</span>
+                <span style="margin-left:35%">Update Member Details </span>
                 <span class="ng-modal-close" ng-click="cancel()"><i id="closing" style="font-size:14px;float:right;cursor:pointer;" class="fa fa-times"></i></span>
             </div>
-            <accordion>
-                    <accordion-group>
+            <accordion ng-init="getScheme()">
+                    <accordion-group ng-repeat="header in scheme_list">
                           <div style="background-color:#F5F5F5 !important;">
                             <accordion-heading>
                                 <h4 class="panel-title">
-                                            <a data-toggle="collapse" data-parent="#accordion"  aria-expanded="true" aria-controls="collapseOne">Offers</a>
+                                            <a data-toggle="collapse" data-parent="#accordion"  aria-expanded="true" aria-controls="collapseOne">{{header}}</a>
                                         </h4>
                             </accordion-heading>
                           </div>
@@ -866,16 +866,21 @@
                                 <span style="cursor:pointer;padding-left: 5px;display:block;" >Latest offers and Best sellers</span>
                             </div>
                     </accordion-group>
-                    <accordion-group ng-repeat="header in header_categories">
+                    <accordion-group ng-repeat="header in scheme_list">
                             <accordion-heading>
                                 <h4 class="panel-title">
                                             <a data-toggle="collapse" data-parent="#accordion"  aria-expanded="true" aria-controls="collapseOne">{{header}}</a>
                                         </h4>
                                 <!-- <div ng-show="clear_button_show(header,idea_feeds);" class="idea_filter_clear_btn" ng-click="$event.stopPropagation();$event.preventDefault();clear_filter(header,idea_feeds,idea_chang_status);"> <i class="fa fa-times"></i> Clear </div> -->
                             </accordion-heading>
-                            <div class="input-group" ng-repeat="key in categories[header]" style="border-bottom:1px solid black;" ng-click="set_statuspage('individuals');subcategory_clicked(key);">
+                            <div class="input-group" ng-repeat="key in getSubScheme[header]" style="border-bottom:1px solid black;" ng-click="set_statuspage('individuals');subcategory_clicked(key);">
                                 <!-- <input type="checkbox" style="position: relative;top: -1px;" aria-label="..." ng-model="idea_feeds[header][key]">  -->
-                                <span style="cursor:pointer;padding-left: 5px;display:block;" >{{key}}</span>
+                                {{key.sub}}
+                                <span ng-repeat="a in ['Yes','No']">
+                                    <!--<input type="radio" name="{{key.subscheme_id}}" ng-model="{{key.subscheme_id}}" value="{{a}}">{{a}}-->
+                                    <input type="radio" name="{{key.subscheme_id}}" ng-model="{{key.subscheme_id}}" value="Yes">Yes
+                                    <input type="radio" name="{{key.subscheme_id}}" ng-model="{{key.subscheme_id}}" value="No">No
+                                </span>
                             </div>
                         </accordion-group>
             </accordion>                        
