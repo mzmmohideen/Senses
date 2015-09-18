@@ -103,6 +103,18 @@ def SchemeData(request):
         # taluk = map(lambda x:{'district'}    Taluk.objects.all())
         return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
 
+def getSchemeData(request):
+    data = defaultdict(list)
+    for i in SubScheme.objects.all():
+        if Member_scheme.objects.filter(member=Member.objects.get(mem_id=request.GET['mem_id']),scheme=SubScheme.objects.get(subscheme_id=i.subscheme_id)):
+            checked = Member_scheme.objects.get(member=Member.objects.get(mem_id=request.GET['mem_id']),scheme=SubScheme.objects.get(subscheme_id=i.subscheme_id)).status
+        else:
+            checked = False
+        print 'iii',checked,i.name
+        status = 'Yes' if checked == True else 'No'
+        data[i.scheme.scheme_type].append({'sub':i.name,'scheme_id':i.subscheme_id,'status':status})
+    return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
+
 def add_masjid(request):
     if request.method == 'POST':        
         data = json.loads(request.body)
@@ -184,7 +196,6 @@ def FamilyMemberData(request):
         return HttpResponse(content=json.dumps({'data':'success'}),content_type='Application/json')
     else:
         member = map(lambda x:{'mem_id':x.mem_id,'family':x.family.family_id,'name':x.name,'gender':x.gender,'age':x.age,'relationship':x.Relation,'qualification':x.qualification,'marital_status':x.marital_status,'voter_status':x.voter_status,'curr_location':x.curr_location,'occupation':x.occupation},Member.objects.filter(family=Family.objects.get(family_id=request.GET['family_id'])))
-        print 'member',member
         return HttpResponse(content=json.dumps(member),content_type='Application/json')
         
 def UpdateFamily_member(request):
@@ -197,7 +208,6 @@ def UpdateFamily_member(request):
         alive = True if data['alive'] == 'Yes' else False 
         if Member.objects.filter(mem_id=mem_id):
             member = Member.objects.filter(mem_id=mem_id).update(mother_tongue=data['language'],disability=physical,donor=donor,volunteer=volunteer,mobile=data['mobile'],alive=alive)
-            print 'mem_id',member
             return HttpResponse(content=json.dumps('success'),content_type='Application/json')
         else:
             return HttpResponse(content=json.dumps('notfound'),content_type='Application/json')
@@ -206,10 +216,23 @@ def UpdateFamily_member(request):
         if Member.objects.filter(mem_id=mem_id):
             member = Member.objects.get(mem_id=mem_id)
             # .update(mother_tongue=data['language'],disability=physical,donor=donor,volunteer=volunteer,mobile=data['mobile'])
-            print 'mem_id',member
             donor = 'Yes' if member.donor == True else 'No'
             disability = 'Yes' if member.disability == True else 'No'
             volunteer = 'Yes' if member.volunteer == True else 'No'
             alive = 'Yes' if member.alive == True else 'No' 
             return HttpResponse(content=json.dumps({'alive':alive,'language':member.mother_tongue,'disability':disability,'volunteer':volunteer,'mobile':member.mobile,'donor':donor}),content_type='Application/json')
 
+def updateMemScheme(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)['data']
+        for i in data:
+            member = Member.objects.get(mem_id=i['Mem_ID'])
+            scheme = SubScheme.objects.get(subscheme_id=i['scheme_id'])
+            status = True if i['scheme_value'] == 'Yes' else False
+            if Member_scheme.objects.filter(member=member,scheme=scheme,status=status):
+                continue
+            elif Member_scheme.objects.filter(member=member,scheme=scheme):
+                member = Member_scheme.objects.filter(member=member,scheme=scheme).update(status=status)           
+            else:
+                member = Member_scheme.objects.create(member=member,scheme=scheme,status=status)           
+        return HttpResponse(content=json.dumps({'response':'success'}),content_type='Application/json')

@@ -22,6 +22,8 @@ urlpatterns = patterns('',
     url(r'^familyData/',familyData),
     url(r'^UpdateFamily_member/',UpdateFamily_member),
     url(r'^SchemeData/',SchemeData),
+    url(r'^getSchemeData/',getSchemeData),
+    url(r'^updateMemScheme/',updateMemScheme),
     url(r'^FamilyMemberData/',FamilyMemberData),
     # Examples:
     # url(r'^$', 'sensesapp.views.home', name='home'),

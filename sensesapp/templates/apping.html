@@ -843,7 +843,7 @@
                         </div>
                         <div class="form-group" style="margin:5px;">
                             <input type="submit" class="btn btn-primary" ng-click="update_member(MemberUpdate,'continue');" value="Save" />
-                            <input type="submit" class="btn btn-primary" ng-click="next=true;get_memberUpdate(Mem_ID)" value="Next>>" />
+                            <input type="submit" class="btn btn-primary" ng-click="next=true;" value="Next>>" />
                             <input type="submit" class="btn btn-primary" ng-click="update_member(MemberUpdate,'exit');" value="Save and Exit" />
                         </div>
                     </form>
@@ -854,7 +854,7 @@
                 <span class="ng-modal-close" ng-click="cancel()"><i id="closing" style="font-size:14px;float:right;cursor:pointer;" class="fa fa-times"></i></span>
             </div>
             <accordion ng-init="getScheme()">
-                    <accordion-group ng-repeat="header in scheme_list">
+                    <!--<accordion-group ng-repeat="header in scheme_list">
                           <div style="background-color:#F5F5F5 !important;">
                             <accordion-heading>
                                 <h4 class="panel-title">
@@ -865,7 +865,7 @@
                           <div class="input-group" style="border-bottom:1px solid black;" ng-click="set_statuspage('offers');load_offers();">
                                 <span style="cursor:pointer;padding-left: 5px;display:block;" >Latest offers and Best sellers</span>
                             </div>
-                    </accordion-group>
+                    </accordion-group>-->
                     <accordion-group ng-repeat="header in scheme_list">
                             <accordion-heading>
                                 <h4 class="panel-title">
@@ -877,17 +877,17 @@
                                 <!-- <input type="checkbox" style="position: relative;top: -1px;" aria-label="..." ng-model="idea_feeds[header][key]">  -->
                                 {{key.sub}}
                                 <span ng-repeat="a in ['Yes','No']">
-                                    <!--<input type="radio" name="{{key.subscheme_id}}" ng-model="{{key.subscheme_id}}" value="{{a}}">{{a}}-->
-                                    <input type="radio" name="{{key.subscheme_id}}" ng-model="{{key.subscheme_id}}" value="Yes">Yes
-                                    <input type="radio" name="{{key.subscheme_id}}" ng-model="{{key.subscheme_id}}" value="No">No
+                                    <input type="radio" name="{{key.scheme_id}}" ng-change="getMemberScheme(scheme_value,key.scheme_id,Mem_ID)" ng-model="scheme_value" value="{{a}}">{{a}}
+                                    <!--{{key.scheme_id}}<input type="radio" name="key.scheme_id" ng-model="key.scheme_id" value="Yes">Yes
+                                    <input type="radio" name="key.scheme_id" ng-model="key.scheme_id" value="No">No-->
                                 </span>
                             </div>
                         </accordion-group>
             </accordion>                        
             <div class="form-group" style="margin:5px;">
                 <input type="submit" class="btn btn-primary" ng-click="next=false" value="<<Previous" />
-                <input type="submit" class="btn btn-primary" ng-click="update_member(MemberUpdate,'continue');" value="Save" />
-                <input type="submit" class="btn btn-primary" ng-click="update_member(MemberUpdate,'exit');" value="Save and Exit" />
+                <input type="submit" class="btn btn-primary" ng-click="update_memberScheme(MemschemeList,'continue');" value="Save" />
+                <input type="submit" class="btn btn-primary" ng-click="update_memberScheme(MemschemeList,'exit');" value="Save and Exit" />
             </div>
     </div>
     </script>

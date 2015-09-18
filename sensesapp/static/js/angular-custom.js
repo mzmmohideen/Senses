@@ -436,12 +436,12 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             })
         }
         $scope.getScheme = function() {
-            console.log('vityasam')
-            $http.get('/SchemeData/',{}).success(function(data) {
+            console.log('vityasam',$scope.Mem_ID)
+            $http.get('/getSchemeData/?mem_id='+$scope.Mem_ID,{}).success(function(data) {
                 console.log('datascheme',data)
                 $scope.scheme_list = _.keys(data.data)
                 $scope.getSubScheme = data.data;
-                console.log('datascheme',$scope.getSubScheme)
+                console.log('dataschemeLISt',$scope.getSubScheme)
             })
         }
         $scope.GetMemData()
@@ -477,8 +477,23 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
                 console.log('response',response)
             })
         }
-        $scope.get_memberUpdate = function (id) {
-            console.log('mem_id',id)
+        $scope.MemschemeList = []
+        $scope.getMemberScheme = function(scheme_value,scheme_id,Mem_ID) {
+            console.log('MemschemeList',scheme_value,scheme_id,Mem_ID)
+            var schemeList = _.filter($scope.MemschemeList,function(num) { return num.scheme_id==scheme_id && num.Mem_ID == Mem_ID})
+            console.log('schemeList',schemeList)
+            $scope.MemschemeList.push({'scheme_value':scheme_value,'scheme_id':scheme_id,'Mem_ID':Mem_ID})
+            console.log('MemschemeList',$scope.MemschemeList)
+        }
+        $scope.update_memberScheme = function (MemschemeList) {
+            console.log('mem_id',MemschemeList)
+            $http.post('/updateMemScheme/',{
+                data: MemschemeList,
+            }).success(function(data){
+                console.log('data',data)
+                alert(data.response)
+                $scope.MemschemeList = []
+            })
         }
     }
 
