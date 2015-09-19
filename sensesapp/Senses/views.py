@@ -162,13 +162,13 @@ def familyData(request):
         insurance = True if data['health_insurance'] == 'Yes' else False
         try:            
             if data['familyid'] != '':
-                family = Family.objects.filter(family_id=data['familyid']).update(muhalla=masjid,ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
+                family = Family.objects.filter(family_id=data['familyid']).update(muhalla=masjid,language=data['language'],ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
                 # family_data = Family.objects.get(id=family)
                 # family_data.family_id = '%s / %s%s / %s' %(taluk.district.district_code,'%02d'%taluk.id,'%02d'%masjid.id,family_data.id)
                 # family_data.save()
                 response = 'Family Data Updated Successfully!'
             else:
-                family = Family.objects.create(family_id=data['familyid'],muhalla=masjid,ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
+                family = Family.objects.create(family_id=data['familyid'],muhalla=masjid,language=data['language'],ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
                 # family.family_id = '%s / %s%s / %s' %(taluk.district.district_code,'%02d'%taluk.id,'%02d'%masjid.id,family.id)
                 family.family_id = '%s / %s / %s' %(taluk.district.district_code,masjid.mohalla_id,family.id)
                 family.save()
@@ -177,9 +177,30 @@ def familyData(request):
         except:
             print repr(format_exc())            
     else:
-        family = map(lambda x:{'family_id':x.family_id,'muhalla':x.muhalla.name,'taluk':x.muhalla.taluk.taluk_name,'district_name':x.muhalla.taluk.district.district_name,'ration_card':x.ration_card,'address':x.address,'mobile':x.mobile,'house_type':x.house_type,'donor':x.donor,'volunteer':x.volunteer,'health_insurance':x.health_insurance,'family_needs':x.family_needs,'toilet':x.toilet,'financial_status':x.financial_status},Family.objects.all())
+        family = map(lambda x:{'family_id':x.family_id,'muhalla':x.muhalla.name,'language':x.language,'taluk':x.muhalla.taluk.taluk_name,'district_name':x.muhalla.taluk.district.district_name,'ration_card':x.ration_card,'address':x.address,'mobile':x.mobile,'house_type':x.house_type,'donor':x.donor,'volunteer':x.volunteer,'health_insurance':x.health_insurance,'family_needs':x.family_needs,'toilet':x.toilet,'financial_status':x.financial_status},Family.objects.all())
         return HttpResponse(content=json.dumps({'data':family}),content_type='Application/json')
-        
+
+def ServiceData(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)['data']
+        print 'data',data
+        if Service.objects.filter(name=data['service']):
+            service = Service.objects.filter(name=data['service']).update(description=data['description'])
+            return HttpResponse(content=json.dumps({'data':'Description Updated!'}),content_type='Application/json')
+        else:
+            service = Service.objects.create(name=data['service'],description=data['description'])
+            return HttpResponse(content=json.dumps({'data':'Service Created Successfully!'}),content_type='Application/json')
+    else:
+        try:
+            data = request.GET['del_ser']
+            print 'Yes',data
+            service = Service.objects.filter(name=data).delete()
+            print 'service',service
+            return HttpResponse(content=json.dumps({'data':'Deleted Successfully!'}),content_type='Application/json')
+        except:
+            service = map(lambda x:{'service':x.name,'description':x.description},Service.objects.all())
+            return HttpResponse(content=json.dumps({'data':service}),content_type='Application/json')
+
 def FamilyMemberData(request):
     if request.method == 'POST':
         data = json.loads(request.body)['data']
@@ -236,3 +257,15 @@ def updateMemScheme(request):
             else:
                 member = Member_scheme.objects.create(member=member,scheme=scheme,status=status)           
         return HttpResponse(content=json.dumps({'response':'success'}),content_type='Application/json')
+
+def DiseaseData(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)['data']
+        return HttpResponse(content=json.dumps({'response':'success'}),content_type='Application/json')
+    else:
+        symptom_type = request.GET['type']
+        print 'data',symptom_type
+        get_data = map(lambda x:{'type':x.sym_type,'name':x.disease_name},Disease.objects.filter(sym_type=symptom_type))
+        return HttpResponse(content=json.dumps({'response':get_data}),content_type='Application/json')
+
+        

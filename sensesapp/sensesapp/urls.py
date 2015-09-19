@@ -23,6 +23,8 @@ urlpatterns = patterns('',
     url(r'^UpdateFamily_member/',UpdateFamily_member),
     url(r'^SchemeData/',SchemeData),
     url(r'^getSchemeData/',getSchemeData),
+    url(r'^ServiceData/',ServiceData),
+    url(r'^DiseaseData/',DiseaseData),
     url(r'^updateMemScheme/',updateMemScheme),
     url(r'^FamilyMemberData/',FamilyMemberData),
     # Examples:

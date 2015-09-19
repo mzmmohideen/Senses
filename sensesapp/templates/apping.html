@@ -490,84 +490,74 @@
         </div>
     </script>
     <script type="text/ng-template" id="services.html">
-        <div class="row" ng-init="getScheme()">
+        <div class="row" ng-init="getService()">
             <div class="col-lg-12">
                 <h1 class="page-header">Services</h1>
             </div>
             <div class=" col-lg-12" style="padding-right: 20px;border-right: 1px solid #E2E2E2;height: 400px;">
             <div class="form-group" style="padding-bottom: 34px;">
-                <ui-select style="display: inline-block;height: 34px;width: 30%;float: left;" on-select="getDis=scheme_values.scheme;get_scheme(getDis)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="scheme_values.scheme">
-                    <ui-select-match placeholder="{{scheme_val}}">{{scheme_val}}</ui-select-match>
-                    <ui-select-choices refresh="getDis=$select.search;get_scheme(getDis)" repeat="mod in scheme_list | filter:$select.search">
+                <ui-select style="display: inline-block;height: 34px;width: 30%;float: left;" on-select="get_ser=service_values;get_service(get_ser)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="service_values">
+                    <ui-select-match placeholder="{{service_val}}">{{service_val}}</ui-select-match>
+                    <ui-select-choices refresh="get_ser=$select.search;get_service(get_ser)" repeat="mod in service_list | filter:$select.search">
                         <div ng-bind-html="mod | highlight: $select.search"></div>
                     </ui-select-choices>
                 </ui-select>
-                <ui-select ng-model="scheme_values.sub_scheme" style="display: inline-block;height: 34px;width: 30%;float: left;" on-select="getTal=scheme_values.sub_scheme;get_sub_scheme(getTal)" reset-search-input="false" theme="bootstrap" ng-disabled="scheme_val=='' || scheme_val=='SELECT SCHEMES'">
-                    <ui-select-match placeholder="{{sub_scheme_val}}">{{sub_scheme_val}}</ui-select-match>
-                    <ui-select-choices refresh="getTal=$select.search;get_sub_scheme(getTal)" repeat="mod in getSubScheme[scheme_val] | filter:$select.search">
-                        <div ng-bind-html="mod.sub | highlight: $select.search"></div>
-                    </ui-select-choices>
-                </ui-select>
-                <select ng-change="condition_list(scheme_values.field)" style="display: inline-block;height: 34px;width: 20%;float: left;" ng-model="scheme_values.field" ng-options="val for val in field_list" class="form-control">
-                    <option value="">SELECT FIELD</option>
-                </select>
-                <select style="display: inline-block;height: 34px;width: 20%;float: left;" ng-model="scheme_values.condition" ng-options="val for val in conditionsData" class="form-control">
-                    <option value="">SELECT CONDITION</option>
-                </select>
-                <select style="display: inline-block;height: 34px;width: 20%;float: left;" ng-model="scheme_values.apply_cond" ng-options="val for val in ['ALL,EITHER']" class="form-control">
-                    <option value="">APPLY CONDITION</option>
-                </select>
-                <ui-select ng-model="scheme_values.value" style="display: inline-block;height: 34px;width: 20%;float: left;" on-select="getVal=scheme_values.value;get_val(getVal)" reset-search-input="false" theme="bootstrap">
-                    <ui-select-match placeholder="{{value}}">{{value}}</ui-select-match>
-                    <ui-select-choices refresh="getVal=$select.search;get_val(getVal)" repeat="mod in getValue | filter:$select.search">
-                        <div ng-bind-html="mod | highlight: $select.search"></div>
-                    </ui-select-choices>
-                </ui-select>
-                <button  ng-disabled="scheme_val=='' || scheme_val=='SELECT SCHEMES' || sub_scheme_val=='' || sub_scheme_val=='SELECT SUB SCHEME'" type="submit" style="width:20%;height: 34px;float:right;" ng-click="add_schemes(scheme_val,sub_scheme_val,scheme_values)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
+                <input style="display: inline-block;height: 34px;width: 50%;float: left;" class="form-control" type="text" ng-model="description" placeholder="Description(optional)" />
+                <button  ng-disabled="service_val=='' || service_val=='SELECT or ADD SERVICES'" type="submit" style="width:20%;height: 34px;float:right;" ng-click="add_service(service_val,description)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
             </div>
-            <table class="table table-striped table-bordered table-hover ng-scope" ng-init="getLocation()">
+            <table class="table table-striped table-bordered table-hover ng-scope">
                 <thead>
                     <tr class="ng-scope">
                         <th>S.No</th>
-                        <th>Sub Schemes in {{scheme_val}}</th>
+                        <th>Services</th>
+                        <th>Description</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-show="!getSubScheme[scheme_val]">
-                        <td colspan="8" style="text-align:center;" class="ng-binding">Please Select Above Details !</td>
+                    <tr ng-show="getServices.length==0">
+                        <td colspan="8" style="text-align:center;" class="ng-binding">No Services Found!</td>
                     </tr>
-                    <tr ng-show="getSubScheme[scheme_val].length==0">
-                        <td colspan="8" style="text-align:center;" class="ng-binding">No Sub Schemes Found!</td>
-                    </tr>
-                    <tr ng-show="getSubScheme[scheme_val].length!=0" ng-repeat="sub in getSubScheme[scheme_val]" class="ng-scope">
+                    <tr ng-show="getServices.length!=0" ng-repeat="sub in getServices" class="ng-scope">
                         <td>{{$index+1}}</td>
-                        <td class="ng-binding">{{sub.sub}}</td>
-                        <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
+                        <td class="ng-binding">{{sub.service}}</td>
+                        <td class="ng-binding">{{sub.description}}</td>
+                        <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-confirm-click="Are you Sure you want to Delete?" confirmed-click="delete_service(sub.service)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
                     </tr>
                 </tbody>
             </table>
         </div>
     </script>
     <script type="text/ng-template" id="diseases.html">
-        <div class="row" ng-init="getScheme()">
+        <div class="row">
             <div class="col-lg-12">
                 <h1 class="page-header">Diseases</h1>
             </div>
             <div class="form-group" style="padding-bottom: 34px;">
-                <button  ng-disabled="scheme_val=='' || scheme_val=='SELECT SCHEMES' || sub_scheme_val=='' || sub_scheme_val=='SELECT SUB SCHEME'" type="submit" style="width:25%;height: 34px;float:right;" ng-click="add_schemes(scheme_val,sub_scheme_val,scheme_values)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
+                <select ng-change="getDisease(DiseaseVal.sym_type)" style="display: inline-block;height: 34px;width: 15%;float: left;" ng-model="DiseaseVal.sym_type" ng-options="val for val in ['DISEASE','DISORDER']" class="form-control">
+                    <option value="">SELECT TYPE</option>
+                </select>
+                <ui-select style="display: inline-block;height: 34px;width: 25%;float: left;" on-select="getDisease=DiseaseVal.name;get_disease(getDisease)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="DiseaseVal.name">
+                    <ui-select-match placeholder="{{disease_val}}">{{disease_val}}</ui-select-match>
+                    <ui-select-choices refresh="getDisease=$select.search;get_disease(getDisease)" repeat="mod in disease_list | filter:$select.search">
+                        <div ng-bind-html="mod | highlight: $select.search"></div>
+                    </ui-select-choices>
+                </ui-select>
+                <input style="display: inline-block;height: 34px;width: 45%;float: left;" class="form-control" type="text" ng-model="DiseaseVal.description" placeholder="Description(optional)" />
+                <button  ng-disabled="disease_val=='' || disease_val=='SELECT or ADD DISEASE' || !DiseaseVal.sym_type" type="submit" style="width:15%;height: 34px;float:right;" ng-click="add_schemes(scheme_val,sub_scheme_val,scheme_values)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
             </div>
-            <table class="table table-striped table-bordered table-hover ng-scope" ng-init="getLocation()">
+            <table class="table table-striped table-bordered table-hover ng-scope">
                 <thead>
                     <tr class="ng-scope">
                         <th>S.No</th>
                         <th>Diseases</th>
+                        <th>Description</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr ng-show="!getSubScheme[scheme_val]">
-                        <td colspan="8" style="text-align:center;" class="ng-binding">Please Select Above Details !</td>
+                        <td colspan="8" style="text-align:center;" class="ng-binding">Please Select Type !</td>
                     </tr>
                     <tr ng-show="getSubScheme[scheme_val].length==0">
                         <td colspan="8" style="text-align:center;" class="ng-binding">No Sub Schemes Found!</td>
@@ -575,6 +565,7 @@
                     <tr ng-show="getSubScheme[scheme_val].length!=0" ng-repeat="sub in getSubScheme[scheme_val]" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td class="ng-binding">{{sub.sub}}</td>
+                        <td class="ng-binding">{{sub.description}}</td>
                         <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
                     </tr>
                 </tbody>
@@ -694,10 +685,11 @@
                 </div>
             </div>
         <div class=" col-lg-12" style="padding-bottom: 34px;">
-                <input style="display: inline-block;width: 15%;height: 34px;float: left;" type="text" placeholder="Ration Card Number" ng-model="FamilyValue.ration_card" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <input style="display: inline-block;width: 15%;height: 34px;float: left;" type="text" placeholder="Mobile Number" ng-model="FamilyValue.mobile_no" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <input style="display: inline-block;width: 35%;height: 34px;float: left;" type="text" placeholder="Address" ng-model="FamilyValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <input style="display: inline-block;width: 35%;height: 34px;float: left;" type="text" placeholder="Any Emergency Needs in this Family?" ng-model="FamilyValue.family_needs" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                <input style="display: inline-block;width: 13%;height: 34px;float: left;" type="text" placeholder="Ration Card Number" ng-model="FamilyValue.ration_card" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                <input style="display: inline-block;width: 13%;height: 34px;float: left;" type="text" placeholder="Mobile Number" ng-model="FamilyValue.mobile_no" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                <input style="display: inline-block;height: 34px;width: 15%;float: left;" class="form-control" type="text" ng-model="FamilyValue.language" placeholder="Mother Tongue" />
+                <input style="display: inline-block;width: 29%;height: 34px;float: left;" type="text" placeholder="Address" ng-model="FamilyValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                <input style="display: inline-block;width: 30%;height: 34px;float: left;" type="text" placeholder="Any Emergency Needs in this Family?" ng-model="FamilyValue.family_needs" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
         </div>
         <div class=" col-lg-12" style="padding-bottom: 34px;">
                 <select style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="FamilyValue.house" ng-options="house for house in ['Rent','Own']" class="form-control">
@@ -815,7 +807,7 @@
                                 </select>
                             </div>
                         </div>
-                        <div class="form-group" style="margin:5px;">
+                        <!--<div class="form-group" style="margin:5px;">
                             <label class="control-label col-xs-5">Mother Tongue</label>
                             <div class="col-xs-7">
                                 <input class="form-control" type="text" ng-model="MemberUpdate.language" ng-change="clear_error()" placeholder="Mother Tongue" />
@@ -826,7 +818,7 @@
                             <div class="col-xs-7">
                                 <input class="form-control" type="text" ng-model="MemberUpdate.mobile" ng-change="clear_error()" placeholder="Mobile Number" />
                             </div>
-                        </div>
+                        </div>-->
                         <div class="form-group" style="margin:5px;">
                             <label class="control-label col-xs-5">Physically Handicaped?</label>
                             <div class="col-xs-7">

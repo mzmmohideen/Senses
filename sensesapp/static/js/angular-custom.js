@@ -5,7 +5,7 @@ underscore.factory('_', function() {
 });
 var app = angular.module('senses', ['ngSanitize', 'ngCookies', 'ui.bootstrap', 'ngRoute', 'ui.select', 'underscore']);
 app.run(function($http, $cookies) {
-    console.log($cookies.csrftoken)
+    console.log($cookies.csrftoken,'csrrf')
     $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
 });
 app.directive('ngEnter', function() {
@@ -105,23 +105,21 @@ app.directive('fileModel', ['$parse', function($parse) {
         }
     };
 }]);
+app.directive('ngConfirmClick', [
+    function(){
+        return {
+            link: function (scope, element, attr) {
+                var msg = attr.ngConfirmClick || "Are you sure?";
+                var clickAction = attr.confirmedClick;
+                element.bind('click',function (event) {
+                    if ( window.confirm(msg) ) {
+                        scope.$eval(clickAction)
+                    }
+                });
+            }
+        };
+}])
 app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,$modal) {
-    $scope.fetch_data = function() {
-        $http.get('/fetchData/', {}).success(function(data) {
-            $scope.courses = data.course;
-            $scope.unique_course = _.filter($scope.courses, function(num){ return num.course_type == 'LECTURES'; });
-            $scope.program = data.program;
-            $scope.subjectAllocData.program = $scope.program[0];
-            $scope.student_data = data.student;
-            $scope.group_data = data.group;
-            $scope.coursemap_data = data.course_map;
-            $scope.fetchSubjectAllocData();
-            $scope.subjectAllocData.group = $scope.group_data[0];
-            $scope.get_group($scope.program[0],1)
-            console.log('course_module',$scope.coursemap_data)
-        })
-    }
-    $scope.fetch_data();
     $scope.group_value="Select the Group in the list or Enter New...";
     $scope.get_group = function(prog,sem) {
         console.log('program',prog,sem,$scope.group_data)
@@ -158,11 +156,26 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         console.log('val',$scope.sub_scheme_val)
     }
     $scope.getScheme = function() {
-        console.log('vityasam')
         $http.get('/SchemeData/',{}).success(function(data) {
-            console.log('datascheme',data)
             $scope.scheme_list = _.keys(data.data)
             $scope.getSubScheme = data.data;
+        })
+    }
+    $scope.service_val = 'SELECT or ADD SERVICES';
+    $scope.get_service = function(service) {
+        if(!service) {
+            $scope.service_val = 'SELECT or ADD SERVICES';
+        }
+        else {
+            $scope.service_val = service;
+        }
+        console.log('service_val',$scope.service_val)
+    }
+    $scope.getService = function() {
+        $http.get('/ServiceData/',{}).success(function(data) {
+            console.log('datascheme',data)
+            $scope.service_list = _.pluck(data.data,"service")
+            $scope.getServices = data.data;
         })
     }
     $scope.district_val = 'SELECT DISTRICT';
@@ -184,6 +197,29 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             }
 
         }
+    }
+    $scope.DiseaseVal = {
+        sym_type: '',
+        name: '',
+        description: '',
+    }
+    $scope.disease_val = 'SELECT or ADD DISEASE';
+    $scope.get_disease = function(disease) {
+        console.log('val',disease)
+        if(!disease) {
+            $scope.disease_val = 'SELECT or ADD DISEASE';
+        }
+        else {
+            $scope.disease_val = disease;
+        }
+    }
+    $scope.getDisease = function(sym_type) {
+        console.log('sym_type',sym_type)
+        $http.get('/DiseaseData/?type='+sym_type,{}).success(function(data) {
+            console.log(data.response)
+            $scope.disease_list = _.keys(data.data)
+            $scope.getSubScheme = data.data;
+        })
     }
     $scope.scheme_values = {
         scheme: '',
@@ -348,6 +384,29 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.getLocation();
         })
     }
+    $scope.add_service = function(service,description) {
+        console.log('mahalla',service,description)
+        if(description) { var desc = description; } else { var desc = '' }
+        var data = {
+            service : service,
+            description : desc,
+        }
+        $http.post('/ServiceData/',{
+            data: data,
+        }).success(function(data){
+            alert(data.data)
+            $scope.getService()
+            console.log('data',data)
+        })
+    }
+    $scope.delete_service = function(service) {
+        console.log('???',service)
+        $http.get('/ServiceData/?del_ser='+service,{}).success(function(response){
+            alert(response.data)
+            $scope.getService()
+            console.log('response',response)
+        })
+    }
     $scope.getMahallaData = function(val) {
         $scope.muhallaData = _.filter($scope.mahallaList, function(data){ return data.district == val.district && data.taluk == val.taluk })
         console.log('mahalla',$scope.muhallaData)
@@ -509,6 +568,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.FamilyValue.house = '';
             $scope.FamilyValue.toilet = '';
             $scope.FamilyValue.financial = '';
+            $scope.FamilyValue.language = '';
             // $scope.FamilyValue.district = '';
             // $scope.FamilyValue.taluk = '';
             // $scope.FamilyValue.masjid = '';
@@ -530,6 +590,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.FamilyValue.district = family.district_name
             $scope.FamilyValue.taluk = family.taluk;
             $scope.FamilyValue.masjid = family.muhalla;
+            $scope.FamilyValue.language = family.language;
             // if(family.donor == true) { $scope.FamilyValue.donor = 'Yes'; } else if(family.donor == false) { $scope.FamilyValue.donor = 'No'; }
             if(family.health_insurance == true) { $scope.FamilyValue.health_insurance = 'Yes'; } else if(family.health_insurance == false) { $scope.FamilyValue.health_insurance = 'No'; }
             // if(family.volunteer == true) { $scope.FamilyValue.volunteer = 'Yes'; } else if(family.volunteer == false) { $scope.FamilyValue.volunteer = 'No'; }
@@ -549,6 +610,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         district_code: '',
         house: '',
         toilet: '',
+        language: '',
         // donor: '', 
         // volunteer: '', 
         health_insurance: '', 
@@ -571,6 +633,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             district: value.district,
             masjid: masjid,
             toilet: value.toilet,
+            language: value.language,
             // donor: value.donor,
             // volunteer: value.volunteer,
             health_insurance: value.health_insurance,
@@ -623,7 +686,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         //     }
         // })
         $http.get('/familyData/', {}).success(function(data) {
-            console.log('var',data)
+            console.log('varerror',data)
             $scope.familyList = _.filter(data.data,function(data) { return data.taluk == $scope.FamilyValue.taluk && data.district_name == $scope.FamilyValue.district && data.muhalla == $scope.FamilyValue.masjid.name });
             
             console.log('val',$scope.familyList)
