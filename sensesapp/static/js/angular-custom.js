@@ -216,9 +216,30 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
     $scope.getDisease = function(sym_type) {
         console.log('sym_type',sym_type)
         $http.get('/DiseaseData/?type='+sym_type,{}).success(function(data) {
-            console.log(data.response)
-            $scope.disease_list = _.keys(data.data)
-            $scope.getSubScheme = data.data;
+            $scope.disease_list = _.pluck(data.response,"name")
+            $scope.getDiseaseData = data.response;
+            console.log($scope.getDiseaseData)
+        })
+    }
+    $scope.deleteDisease = function(value) {
+        console.log('delete',value)
+        $http.get('/DiseaseData/?disease='+value.name,{}).success(function(data) {
+            alert(data.response)
+            $scope.getDisease(value.type)
+            console.log('val',data)
+        })
+    }
+    $scope.add_disease = function(disease_val,data) {
+        var symptom_type = data.sym_type;
+        console.log('value',symptom_type)
+        $http.post('/DiseaseData/',{
+            sym_type: symptom_type,
+            description: data.description,
+            disease: disease_val, 
+        }).success(function(data){
+            alert(data.response)
+            $scope.getDisease(symptom_type)
+            console.log('value',data)
         })
     }
     $scope.scheme_values = {
@@ -226,6 +247,8 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         sub_scheme: '',
         field: '',
         condition: '',
+        scheme_id: '',
+        description: '',
         value: '',
         apply: '',
     }
@@ -369,11 +392,13 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         })
     }
     $scope.add_schemes = function(scheme,sub,scheme_values) {
-        console.log('val',scheme,'taluk',sub,'scheme_values',scheme_values)
+        console.log('val',scheme,'taluk',sub,'scheme_values',scheme_values.scheme_id)
         $http.post('/SchemeData/',{
             scheme: scheme,
             sub: sub,
             field: scheme_values.field,
+            scheme_id: scheme_values.scheme_id,
+            description: scheme_values.description,
             condition: scheme_values.condition,
             value: scheme_values.value,
             apply: scheme_values.apply,
@@ -384,11 +409,12 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.getLocation();
         })
     }
-    $scope.add_service = function(service,description) {
+    $scope.add_service = function(service,service_id,description) {
         console.log('mahalla',service,description)
         if(description) { var desc = description; } else { var desc = '' }
         var data = {
             service : service,
+            service_id : service_id,
             description : desc,
         }
         $http.post('/ServiceData/',{
@@ -494,6 +520,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
                 $scope.MemberUpdate.alive = data.alive;
             })
         }
+        $scope.GetMemData()
         $scope.getScheme = function() {
             console.log('vityasam',$scope.Mem_ID)
             $http.get('/getSchemeData/?mem_id='+$scope.Mem_ID,{}).success(function(data) {
@@ -503,7 +530,13 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
                 console.log('dataschemeLISt',$scope.getSubScheme)
             })
         }
-        $scope.GetMemData()
+        $scope.getService = function() {
+            $http.get('/getServiceData/?mem_id='+$scope.Mem_ID,{}).success(function(data) {
+                console.log('datascheme',data)
+                $scope.service_list = _.keys(data.data,"service")
+                $scope.getServices = data.data;
+            })
+        }
         $scope.update_member = function(data,status) {
             console.log('member_name',status,data,$scope.Mem_ID)
             $http.post('/UpdateFamily_member/',{
@@ -544,10 +577,19 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.MemschemeList.push({'scheme_value':scheme_value,'scheme_id':scheme_id,'Mem_ID':Mem_ID})
             console.log('MemschemeList',$scope.MemschemeList)
         }
-        $scope.update_memberScheme = function (MemschemeList) {
+        $scope.MemserviceList = []
+        $scope.getMemberService = function(service_value,service_id,Mem_ID) {
+            console.log('MemserviceList',service_value,service_id,Mem_ID)
+            var serviceList = _.filter($scope.MemserviceList,function(num) { return num.service_id==service_id && num.Mem_ID == Mem_ID})
+            console.log('serviceList',serviceList)
+            $scope.MemserviceList.push({'service_value':service_value,'service_id':service_id,'Mem_ID':Mem_ID})
+            console.log('MemserviceList',$scope.MemserviceList)
+        }
+        $scope.update_memberScheme = function (MemschemeList,MemserviceList) {
             console.log('mem_id',MemschemeList)
             $http.post('/updateMemScheme/',{
-                data: MemschemeList,
+                schemeData: MemschemeList,
+                Servicedata: MemserviceList,
             }).success(function(data){
                 console.log('data',data)
                 alert(data.response)

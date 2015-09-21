@@ -57,6 +57,7 @@ class Condition(models.Model):
     value = models.CharField(max_length=20,null=True)
 
 class Service(models.Model):
+    service_id = models.CharField(max_length=10,unique=True)
     name = models.CharField(max_length=50,unique=True)
     description = models.TextField(null=True)
 
@@ -101,6 +102,7 @@ class Member_service(models.Model):
 class Disease(models.Model):
     sym_type = models.CharField(max_length=30,choices=SYMPTOMTYPE)
     disease_name = models.CharField(max_length=50,unique=True)
+    description = models.TextField(null=True)
 
 class Surgery(models.Model):
     member = models.ForeignKey(Member,null=True)

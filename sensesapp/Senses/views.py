@@ -68,9 +68,9 @@ def addLocation(request):
         return HttpResponse(content=json.dumps({'data':data,'district':district}), content_type='Application/json')
 
 def SchemeData(request):
-    print 'request'
     if request.method == 'POST':
         data = json.loads(request.body)
+        print 'data',data
         try:
             if Scheme.objects.filter(scheme_type=data['scheme']):
                 scheme = Scheme.objects.get(scheme_type=data['scheme'])
@@ -81,24 +81,23 @@ def SchemeData(request):
             # else:
             #     condition = Condition.objects.create(field=data['field'],conditions=data['condition'],value=data['value'])                
             if SubScheme.objects.filter(scheme=scheme,name=data['sub']):
-                return HttpResponse(content=json.dumps({'data':'Given condition Exist under this Scheme!'}), content_type='Application/json')
-            # elif SubScheme.objects.filter(scheme=scheme,name=data['sub']):
-            #     sub_scheme = SubScheme.objects.filter(scheme=scheme,name=data['sub'])
+                return HttpResponse(content=json.dumps({'data':'Given SubScheme Exist under this Scheme!'}), content_type='Application/json')
+            elif SubScheme.objects.filter(subscheme_id=data['scheme_id']):
+                sub_scheme = SubScheme.objects.filter(subscheme_id=data['scheme_id']).update(scheme=scheme,name=data['sub'],description=data['description'])
                 # sub_scheme.conditions .update(field=data['field'],conditions=data['condition'],value=data['value'])
-                # return HttpResponse(content=json.dumps({'data':'Updated'}), content_type='Application/json')
+                return HttpResponse(content=json.dumps({'data':'Updated'}), content_type='Application/json')
             else:
-                print 'save',scheme
-                subScheme = SubScheme.objects.create(scheme=scheme,name=data['sub'])
+                subScheme = SubScheme.objects.create(scheme=scheme,subscheme_id=data['scheme_id'],name=data['sub'],description=data['description'])
                     # ,field=data['field'],conditions=data['condition'],value=data['value'])
                 return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
         except:
             scheme = Scheme.objects.create(scheme_type=data['scheme'])
-            sub_scheme = SubScheme.objects.create(scheme=scheme,name=data['sub'],field=data['field'],conditions=data['condition'],value=data['value'])
+            sub_scheme = SubScheme.objects.create(scheme=scheme,name=data['sub'],description=data['description'],subscheme_id=data['scheme_id'])
         return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
     else:
         data = defaultdict(list)
         for i in SubScheme.objects.all():
-            data[i.scheme.scheme_type].append({'sub':i.name,'scheme_id':i.subscheme_id})
+            data[i.scheme.scheme_type].append({'sub':i.name,'scheme_id':i.subscheme_id,'description':i.description})
             # data[i.scheme.scheme_type].append({'sub':i.name,'field':i.field,'conditions':i.conditions,'value':i.value})
         # taluk = map(lambda x:{'district'}    Taluk.objects.all())
         return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
@@ -110,7 +109,6 @@ def getSchemeData(request):
             checked = Member_scheme.objects.get(member=Member.objects.get(mem_id=request.GET['mem_id']),scheme=SubScheme.objects.get(subscheme_id=i.subscheme_id)).status
         else:
             checked = False
-        print 'iii',checked,i.name
         status = 'Yes' if checked == True else 'No'
         data[i.scheme.scheme_type].append({'sub':i.name,'scheme_id':i.subscheme_id,'status':status})
     return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
@@ -132,7 +130,6 @@ def add_masjid(request):
 def masjid_member(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        print 'data',data
         # taluk = Taluk.objects.get(district=District.objects.get(district_name=data['data']['district']),taluk_name=data['data']['taluk'])
         masjid_val = Masjid.objects.get(mohalla_id=data['data']['mohalla_id'])
         if Masjid_members.objects.filter(masjid=masjid_val,member_name=data['member_name'],designation=data['designation']):
@@ -153,7 +150,6 @@ def masjid_member(request):
 def familyData(request):
     if request.method == 'POST':
         data = json.loads(request.body)['value']
-        print 'data',data
         taluk = Taluk.objects.get(taluk_name=data['taluk'],district=District.objects.get(district_name=data['district']))
         masjid = Masjid.objects.get(name=data['masjid'],taluk=taluk)
         toilet = True if data['toilet'] == 'Yes' else False
@@ -183,23 +179,34 @@ def familyData(request):
 def ServiceData(request):
     if request.method == 'POST':
         data = json.loads(request.body)['data']
-        print 'data',data
-        if Service.objects.filter(name=data['service']):
+        if Service.objects.filter(service_id=data['service_id']):
+            return HttpResponse(content=json.dumps({'data':'Service ID Exist!'}),content_type='Application/json')
+        elif Service.objects.filter(name=data['service']):
             service = Service.objects.filter(name=data['service']).update(description=data['description'])
             return HttpResponse(content=json.dumps({'data':'Description Updated!'}),content_type='Application/json')
         else:
-            service = Service.objects.create(name=data['service'],description=data['description'])
+            service = Service.objects.create(name=data['service'],service_id=data['service_id'],description=data['description'])
             return HttpResponse(content=json.dumps({'data':'Service Created Successfully!'}),content_type='Application/json')
     else:
         try:
             data = request.GET['del_ser']
-            print 'Yes',data
             service = Service.objects.filter(name=data).delete()
-            print 'service',service
             return HttpResponse(content=json.dumps({'data':'Deleted Successfully!'}),content_type='Application/json')
         except:
-            service = map(lambda x:{'service':x.name,'description':x.description},Service.objects.all())
+            service = map(lambda x:{'service':x.name,'description':x.description,'service_id':x.service_id},Service.objects.all())
             return HttpResponse(content=json.dumps({'data':service}),content_type='Application/json')
+
+def getServiceData(request):
+    print 'request',request.GET['mem_id']
+    data = defaultdict(list)
+    for i in Service.objects.all():
+        if Member_service.objects.filter(member=Member.objects.get(mem_id=request.GET['mem_id']),scheme=Service.objects.get(name=i.name)):
+            checked = Member_service.objects.get(member=Member.objects.get(mem_id=request.GET['mem_id']),scheme=Service.objects.get(name=i.name)).status
+        else:
+            checked = False
+        status = 'Yes' if checked == True else 'No'
+        data[i.name].append({'sub':i.name,'service_id':i.service_id,'status':status})
+    return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
 
 def FamilyMemberData(request):
     if request.method == 'POST':
@@ -207,7 +214,6 @@ def FamilyMemberData(request):
         familyid = json.loads(request.body)['familyid']
         family = Family.objects.get(family_id=familyid)
         voter = True if data['voter'] == 'Yes' else False
-        print 'data',familyid
         if Member.objects.filter(mem_id=data['mem_id']):
             member = Member.objects.filter(mem_id=data['mem_id']).update(family=family,name=data['name'],gender=data['gender'],age=data['age'],Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
         else:
@@ -245,8 +251,9 @@ def UpdateFamily_member(request):
 
 def updateMemScheme(request):
     if request.method == 'POST':
-        data = json.loads(request.body)['data']
-        for i in data:
+        schemeData = json.loads(request.body)['schemeData']
+        Servicedata = json.loads(request.body)['Servicedata']
+        for i in schemeData:
             member = Member.objects.get(mem_id=i['Mem_ID'])
             scheme = SubScheme.objects.get(subscheme_id=i['scheme_id'])
             status = True if i['scheme_value'] == 'Yes' else False
@@ -256,16 +263,37 @@ def updateMemScheme(request):
                 member = Member_scheme.objects.filter(member=member,scheme=scheme).update(status=status)           
             else:
                 member = Member_scheme.objects.create(member=member,scheme=scheme,status=status)           
+        for j in Servicedata:
+            member = Member.objects.get(mem_id=j['Mem_ID'])
+            service = Service.objects.get(service_id=j['service_id'])
+            status = True if j['service_value'] == 'Yes' else False
+            if Member_service.objects.filter(member=member,scheme=service,status=status):
+                continue
+            elif Member_service.objects.filter(member=member,scheme=service):
+                member = Member_service.objects.filter(member=member,scheme=service).update(status=status)           
+            else:
+                member = Member_service.objects.create(member=member,scheme=service,status=status)                           
         return HttpResponse(content=json.dumps({'response':'success'}),content_type='Application/json')
 
 def DiseaseData(request):
     if request.method == 'POST':
-        data = json.loads(request.body)['data']
-        return HttpResponse(content=json.dumps({'response':'success'}),content_type='Application/json')
+        data = json.loads(request.body)
+        if Disease.objects.filter(disease_name=data['disease']):
+            disease = Disease.objects.filter(disease_name=data['disease']).update(description=data['description'])
+            return HttpResponse(content=json.dumps({'response':'Description updated!'}),content_type='Application/json')
+        else:
+            disease = Disease.objects.create(disease_name=data['disease'],sym_type=data['sym_type'],description=data['description'])
+            return HttpResponse(content=json.dumps({'response':'Disease added Successfully!'}),content_type='Application/json')
     else:
-        symptom_type = request.GET['type']
-        print 'data',symptom_type
-        get_data = map(lambda x:{'type':x.sym_type,'name':x.disease_name},Disease.objects.filter(sym_type=symptom_type))
-        return HttpResponse(content=json.dumps({'response':get_data}),content_type='Application/json')
+        try:
+            symptom_type = request.GET['type']
+            # get_data = defaultdict(list)
+            # for k in Disease.objects.filter(sym_type=symptom_type):
+                # get_data[k.sym_type].append({'description':k.description,'name':k.disease_name})
+            get_data = map(lambda x:{'type':x.sym_type,'name':x.disease_name,'description':x.description},Disease.objects.filter(sym_type=symptom_type))
+            return HttpResponse(content=json.dumps({'response':get_data}),content_type='Application/json')
+        except:
+            disease = Disease.objects.filter(disease_name=request.GET['disease']).delete()
+            return HttpResponse(content=json.dumps({'response':'Disease Deleted Successfully!'}),content_type='Application/json')
 
         
