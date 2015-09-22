@@ -387,7 +387,7 @@
             </div>
         <div class=" col-lg-12" style="padding-bottom: 34px;">
                 <input style="display: inline-block;width: 35%;height: 34px;float: left;" type="text" placeholder="Masjid Name" ng-model="MasjidAddValue.masjid_name" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <input style="display: inline-block;width: 15%;height: 34px;float: left;" type="text" placeholder="Number of Musallas" ng-model="MasjidAddValue.musallas" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                <input style="display: inline-block;width: 15%;height: 34px;float: left;" type="text" placeholder="Number of Musallis" ng-model="MasjidAddValue.musallas" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
                 <input style="display: inline-block;width: 50%;height: 34px;float: left;" type="text" placeholder="Address" ng-model="MasjidAddValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
         </div>
         <!--<div class=" col-lg-12" style="padding-bottom: 34px;">
@@ -801,43 +801,58 @@
             </div>
              <form class="form-horizontal">
                         <div class="form-group" style="margin:5px;">
-                            <label class="control-label col-xs-5">Volounteer?</label>
-                            <div class="col-xs-7">
+                            <label class="control-label col-xs-7">Volounteer?</label>
+                            <div class="col-xs-5">
                                 <select ng-model="MemberUpdate.volunteer" ng-options="volunteer for volunteer in ['Yes','No']" class="form-control">
                                     <option value="">Want to be a Volunteer?</option>
                                 </select>
                             </div>
                         </div>
                         <div class="form-group" style="margin:5px;">
-                            <label class="control-label col-xs-5">Donor?</label>
-                            <div class="col-xs-7">
+                            <label class="control-label col-xs-7">Donor?</label>
+                            <div class="col-xs-5">
                                 <select ng-model="MemberUpdate.donor" ng-options="donor for donor in ['Yes','No']" class="form-control">
                                     <option value="">Willing to be a Financial Donor?</option>
                                 </select>
                             </div>
                         </div>
                         <!--<div class="form-group" style="margin:5px;">
-                            <label class="control-label col-xs-5">Mother Tongue</label>
-                            <div class="col-xs-7">
+                            <label class="control-label col-xs-7">Mother Tongue</label>
+                            <div class="col-xs-5">
                                 <input class="form-control" type="text" ng-model="MemberUpdate.language" ng-change="clear_error()" placeholder="Mother Tongue" />
                             </div>
                         </div>
                         <div class="form-group" style="margin:5px;">
-                            <label class="control-label col-xs-5">Mobile</label>
-                            <div class="col-xs-7">
+                            <label class="control-label col-xs-7">Mobile</label>
+                            <div class="col-xs-5">
                                 <input class="form-control" type="text" ng-model="MemberUpdate.mobile" ng-change="clear_error()" placeholder="Mobile Number" />
                             </div>
                         </div>-->
                         <div class="form-group" style="margin:5px;">
-                            <label class="control-label col-xs-5">Physically Handicaped?</label>
-                            <div class="col-xs-7">
+                            <label class="control-label col-xs-7">Interested to join Makthab Madarasa?</label>
+                            <div class="col-xs-5">
+                                <input type="radio" name="madarasa" ng-model="MemberUpdate.makthab" value="Yes">Yes
+                                <input type="radio" name="madarasa" ng-model="MemberUpdate.makthab" value="No">No
+                            </div>
+                        </div>
+                        <div ng-show="MemberUpdate.makthab" class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-7">Makthab Madarasa Category</label>
+                            <div class="col-xs-5">
+                                <select ng-model="MemberUpdate.makthab_detail" ng-options="val for val in ['Boys For Makthab 4-15','Girls For Makthab 4-15','Adult Makthab','Interest in Aalim/Hifz','Interest in Niswan','Interest in 1yr Muallim']" class="form-control">
+                                    <option value="">Makthab Category</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-7">Physically Handicaped?</label>
+                            <div class="col-xs-5">
                                 <input type="radio" name="physical" ng-model="MemberUpdate.physical" value="Yes">Yes
                                 <input type="radio" name="physical" ng-model="MemberUpdate.physical" value="No">No
                             </div>
                         </div>
                         <div class="form-group" style="margin:5px;">
-                            <label class="control-label col-xs-5">Whether Alive or Not?</label>
-                            <div class="col-xs-7">
+                            <label class="control-label col-xs-7">Whether Alive or Not?</label>
+                            <div class="col-xs-5">
                                 <input type="radio" name="alive" ng-model="MemberUpdate.alive" value="Yes">Yes
                                 <input type="radio" name="alive" ng-model="MemberUpdate.alive" value="No">No
                             </div>
@@ -858,39 +873,127 @@
                     <accordion-group ng-repeat="header in scheme_list">
                             <accordion-heading>
                                 <h4 class="panel-title">
-                                            <a data-toggle="collapse" data-parent="#accordion"  aria-expanded="true" aria-controls="collapseOne">{{header}}</a>
+                                            <a data-toggle="collapse" style="text-decoration:none;" data-parent="#accordion"  aria-expanded="true" aria-controls="collapseOne">{{header}}</a>
                                         </h4>
                             </accordion-heading>
-                            <div class="input-group" ng-repeat="key in getSubScheme[header]" style="border-bottom:1px solid black;" ng-click="">
-                                {{key.sub}}
-                                <span ng-repeat="a in ['Yes','No']">
-                                    <input type="radio" name="{{key.scheme_id}}" ng-change="getMemberScheme(scheme_value,key.scheme_id,Mem_ID)" ng-model="scheme_value" value="{{a}}">{{a}}
-                                    <!--{{key.scheme_id}}<input type="radio" name="key.scheme_id" ng-model="key.scheme_id" value="Yes">Yes
+                            <div class="form-group" ng-repeat="key in getSubScheme[header]">
+                                <label class="control-label col-xs-6">{{key.sub}}</label>
+                                <input type="radio" name="{{key.scheme_id}}" ng-change="getMemberScheme(scheme_value,key.scheme_id,Mem_ID)" ng-model="scheme_value" value="Yes">Yes
+                                <input type="radio" name="{{key.scheme_id}}" ng-change="getMemberScheme(scheme_value,key.scheme_id,Mem_ID)" ng-model="scheme_value" value="No">No
+                                <!--<span ng-repeat="a in ['Yes','No']">
+                                    <!--<input type="radio" name="{{key.scheme_id}}" ng-change="getMemberScheme(scheme_value,key.scheme_id,Mem_ID)" ng-model="scheme_value" value="{{a}}">{{a}}
+                                     {{key.scheme_id}}<input type="radio" name="key.scheme_id" ng-model="key.scheme_id" value="Yes">Yes
                                     <input type="radio" name="key.scheme_id" ng-model="key.scheme_id" value="No">No-->
-                                </span>
+                                </span>-->
                             </div>
                     </accordion-group>
                     <accordion-group>
                           <div style="background-color:#F5F5F5 !important;">
                             <accordion-heading>
                                 <h4 class="panel-title">
-                                            <a data-toggle="collapse" data-parent="#accordion"  aria-expanded="true" aria-controls="collapseOne">Services</a>
+                                            <a data-toggle="collapse" style="text-decoration:none;" data-parent="#accordion"  aria-expanded="true" aria-controls="collapseOne">Services</a>
                                         </h4>
                             </accordion-heading>
                           </div>
-                          <div class="input-group" style="border-bottom:1px solid black;" ng-repeat="(key,val) in getServices">
-                                <span style="cursor:pointer;padding-left: 5px;display:block;" >
-                                    {{key}}
-                                    <span ng-repeat="a in ['Yes','No']">
-                                    <input type="radio" name="{{getServices[key][0].service_id}}" ng-change="getMemberService(service_value,getServices[key][0].service_id,Mem_ID)" ng-model="service_value" value="{{a}}">{{a}}
-                                </span>
-                            </div>
+                          <div class="form-group" ng-repeat="(key,val) in getServices">
+                                <label class="control-label col-xs-6">{{key}}</label>
+                                <input type="radio" name="{{getServices[key][0].service_id}}" ng-change="getMemberService(service_value,getServices[key][0].service_id,Mem_ID)" ng-model="service_value" value="Yes">Yes
+                                <input type="radio" name="{{getServices[key][0].service_id}}" ng-change="getMemberService(service_value,getServices[key][0].service_id,Mem_ID)" ng-model="service_value" value="No">No
+                          </div>
+                    </accordion-group>
+                    <accordion-group>
+                          <div style="background-color:#F5F5F5 !important;">
+                            <accordion-heading>
+                                <h4 class="panel-title">
+                                            Disease
+                                        </h4>
+                            </accordion-heading>
+                          </div>
+                          <div class="form-group">
+                                <select ng-change="getDisease(DiseaseValue.sym_type)" style="display: inline-block;height: 34px;width: 40%;float: left;" ng-model="DiseaseValue.sym_type" ng-options="val for val in ['DISEASE','DISORDER']" class="form-control">
+                                    <option value="">SELECT TYPE</option>
+                                </select>
+                                <ui-select style="display: inline-block;height: 34px;width: 60%;float: left;" on-select="getDisease=DiseaseValue.name;get_disease(getDisease)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="DiseaseValue.name">
+                                    <ui-select-match placeholder="{{disease_val}}">{{disease_val}}
+                                    </ui-select-match>
+                                    <ui-select-choices refresh="getDisease=$select.search;get_disease(getDisease)" repeat="mod in disease_list | filter:$select.search">
+                                    <div ng-bind-html="mod | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                          </div>
+                          <div class="form-group" ng-init="DiseaseValue.name=disease_val">      
+                                <input style="display: inline-block;height: 34px;width: 50%;float: left;" type="text" ng-model="DiseaseValue.medicine" placeholder="Medicine Name">
+                                <input style="display: inline-block;height: 34px;width: 50%;float: left;" type="text" ng-model="DiseaseValue.cost" placeholder="Medicine Cost">
+                          </div>
+                    </accordion-group>
+                    <accordion-group>
+                          <div style="background-color:#F5F5F5 !important;">
+                            <accordion-heading>
+                                <h4 class="panel-title">
+                                            Surgery
+                                        </h4>
+                            </accordion-heading>
+                          </div>
+                          <div class="form-group">
+                                <label class="control-label col-xs-6">Surgery Needed?</label>
+                                <input type="radio" name="surgery" ng-model="surgery_val" value="Yes">Yes
+                                <input type="radio" name="surgery" ng-model="surgery_val" value="No">No
+                          </div>
+                          <div ng-show="surgery_val" class="form-group">
+                                <select ng-change="getDisease(SurgeryValue.sym_type)" style="display: inline-block;height: 34px;width: 40%;float: left;" ng-model="SurgeryValue.sym_type" ng-options="val for val in ['DISEASE','DISORDER']" class="form-control">
+                                    <option value="">SELECT TYPE</option>
+                                </select>
+                                <ui-select style="display: inline-block;height: 34px;width: 60%;float: left;" on-select="getDisease=SurgeryValue.name;sur_get_disease(getDisease)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="SurgeryValue.name">
+                                    <ui-select-match placeholder="{{sur_disease_val}}">{{sur_disease_val}}
+                                    </ui-select-match>
+                                    <ui-select-choices refresh="getDisease=$select.search;sur_get_disease(getDisease)" repeat="mod in disease_list | filter:$select.search">
+                                    <div ng-bind-html="mod | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                          </div>
+                          <div ng-show="surgery_val" class="form-group" ng-init="SurgeryValue.name=sur_disease_val">      
+                                <input style="display: inline-block;height: 34px;width: 50%;float: left;" type="text" ng-model="SurgeryValue.operation" placeholder="Operation Cost">
+                                <input style="display: inline-block;height: 34px;width: 50%;float: left;" type="text" ng-model="SurgeryValue.cash_hand" placeholder="Cash in Hand">
+                                <input style="display: inline-block;height: 34px;width: 50%;float: left;" type="text" ng-model="SurgeryValue.operation_cost" placeholder="Hospital Name">
+                                <input style="display: inline-block;height: 34px;width: 50%;float: left;" type="text" ng-model="SurgeryValue.details" placeholder="Surgery Details">
+                          </div>
+                    </accordion-group>
+                    <accordion-group>
+                          <div style="background-color:#F5F5F5 !important;">
+                            <accordion-heading>
+                                <h4 class="panel-title">
+                                            Are you ever Cured from Chronic Disease?
+                                        </h4>
+                            </accordion-heading>
+                          </div>
+                          <div class="form-group">
+                                <label class="control-label col-xs-6">cured from Chronic Disease?</label>
+                                <input type="radio" name="chronic" ng-model="ChronicValue.chronic_val" value="Yes">Yes
+                                <input type="radio" name="chronic" ng-model="ChronicValue.chronic_val" value="No">No
+                          </div>
+                          <div ng-show="ChronicValue.chronic_val" class="form-group">
+                                <select ng-change="getDisease(ChronicValue.sym_type)" style="display: inline-block;height: 34px;width: 40%;float: left;" ng-model="ChronicValue.sym_type" ng-options="val for val in ['DISEASE','DISORDER']" class="form-control">
+                                    <option value="">SELECT TYPE</option>
+                                </select>
+                                <ui-select style="display: inline-block;height: 34px;width: 60%;float: left;" on-select="getDisease=ChronicValue.name;chr_get_disease(getDisease)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="ChronicValue.name">
+                                    <ui-select-match placeholder="{{chr_disease_val}}">{{chr_disease_val}}
+                                    </ui-select-match>
+                                    <ui-select-choices refresh="getDisease=$select.search;chr_get_disease(getDisease)" repeat="mod in disease_list | filter:$select.search">
+                                    <div ng-bind-html="mod | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                          </div>
+                          <div ng-show="ChronicValue.chronic_val" class="form-group" ng-init="ChronicValue.name=chr_disease_val">      
+                                <input style="display: inline-block;height: 34px;width: 50%;float: left;" type="text" ng-model="ChronicValue.doctor" placeholder="Doctor Name">
+                                <input style="display: inline-block;height: 34px;width: 50%;float: left;" type="text" ng-model="ChronicValue.tot_cost" placeholder="Total Cost for Treatment">
+                                <input style="display: inline-block;height: 34px;width: 50%;float: left;" type="text" ng-model="ChronicValue.details" placeholder="Disease Details">
+                          </div>
                     </accordion-group>    
             </accordion>                        
             <div class="form-group" style="margin:5px;">
                 <input type="submit" class="btn btn-primary" ng-click="next=false" value="<<Previous" />
-                <input type="submit" class="btn btn-primary" ng-click="update_memberScheme(MemschemeList,MemserviceList,'continue');" value="Save" />
-                <input type="submit" class="btn btn-primary" ng-click="update_memberScheme(MemschemeList,MemserviceList,'exit');" value="Save and Exit" />
+                <input type="submit" class="btn btn-primary" ng-click="update_memberScheme(MemschemeList,MemserviceList,DiseaseValue,SurgeryValue,ChronicValue,'continue');" value="Save" />
+                <input type="submit" class="btn btn-primary" ng-click="update_memberScheme(MemschemeList,MemserviceList,DiseaseValue,SurgeryValue,ChronicValue,'exit');" value="Save and Exit" />
             </div>
     </div>
     </script>

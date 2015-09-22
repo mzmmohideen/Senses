@@ -231,10 +231,11 @@ def UpdateFamily_member(request):
         mem_id = json.loads(request.body)['mem_id']
         donor = True if data['donor'] == 'Yes' else False
         volunteer = True if data['volunteer'] == 'Yes' else False
+        makthab = True if data['makthab'] == 'Yes' else False
         physical = True if data['physical'] == 'Yes' else False 
         alive = True if data['alive'] == 'Yes' else False 
         if Member.objects.filter(mem_id=mem_id):
-            member = Member.objects.filter(mem_id=mem_id).update(mother_tongue=data['language'],disability=physical,donor=donor,volunteer=volunteer,mobile=data['mobile'],alive=alive)
+            member = Member.objects.filter(mem_id=mem_id).update(mother_tongue=data['language'],Makthab=makthab,madarasa_details=data['makthab_detail'],disability=physical,donor=donor,volunteer=volunteer,mobile=data['mobile'],alive=alive)
             return HttpResponse(content=json.dumps('success'),content_type='Application/json')
         else:
             return HttpResponse(content=json.dumps('notfound'),content_type='Application/json')
@@ -244,10 +245,11 @@ def UpdateFamily_member(request):
             member = Member.objects.get(mem_id=mem_id)
             # .update(mother_tongue=data['language'],disability=physical,donor=donor,volunteer=volunteer,mobile=data['mobile'])
             donor = 'Yes' if member.donor == True else 'No'
+            makthab = 'Yes' if member.Makthab == True else 'No'
             disability = 'Yes' if member.disability == True else 'No'
             volunteer = 'Yes' if member.volunteer == True else 'No'
             alive = 'Yes' if member.alive == True else 'No' 
-            return HttpResponse(content=json.dumps({'alive':alive,'language':member.mother_tongue,'disability':disability,'volunteer':volunteer,'mobile':member.mobile,'donor':donor}),content_type='Application/json')
+            return HttpResponse(content=json.dumps({'alive':alive,'makthab':makthab,'makthab_detail':member.madarasa_details,'language':member.mother_tongue,'disability':disability,'volunteer':volunteer,'mobile':member.mobile,'donor':donor}),content_type='Application/json')
 
 def updateMemScheme(request):
     if request.method == 'POST':

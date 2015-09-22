@@ -506,15 +506,17 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             language : '', 
             mobile : '', 
             physical : '', 
-            alive : '', 
+            alive : '',
+            makthab : '',
+            makthab_detail : '', 
         }
         $scope.GetMemData = function() {
-            console.log('varll',$scope.Mem_ID)
             $http.get('/UpdateFamily_member/?mem_id='+$scope.Mem_ID,{}).success(function(data){
-                console.log('data',data)
                 $scope.MemberUpdate.volunteer = data.volunteer;
                 $scope.MemberUpdate.mobile = data.mobile;
                 $scope.MemberUpdate.donor = data.donor;
+                $scope.MemberUpdate.makthab = data.makthab;
+                $scope.MemberUpdate.makthab_detail = data.makthab_detail;
                 $scope.MemberUpdate.language = data.language;
                 $scope.MemberUpdate.physical = data.disability;
                 $scope.MemberUpdate.alive = data.alive;
@@ -522,17 +524,14 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         }
         $scope.GetMemData()
         $scope.getScheme = function() {
-            console.log('vityasam',$scope.Mem_ID)
             $http.get('/getSchemeData/?mem_id='+$scope.Mem_ID,{}).success(function(data) {
                 console.log('datascheme',data)
                 $scope.scheme_list = _.keys(data.data)
                 $scope.getSubScheme = data.data;
-                console.log('dataschemeLISt',$scope.getSubScheme)
             })
         }
         $scope.getService = function() {
             $http.get('/getServiceData/?mem_id='+$scope.Mem_ID,{}).success(function(data) {
-                console.log('datascheme',data)
                 $scope.service_list = _.keys(data.data,"service")
                 $scope.getServices = data.data;
             })
@@ -569,24 +568,81 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
                 console.log('response',response)
             })
         }
+        $scope.DiseaseValue = {
+            sym_type: '',
+            name: '',
+            medicine: '',
+            cost: '',
+        }
+        $scope.SurgeryValue = {
+            name : '',
+            operation : '',
+            cash_hand : '',
+            operation_cost : '',
+            details : '',
+        }
+        $scope.ChronicValue = {
+            name : '',
+            chronic_val : '',
+            doctor : '',
+            tot_cost : '',
+            details : '',
+        }
+        $scope.disease_val = 'SELECT or ADD DISEASE';
+        $scope.get_disease = function(disease) {
+            if(!disease) {
+                $scope.disease_val = 'SELECT or ADD DISEASE';
+            }
+            else {
+                $scope.disease_val = disease;
+            }
+        }
+        $scope.sur_disease_val = 'SELECT or ADD DISEASE';
+        $scope.sur_get_disease = function(disease) {
+            if(!disease) {
+                $scope.sur_disease_val = 'SELECT or ADD DISEASE';
+            }
+            else {
+                $scope.sur_disease_val = disease;
+            }
+        }
+        $scope.chr_disease_val = 'SELECT or ADD DISEASE';
+        $scope.chr_get_disease = function(disease) {
+            if(!disease) {
+                $scope.chr_disease_val = 'SELECT or ADD DISEASE';
+            }
+            else {
+                $scope.chr_disease_val = disease;
+            }
+        }
+        $scope.getDisease = function(sym_type) {
+            console.log('sym_type',sym_type)
+            $http.get('/DiseaseData/?type='+sym_type,{}).success(function(data) {
+                $scope.disease_list = _.pluck(data.response,"name")
+                $scope.getDiseaseData = data.response;
+                console.log($scope.getDiseaseData)
+            })
+        }
         $scope.MemschemeList = []
         $scope.getMemberScheme = function(scheme_value,scheme_id,Mem_ID) {
             console.log('MemschemeList',scheme_value,scheme_id,Mem_ID)
-            var schemeList = _.filter($scope.MemschemeList,function(num) { return num.scheme_id==scheme_id && num.Mem_ID == Mem_ID})
-            console.log('schemeList',schemeList)
+            var schemeList = _.find($scope.MemschemeList,function(num) { return num.scheme_id==scheme_id})
+            if(schemeList !== undefined) {
+                $scope.MemschemeList.splice(schemeList,1)
+            }
             $scope.MemschemeList.push({'scheme_value':scheme_value,'scheme_id':scheme_id,'Mem_ID':Mem_ID})
-            console.log('MemschemeList',$scope.MemschemeList)
         }
         $scope.MemserviceList = []
         $scope.getMemberService = function(service_value,service_id,Mem_ID) {
             console.log('MemserviceList',service_value,service_id,Mem_ID)
-            var serviceList = _.filter($scope.MemserviceList,function(num) { return num.service_id==service_id && num.Mem_ID == Mem_ID})
-            console.log('serviceList',serviceList)
+            var serviceList = _.find($scope.MemserviceList,function(num) { return num.service_id == service_id; })
+            if(serviceList !== undefined) {
+                $scope.MemserviceList.splice(serviceList,1)
+            }
             $scope.MemserviceList.push({'service_value':service_value,'service_id':service_id,'Mem_ID':Mem_ID})
-            console.log('MemserviceList',$scope.MemserviceList)
         }
-        $scope.update_memberScheme = function (MemschemeList,MemserviceList) {
-            console.log('mem_id',MemschemeList)
+        $scope.update_memberScheme = function (MemschemeList,MemserviceList,DiseaseValue,SurgeryValue,ChronicValue,status) {
+            console.log('mem_id',DiseaseValue,SurgeryValue,ChronicValue)
             $http.post('/updateMemScheme/',{
                 schemeData: MemschemeList,
                 Servicedata: MemserviceList,
