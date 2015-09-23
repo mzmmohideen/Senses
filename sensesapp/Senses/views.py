@@ -176,6 +176,18 @@ def familyData(request):
         family = map(lambda x:{'family_id':x.family_id,'muhalla':x.muhalla.name,'language':x.language,'taluk':x.muhalla.taluk.taluk_name,'district_name':x.muhalla.taluk.district.district_name,'ration_card':x.ration_card,'address':x.address,'mobile':x.mobile,'house_type':x.house_type,'donor':x.donor,'volunteer':x.volunteer,'health_insurance':x.health_insurance,'family_needs':x.family_needs,'toilet':x.toilet,'financial_status':x.financial_status},Family.objects.all())
         return HttpResponse(content=json.dumps({'data':family}),content_type='Application/json')
 
+def fetchReportData(request):
+    if request.method == 'GET':
+        print '??',request.GET['muhalla_id']
+        muhalla = Masjid.objects.get(mohalla_id=request.GET['muhalla_id'])
+        get_family = Family.objects.filter(muhalla=muhalla)
+        # getFamData = map(lambda x:{})
+        get_memData = Member.objects.filter(family=Family.objects.get(muhalla=Masjid.objects.get(mohalla_id=request.GET['muhalla_id'])))
+        # for i in get_memData:
+        #     print 'i',i
+        return HttpResponse(content=json.dumps({'data':family}),content_type='Application/json')
+
+
 def ServiceData(request):
     if request.method == 'POST':
         data = json.loads(request.body)['data']
@@ -255,27 +267,57 @@ def updateMemScheme(request):
     if request.method == 'POST':
         schemeData = json.loads(request.body)['schemeData']
         Servicedata = json.loads(request.body)['Servicedata']
+        disease_val = json.loads(request.body)['disease_val']
+        surgery_val = json.loads(request.body)['surgery_val']
+        chronic_val = json.loads(request.body)['chronic_val']
+        member_id = json.loads(request.body)['mem_id']
+        member_obj = Member.objects.get(mem_id=member_id)
         for i in schemeData:
-            member = Member.objects.get(mem_id=i['Mem_ID'])
+            # member = Member.objects.get(mem_id=i['Mem_ID'])
             scheme = SubScheme.objects.get(subscheme_id=i['scheme_id'])
             status = True if i['scheme_value'] == 'Yes' else False
-            if Member_scheme.objects.filter(member=member,scheme=scheme,status=status):
+            if Member_scheme.objects.filter(member=member_obj,scheme=scheme,status=status):
                 continue
-            elif Member_scheme.objects.filter(member=member,scheme=scheme):
-                member = Member_scheme.objects.filter(member=member,scheme=scheme).update(status=status)           
+            elif Member_scheme.objects.filter(member=member_obj,scheme=scheme):
+                member = Member_scheme.objects.filter(member=member_obj,scheme=scheme).update(status=status)           
             else:
-                member = Member_scheme.objects.create(member=member,scheme=scheme,status=status)           
+                member = Member_scheme.objects.create(member=member_obj,scheme=scheme,status=status)           
         for j in Servicedata:
-            member = Member.objects.get(mem_id=j['Mem_ID'])
+            # member = Member.objects.get(mem_id=j['Mem_ID'])
             service = Service.objects.get(service_id=j['service_id'])
             status = True if j['service_value'] == 'Yes' else False
-            if Member_service.objects.filter(member=member,scheme=service,status=status):
+            if Member_service.objects.filter(member=member_obj,scheme=service,status=status):
                 continue
-            elif Member_service.objects.filter(member=member,scheme=service):
-                member = Member_service.objects.filter(member=member,scheme=service).update(status=status)           
+            elif Member_service.objects.filter(member=member_obj,scheme=service):
+                member = Member_service.objects.filter(member=member_obj,scheme=service).update(status=status)           
             else:
-                member = Member_service.objects.create(member=member,scheme=service,status=status)                           
+                member = Member_service.objects.create(member=member_obj,scheme=service,status=status)
+        if disease_val['name'] != '':
+            disease = Disease.objects.get(disease_name=disease_val['name']) if Disease.objects.filter(disease_name=disease_val['name']) else Disease.objects.create(sym_type=disease_val['sym_type'],disease_name=disease_val['name'])
+            medical_needs = Medical.objects.filter(member=member_obj,disease=disease).update(medicine_needs=disease_val['medicine'],cost=disease_val['cost']) if Medical.objects.filter(member=member_obj,disease=disease) else Medical.objects.create(member=member_obj,disease=disease,medicine_needs=disease_val['medicine'],cost=disease_val['cost'])
+        if surgery_val['surgery_val'] == 'Yes':
+            disease = Disease.objects.get(disease_name=surgery_val['name']) if Disease.objects.filter(disease_name=surgery_val['name']) else Disease.objects.create(sym_type=surgery_val['sym_type'],disease_name=surgery_val['name'])
+            surgery_help = Surgery.objects.filter(member=member_obj,disease=disease).update(hospital_name=surgery_val['hospital_name'],cost=surgery_val['operation_cost'],cash_inHand=surgery_val['cash_hand'],details=surgery_val['details']) if Surgery.objects.filter(member=member_obj,disease=disease) else Surgery.objects.create(member=member_obj,disease=disease,hospital_name=surgery_val['hospital_name'],cost=surgery_val['operation_cost'],cash_inHand=surgery_val['cash_hand'],details=surgery_val['details'])
+        if chronic_val['chronic_val'] == 'Yes':
+            disease = Disease.objects.get(disease_name=chronic_val['name']) if Disease.objects.filter(disease_name=chronic_val['name']) else Disease.objects.create(sym_type=chronic_val['sym_type'],disease_name=chronic_val['name'])
+            chronic_detail = ChronicDisease.objects.filter(member=member_obj,disease_name=disease).update(doctor_name=chronic_val['doctor'],cost=chronic_val['tot_cost'],status=True,details=chronic_val['details']) if Surgery.objects.filter(member=member_obj,disease=disease) else ChronicDisease.objects.create(member=member_obj,disease_name=disease,doctor_name=chronic_val['doctor'],cost=chronic_val['tot_cost'],status=True,details=chronic_val['details'])
         return HttpResponse(content=json.dumps({'response':'success'}),content_type='Application/json')
+    else:
+        member_id = request.GET['mem_id']
+        member_obj = Member.objects.get(mem_id=member_id)
+        if ChronicDisease.objects.filter(member=member_obj):
+            chronic_detail = map(lambda x:{'sym_type':x.disease_name.sym_type,'disease':x.disease_name.disease_name,'doctor':x.doctor_name,'cost':x.cost,'status':x.status,'details':x.details},ChronicDisease.objects.filter(member=member_obj))
+        else:
+            chronic_detail = []
+        if Surgery.objects.filter(member=member_obj):
+            surgery_detail = map(lambda x:{'sym_type':x.disease.sym_type,'disease':x.disease.disease_name,'hospital_name':x.hospital_name,'cost':x.cost,'cash_hand':x.cash_inHand,'details':x.details},Surgery.objects.filter(member=member_obj))
+        else:
+            surgery_detail = []
+        if Medical.objects.filter(member=member_obj):
+            medical_details = map(lambda x:{'sym_type':x.disease.sym_type,'disease':x.disease.disease_name,'medicine_needs':x.medicine_needs,'cost':x.cost},Medical.objects.filter(member=member_obj))
+        else:
+            medical_details = []
+        return HttpResponse(content=json.dumps({'medical':medical_details,'surgery':surgery_detail,'chronic':chronic_detail}),content_type='Application/json')            
 
 def DiseaseData(request):
     if request.method == 'POST':

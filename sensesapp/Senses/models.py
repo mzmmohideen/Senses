@@ -110,6 +110,7 @@ class Surgery(models.Model):
     hospital_name = models.CharField(max_length=50,null=True)
     cost = models.CharField(max_length=20,null=True)
     cash_inHand = models.CharField(max_length=20,null=True)
+    details = models.TextField(null=True)
 
 class Medical(models.Model):
     member = models.ForeignKey(Member,null=True)

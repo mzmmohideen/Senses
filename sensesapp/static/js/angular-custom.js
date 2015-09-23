@@ -315,9 +315,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
     }
     $scope.mahallaList = [];
     $scope.getMasjidData = function(masjid_val) {
-        console.log('masjid',masjid_val)
         $http.get('/add_masjid/').success(function(data){
-            console.log('valuemasjid',data)
             $scope.mahallaList = data.data;
             // $scope.masjidList = _.pluck(data.data,"mohalla_id")
             if(!masjid_val) {
@@ -337,7 +335,6 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
                 $scope.MasjidAddValue.taluk = $scope.getMasjidListData[0].taluk;
                 $scope.MasjidAddValue.address = $scope.getMasjidListData[0].location;
                 $scope.getMasjidMember($scope.MasjidAddValue);
-                console.log('data',$scope.getMasjidListData)
             }
         })
     }
@@ -345,7 +342,14 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         console.log('mahalla',$scope.mahallaList)
         console.log('dataMasjid',data)
         $scope.masjidList = _.pluck(_.filter($scope.mahallaList,function(num) {return num.district == data.district && num.taluk == data.taluk}),"mohalla_id")
+        $scope.muhallaList = _.filter($scope.mahallaList,function(num) {return num.district == data.district && num.taluk == data.taluk})
         console.log('val',$scope.masjidList)
+    }
+    $scope.getFamilyReport = function(data) {
+        console.log('value',data)
+        $http.get('/fetchReportData/?muhalla_id='+data.muhalla.mohalla_id,{}).success(function(data){
+            console.log('data',data)
+        })
     }
     $scope.getMasjidMember = function(data) {
         console.log('masjid_member',data)
@@ -445,6 +449,13 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.getTaluk = data.data;
         })
     }
+    $scope.ReportValues = {
+        district : '',
+        taluk : '',
+        muhalla : '',
+        muhalla_id : '',      
+    }
+
     $scope.add_members = function(data) {
         console.log('masjid_data',data)
         masjid_data.set_MasjidData(data);
@@ -575,8 +586,9 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             cost: '',
         }
         $scope.SurgeryValue = {
+            surgery_val : '',
             name : '',
-            operation : '',
+            hospital_name : '',
             cash_hand : '',
             operation_cost : '',
             details : '',
@@ -596,6 +608,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             else {
                 $scope.disease_val = disease;
             }
+            $scope.get_memberScheme()
         }
         $scope.sur_disease_val = 'SELECT or ADD DISEASE';
         $scope.sur_get_disease = function(disease) {
@@ -605,6 +618,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             else {
                 $scope.sur_disease_val = disease;
             }
+            $scope.get_memberScheme()
         }
         $scope.chr_disease_val = 'SELECT or ADD DISEASE';
         $scope.chr_get_disease = function(disease) {
@@ -614,6 +628,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             else {
                 $scope.chr_disease_val = disease;
             }
+            $scope.get_memberScheme()
         }
         $scope.getDisease = function(sym_type) {
             console.log('sym_type',sym_type)
@@ -642,16 +657,59 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.MemserviceList.push({'service_value':service_value,'service_id':service_id,'Mem_ID':Mem_ID})
         }
         $scope.update_memberScheme = function (MemschemeList,MemserviceList,DiseaseValue,SurgeryValue,ChronicValue,status) {
-            console.log('mem_id',DiseaseValue,SurgeryValue,ChronicValue)
+            console.log('mem_id',DiseaseValue,SurgeryValue,ChronicValue,status)
             $http.post('/updateMemScheme/',{
                 schemeData: MemschemeList,
+                disease_val: DiseaseValue,
+                surgery_val: SurgeryValue,
+                chronic_val: ChronicValue,
                 Servicedata: MemserviceList,
+                mem_id: $scope.Mem_ID,
             }).success(function(data){
                 console.log('data',data)
                 alert(data.response)
+                if(status == 'exit') {
+                    $modalInstance.dismiss('cancel');
+                }
+                else if(status == 'continue') {
+                    $scope.get_memberScheme();
+                }
                 $scope.MemschemeList = []
             })
         }
+        $scope.get_memberScheme = function() {
+            console.log('workinng')
+            $http.get('/updateMemScheme/?mem_id='+$scope.Mem_ID,{}).success(function(data){
+                console.log('data',data.medical,data.chronic)
+                if(data.medical.length!=0) {
+                    $scope.DiseaseValue.sym_type = data.medical[0].sym_type;
+                    // $scope.disease_val = data.medical[0].disease;
+                    $scope.get_disease(data.medical[0].disease)
+                    $scope.DiseaseValue.medicine = data.medical[0].medicine_needs;
+                    $scope.DiseaseValue.cost = data.medical[0].cost;
+                }
+                if(data.surgery.length!=0) {
+                    $scope.SurgeryValue.sym_type = data.surgery[0].sym_type;
+                    // $scope.sur_disease_val = data.surgery[0].disease;
+                    $scope.sur_get_disease(data.surgery[0].disease)
+                    $scope.ChronicValue.surgery_val = 'Yes';
+                    $scope.SurgeryValue.hospital_name = data.surgery[0].hospital_name;
+                    $scope.SurgeryValue.cash_hand = data.surgery[0].cash_hand;
+                    $scope.SurgeryValue.operation_cost = data.surgery[0].cost;
+                    $scope.SurgeryValue.details = data.surgery[0].details;
+                }
+                if(data.chronic.length!=0) {
+                    $scope.ChronicValue.sym_type = data.chronic[0].sym_type;
+                    // $scope.chr_disease_val = data.chronic[0].disease;
+                    $scope.chr_get_disease(data.chronic[0].disease)
+                    $scope.ChronicValue.chronic_val = 'Yes';
+                    $scope.ChronicValue.doctor = data.chronic[0].doctor;
+                    $scope.ChronicValue.tot_cost = data.chronic[0].cost;
+                    $scope.ChronicValue.details = data.chronic[0].details;
+                }
+            })
+        }
+        // $scope.get_memberScheme()
     }
 
     $scope.family_val = '';
