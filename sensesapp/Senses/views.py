@@ -180,12 +180,15 @@ def fetchReportData(request):
     if request.method == 'GET':
         print '??',request.GET['muhalla_id']
         muhalla = Masjid.objects.get(mohalla_id=request.GET['muhalla_id'])
-        get_family = Family.objects.filter(muhalla=muhalla)
+        get_family = map(lambda x:{'familyid':x.family_id,'financial_status':x.financial_status,'muhalla':x.muhalla.name,'ration_card':x.ration_card,'language':x.language},Family.objects.filter(muhalla=muhalla))
         # getFamData = map(lambda x:{})
-        get_memData = Member.objects.filter(family=Family.objects.get(muhalla=Masjid.objects.get(mohalla_id=request.GET['muhalla_id'])))
+        get_memData = map(lambda x:{'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=Masjid.objects.get(mohalla_id=request.GET['muhalla_id'])))
+        print 'count',len(get_memData)
+        rep_data = {'tot_family':len(get_family),'tot_member':len(get_memData),'taluk_count':1,'taluk':muhalla.taluk.taluk_name}
+        print 'rep_data',rep_data
         # for i in get_memData:
         #     print 'i',i
-        return HttpResponse(content=json.dumps({'data':family}),content_type='Application/json')
+        return HttpResponse(content=json.dumps({'get_family':get_family,'get_memdata':get_memData}),content_type='Application/json')
 
 
 def ServiceData(request):
@@ -227,9 +230,9 @@ def FamilyMemberData(request):
         family = Family.objects.get(family_id=familyid)
         voter = True if data['voter'] == 'Yes' else False
         if Member.objects.filter(mem_id=data['mem_id']):
-            member = Member.objects.filter(mem_id=data['mem_id']).update(family=family,name=data['name'],gender=data['gender'],age=data['age'],Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
+            member = Member.objects.filter(mem_id=data['mem_id']).update(family=family,muhalla=family.muhalla,name=data['name'],gender=data['gender'],age=data['age'],Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
         else:
-            member = Member.objects.create(mem_id=data['mem_id'],family=family,name=data['name'],gender=data['gender'],age=data['age'],Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
+            member = Member.objects.create(mem_id=data['mem_id'],family=family,muhalla=family.muhalla,name=data['name'],gender=data['gender'],age=data['age'],Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
             member.mem_id= '%s / %s' %(familyid,member.id)
             member.save()         
         return HttpResponse(content=json.dumps({'data':'success'}),content_type='Application/json')

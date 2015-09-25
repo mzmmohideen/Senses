@@ -69,6 +69,7 @@ class SubScheme(models.Model):
     description = models.CharField(max_length=30,null=True)
     
 class Member(models.Model):
+    muhalla = models.ForeignKey(Masjid)
     mem_id = models.CharField(max_length=20,unique=True)
     name = models.CharField(max_length=30)
     gender = models.CharField(max_length=10,choices=GENDER)

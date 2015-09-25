@@ -341,6 +341,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
     $scope.getMasjidList = function(data) {
         console.log('mahalla',$scope.mahallaList)
         console.log('dataMasjid',data)
+        $scope.ReportValues.muhalla = '';
         $scope.masjidList = _.pluck(_.filter($scope.mahallaList,function(num) {return num.district == data.district && num.taluk == data.taluk}),"mohalla_id")
         $scope.muhallaList = _.filter($scope.mahallaList,function(num) {return num.district == data.district && num.taluk == data.taluk})
         console.log('val',$scope.masjidList)
@@ -692,12 +693,15 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
                     $scope.SurgeryValue.sym_type = data.surgery[0].sym_type;
                     // $scope.sur_disease_val = data.surgery[0].disease;
                     $scope.sur_get_disease(data.surgery[0].disease)
-                    $scope.ChronicValue.surgery_val = 'Yes';
+                    $scope.SurgeryValue.surgery_val = 'Yes';
                     $scope.SurgeryValue.hospital_name = data.surgery[0].hospital_name;
                     $scope.SurgeryValue.cash_hand = data.surgery[0].cash_hand;
                     $scope.SurgeryValue.operation_cost = data.surgery[0].cost;
                     $scope.SurgeryValue.details = data.surgery[0].details;
                 }
+                // else {
+                //     $scope.SurgeryValue.surgery_val = 'No';
+                // }
                 if(data.chronic.length!=0) {
                     $scope.ChronicValue.sym_type = data.chronic[0].sym_type;
                     // $scope.chr_disease_val = data.chronic[0].disease;
@@ -707,6 +711,9 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
                     $scope.ChronicValue.tot_cost = data.chronic[0].cost;
                     $scope.ChronicValue.details = data.chronic[0].details;
                 }
+                // else {
+                //     $scope.ChronicValue.chronic_val = 'No';
+                // }
             })
         }
         // $scope.get_memberScheme()

@@ -946,7 +946,7 @@
                                         </h4>
                             </accordion-heading>
                           </div>
-                          <div class="form-group">
+                          <div class="form-group" ng-init='SurgeryValue.surgery_val="No"'>
                                 <label class="control-label col-xs-6">Surgery Needed?</label>
                                 <input type="radio" name="surgery" ng-model="SurgeryValue.surgery_val" value="Yes">Yes
                                 <input type="radio" name="surgery" ng-model="SurgeryValue.surgery_val" value="No">No
@@ -978,7 +978,7 @@
                                         </h4>
                             </accordion-heading>
                           </div>
-                          <div class="form-group">
+                          <div class="form-group" ng-init='ChronicValue.chronic_val="No"'>
                                 <label class="control-label col-xs-6">cured from Chronic Disease?</label>
                                 <input type="radio" name="chronic" ng-model="ChronicValue.chronic_val" value="Yes">Yes
                                 <input type="radio" name="chronic" ng-model="ChronicValue.chronic_val" value="No">No
