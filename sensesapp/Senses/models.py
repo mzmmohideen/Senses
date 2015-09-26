@@ -9,6 +9,7 @@ MARITAL = (('Married','Married'), ('Unmarried','Unmarried'), ('Widow','Widow'),(
 LOCATION = (('Local','Local'), ('Outstation','Outstation'), ('Foreign','Foreign'))
 MADARASA = (('Boys For Makthab 4-15','Boys For Makthab 4-15'), ('Girls For Makthab 4-15','Girls For Makthab 4-15'), ('Adult Makthab','Adult Makthab'), ('Interest in Aalim/Hifz','Interest in Aalim/Hifz'), ('Interest in Niswan','Interest in Niswan'), ('Interest in 1yr Muallim','Interest in 1yr Muallim'))
 SYMPTOMTYPE = (('DISEASE','DISEASE'),('DISORDER','DISORDER'))
+NAMAS = (('5 Times a day','5 Times a day'),('only Jumah','only Jumah'),('Not at All','Not at All'))
 
 class District(models.Model):
     district_name = models.CharField(max_length=50,unique=True)
@@ -82,7 +83,9 @@ class Member(models.Model):
     alive = models.BooleanField(default=True)
     voter_status = models.BooleanField(default=False)
     family = models.ForeignKey(Family)
-    donor = models.BooleanField(default=False) 
+    donor = models.BooleanField(default=False)
+    quran_reading = models.BooleanField(default=False)
+    namaz = models.CharField(max_length=30,choices=NAMAS) 
     mobile = models.CharField(max_length=20,null=True)
     volunteer = models.BooleanField(default=False)
     occupation = models.CharField(max_length=30,null=True)

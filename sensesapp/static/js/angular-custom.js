@@ -350,6 +350,8 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         console.log('value',data)
         $http.get('/fetchReportData/?muhalla_id='+data.muhalla.mohalla_id,{}).success(function(data){
             console.log('data',data)
+            $scope.getReportData = data.reports;
+            console.log('reportdata',$scope.getReportData)
         })
     }
     $scope.getMasjidMember = function(data) {
@@ -514,7 +516,9 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         $scope.Mem_ID = masjid_data.get_MasjidData();
         $scope.MemberUpdate = {
             volunteer : '', 
-            donor : '', 
+            donor : '',
+            namaz : '',
+            quran_reading : '', 
             language : '', 
             mobile : '', 
             physical : '', 
@@ -527,6 +531,8 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
                 $scope.MemberUpdate.volunteer = data.volunteer;
                 $scope.MemberUpdate.mobile = data.mobile;
                 $scope.MemberUpdate.donor = data.donor;
+                $scope.MemberUpdate.quran_reading = data.quran_reading;
+                $scope.MemberUpdate.namaz = data.namaz;
                 $scope.MemberUpdate.makthab = data.makthab;
                 $scope.MemberUpdate.makthab_detail = data.makthab_detail;
                 $scope.MemberUpdate.language = data.language;
@@ -609,7 +615,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             else {
                 $scope.disease_val = disease;
             }
-            $scope.get_memberScheme()
+            // $scope.get_memberScheme()
         }
         $scope.sur_disease_val = 'SELECT or ADD DISEASE';
         $scope.sur_get_disease = function(disease) {
@@ -619,7 +625,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             else {
                 $scope.sur_disease_val = disease;
             }
-            $scope.get_memberScheme()
+            // $scope.get_memberScheme()
         }
         $scope.chr_disease_val = 'SELECT or ADD DISEASE';
         $scope.chr_get_disease = function(disease) {
@@ -629,7 +635,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             else {
                 $scope.chr_disease_val = disease;
             }
-            $scope.get_memberScheme()
+            // $scope.get_memberScheme()
         }
         $scope.getDisease = function(sym_type) {
             console.log('sym_type',sym_type)
@@ -667,7 +673,10 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
                 Servicedata: MemserviceList,
                 mem_id: $scope.Mem_ID,
             }).success(function(data){
-                console.log('data',data)
+                // if(data.response == 'Please Select Disease First!') {
+                //     alert(data.response)
+                // }
+                // else {
                 alert(data.response)
                 if(status == 'exit') {
                     $modalInstance.dismiss('cancel');
@@ -675,6 +684,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
                 else if(status == 'continue') {
                     $scope.get_memberScheme();
                 }
+                // }
                 $scope.MemschemeList = []
             })
         }
@@ -683,6 +693,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $http.get('/updateMemScheme/?mem_id='+$scope.Mem_ID,{}).success(function(data){
                 console.log('data',data.medical,data.chronic)
                 if(data.medical.length!=0) {
+                    console.log('value',data.medical.length,data.medical)
                     $scope.DiseaseValue.sym_type = data.medical[0].sym_type;
                     // $scope.disease_val = data.medical[0].disease;
                     $scope.get_disease(data.medical[0].disease)
@@ -743,6 +754,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.FamilyValue.family_needs = '';
         }
         else {
+            console.log('val--family',family)
             $scope.family_val = family.family_id;
             $scope.FamilyValue.ration_card = family.ration_card;
             $scope.FamilyValue.mobile_no = family.mobile;
@@ -750,9 +762,9 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.FamilyValue.house = family.house_type;
             if(family.toilet == true) { $scope.FamilyValue.toilet = 'Yes'; } else if(family.toilet == false) { $scope.FamilyValue.toilet = 'No'; }
             $scope.FamilyValue.financial = family.financial_status;
-            $scope.FamilyValue.district = family.district_name
-            $scope.FamilyValue.taluk = family.taluk;
-            $scope.FamilyValue.masjid = family.muhalla;
+            // $scope.FamilyValue.district = family.district_name
+            // $scope.FamilyValue.taluk = family.taluk;
+            // $scope.FamilyValue.masjid = family.muhalla;
             $scope.FamilyValue.language = family.language;
             // if(family.donor == true) { $scope.FamilyValue.donor = 'Yes'; } else if(family.donor == false) { $scope.FamilyValue.donor = 'No'; }
             if(family.health_insurance == true) { $scope.FamilyValue.health_insurance = 'Yes'; } else if(family.health_insurance == false) { $scope.FamilyValue.health_insurance = 'No'; }

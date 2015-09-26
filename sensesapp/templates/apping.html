@@ -601,24 +601,31 @@
             <!--<div class="form-group" style="padding-bottom: 34px;">
                 <button  ng-disabled="scheme_val=='' || scheme_val=='SELECT SCHEMES' || sub_scheme_val=='' || sub_scheme_val=='SELECT SUB SCHEME'" type="submit" style="width:25%;height: 34px;float:right;" ng-click="add_schemes(scheme_val,sub_scheme_val,scheme_values)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
             </div>-->
-            <table class="table table-striped table-bordered table-hover ng-scope" ng-init="getLocation()">
+            <table class="table table-striped table-bordered table-hover ng-scope">
                 <thead>
                     <tr class="ng-scope">
                         <th>S.No</th>
-                        <th>Diseases</th>
-                        <th>Actions</th>
+                        <th>Details</th>
+                        <th>Counts</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-show="!getSubScheme[scheme_val]">
-                        <td colspan="8" style="text-align:center;" class="ng-binding">Please Select Above Details !</td>
-                    </tr>
-                    <tr ng-show="getSubScheme[scheme_val].length==0">
-                        <td colspan="8" style="text-align:center;" class="ng-binding">No Sub Schemes Found!</td>
-                    </tr>
-                    <tr ng-show="getSubScheme[scheme_val].length!=0" ng-repeat="sub in getSubScheme[scheme_val]" class="ng-scope">
+                    <tr ng-repeat="(key,val) in getReportData" class="ng-scope">
                         <td>{{$index+1}}</td>
-                        <td class="ng-binding">{{sub.sub}}</td>
+                        <td ng-show="key!='Mother Tongue'" class="ng-binding">{{key}}</td>
+                        <!--<td ng-show="key=='Mother Tongue'" class="ng-binding">
+                            <table>
+                                <tr>
+                                 <td rowspan="3" style="border:1px solid #ccc">{{key}}</td>
+                                 <td>
+                                 <td style="border:1px solid #ccc">a</td>
+                                 <td style="border:1px solid #ccc">b</td>
+                                 <td style="border:1px solid #ccc">c</td>
+                                 </td>
+                                </tr>
+                            </table>
+                        </td>-->        
+                        <td class="ng-binding">{{val}}</td>
                         <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
                     </tr>
                 </tbody>
@@ -681,12 +688,12 @@
                 <select ng-change="getMahallaData(FamilyValue);FamilyValue.masjid=''" style="display: inline-block;height: 34px;width: 35%;float: left;" ng-model="FamilyValue.taluk" ng-options="gen for gen in getTaluk[FamilyValue.district]" class="form-control">
                     <option value="">SELECT TALUK</option>
                 </select>
-                <select ng-if="!FamilyValue.masjid" ng-change="getFamilyinfo();" style="display: inline-block;height: 34px;width: 30%;float: left;" ng-model="FamilyValue.masjid" ng-options="gen.mohalla_id for gen in muhallaData" class="form-control">
+                <select ng-change="getFamilyinfo();" style="display: inline-block;height: 34px;width: 30%;float: left;" ng-model="FamilyValue.masjid" ng-options="gen.name for gen in muhallaData" class="form-control">
                     <option value="">SELECT MUHALLA </option>
                 </select>
-                <select ng-if="FamilyValue.masjid" ng-change="getFamilyinfo();" style="display: inline-block;height: 34px;width: 30%;float: left;" ng-model="FamilyValue.masjid" ng-options="gen.mohalla_id for gen in muhallaData" class="form-control">
+                <!--<select ng-if="FamilyValue.masjid" ng-change="getFamilyinfo();" style="display: inline-block;height: 34px;width: 30%;float: left;" ng-model="FamilyValue.masjid" ng-options="gen.name for gen in muhallaData" class="form-control">
                     <option value="">{{FamilyValue.masjid}} </option>
-                </select>
+                </select>-->
             </div>
             <div class=" col-lg-12" style="padding-right: 20px;border-right: 1px solid #E2E2E2;">
                 <div class="form-group" style="padding-bottom: 34px;">
@@ -702,13 +709,16 @@
                     <!--<button ng-show="!new_family" ng-disabled="familyList.indexOf(family_val)==-1">-->
                     <button ng-show="new_family" type="submit" style="width:13%;height: 34px;" ng-click="addFamily(family_val,FamilyValue,'new')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Save New</button>
                     <button ng-show="new_family" type="submit" style="width:13%;height: 34px;" ng-click="new_family=false;get_family()" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Cancel</button>
-                    <button ng-show="!new_family" ng-disabled="familyList.indexOf(family_val)==-1 || family_val='Type or Select Family ID from the List'" type="submit" style="width:13%;height: 34px;" ng-click="new_family=true;get_family()" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New</button>
+                    <button ng-show="!new_family" ng-disabled="familyList.indexOf(family_val)>-1" type="submit" style="width:13%;height: 34px;" ng-click="new_family=true;get_family()" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New</button>
                 </div>
             </div>
         <div class=" col-lg-12" style="padding-bottom: 34px;">
                 <input style="display: inline-block;width: 13%;height: 34px;float: left;" type="text" placeholder="Ration Card Number" ng-model="FamilyValue.ration_card" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
                 <input style="display: inline-block;width: 13%;height: 34px;float: left;" type="text" placeholder="Mobile Number" ng-model="FamilyValue.mobile_no" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <input style="display: inline-block;height: 34px;width: 15%;float: left;" class="form-control" type="text" ng-model="FamilyValue.language" placeholder="Mother Tongue" />
+                <select style="display: inline-block;height: 34px;width: 15%;float: left;" ng-model="FamilyValue.language" ng-options="house for house in ['Tamil','Urdu','Others']" class="form-control">
+                    <option value="">Mother Tongue</option>
+                </select>
+                <!--<input style="display: inline-block;height: 34px;width: 15%;float: left;" class="form-control" type="text" ng-model="FamilyValue.language" placeholder="Mother Tongue" />-->
                 <input style="display: inline-block;width: 29%;height: 34px;float: left;" type="text" placeholder="Address" ng-model="FamilyValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
                 <input style="display: inline-block;width: 30%;height: 34px;float: left;" type="text" placeholder="Any Emergency Needs in this Family?" ng-model="FamilyValue.family_needs" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
         </div>
@@ -828,6 +838,22 @@
                                 </select>
                             </div>
                         </div>
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-7">Namaz Status?</label>
+                            <div class="col-xs-5">
+                                <select ng-model="MemberUpdate.namaz" ng-options="n for n in ['5 Times a day','only Jumah','Not at All']" class="form-control">
+                                    <option value="">Namaz Status</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-7">Quran Reading?</label>
+                            <div class="col-xs-5">
+                                <select ng-model="MemberUpdate.quran_reading" ng-options="k for k in ['Yes','No']" class="form-control">
+                                    <option value="">Quran Reading</option>
+                                </select>
+                            </div>
+                        </div>
                         <!--<div class="form-group" style="margin:5px;">
                             <label class="control-label col-xs-7">Mother Tongue</label>
                             <div class="col-xs-5">
@@ -921,7 +947,7 @@
                                         </h4>
                             </accordion-heading>
                           </div>
-                          <div class="form-group">
+                          <div class="form-group" ng-init="get_memberScheme()">
                                 <select ng-change="getDisease(DiseaseValue.sym_type)" style="display: inline-block;height: 34px;width: 40%;float: left;" ng-model="DiseaseValue.sym_type" ng-options="val for val in ['DISEASE','DISORDER']" class="form-control">
                                     <option value="">SELECT TYPE</option>
                                 </select>
@@ -946,7 +972,7 @@
                                         </h4>
                             </accordion-heading>
                           </div>
-                          <div class="form-group" ng-init='SurgeryValue.surgery_val="No"'>
+                          <div class="form-group" ng-init='SurgeryValue.surgery_val="No";get_memberScheme();'>
                                 <label class="control-label col-xs-6">Surgery Needed?</label>
                                 <input type="radio" name="surgery" ng-model="SurgeryValue.surgery_val" value="Yes">Yes
                                 <input type="radio" name="surgery" ng-model="SurgeryValue.surgery_val" value="No">No
@@ -978,7 +1004,7 @@
                                         </h4>
                             </accordion-heading>
                           </div>
-                          <div class="form-group" ng-init='ChronicValue.chronic_val="No"'>
+                          <div class="form-group" ng-init='ChronicValue.chronic_val="No";get_memberScheme()'>
                                 <label class="control-label col-xs-6">cured from Chronic Disease?</label>
                                 <input type="radio" name="chronic" ng-model="ChronicValue.chronic_val" value="Yes">Yes
                                 <input type="radio" name="chronic" ng-model="ChronicValue.chronic_val" value="No">No
