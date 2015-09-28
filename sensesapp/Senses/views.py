@@ -297,18 +297,19 @@ def updateMemScheme(request):
         chronic_val = json.loads(request.body)['chronic_val']
         member_id = json.loads(request.body)['mem_id']
         member_obj = Member.objects.get(mem_id=member_id)
-        for i in schemeData:
-            scheme = SubScheme.objects.get(subscheme_id=i['scheme_id'])
-            status = True if i['scheme_value'] == 'Yes' else False
-            if Member_scheme.objects.filter(member=member_obj,scheme=scheme,status=status):
-                continue
-            elif Member_scheme.objects.filter(member=member_obj,scheme=scheme):
-                member = Member_scheme.objects.filter(member=member_obj,scheme=scheme).update(status=status)           
-            else:
-                member = Member_scheme.objects.create(member=member_obj,scheme=scheme,status=status)           
-        for j in Servicedata:
-            service = Service.objects.get(service_id=j['service_id'])
-            status = True if j['service_value'] == 'Yes' else False
+        for key in schemeData.keys():
+            for i in schemeData[key]:
+                scheme = SubScheme.objects.get(subscheme_id=i['scheme_id'])
+                status = True if i['status'] == 'Yes' else False
+                if Member_scheme.objects.filter(member=member_obj,scheme=scheme,status=status):
+                    continue
+                elif Member_scheme.objects.filter(member=member_obj,scheme=scheme):
+                    member = Member_scheme.objects.filter(member=member_obj,scheme=scheme).update(status=status)           
+                else:
+                    member = Member_scheme.objects.create(member=member_obj,scheme=scheme,status=status)           
+        for k in Servicedata.keys():
+            service = Service.objects.get(service_id=Servicedata[k][0]['service_id'])
+            status = True if Servicedata[k][0]['status'] == 'Yes' else False
             if Member_service.objects.filter(member=member_obj,scheme=service,status=status):
                 continue
             elif Member_service.objects.filter(member=member_obj,scheme=service):

@@ -916,8 +916,8 @@
                             </accordion-heading>
                             <div class="form-group" ng-repeat="key in getSubScheme[header]">
                                 <label class="control-label col-xs-6">{{key.sub}}</label>
-                                <input type="radio" name="{{key.scheme_id}}" ng-change="getMemberScheme(scheme_value,key.scheme_id,Mem_ID)" ng-model="scheme_value" value="Yes">Yes
-                                <input type="radio" name="{{key.scheme_id}}" ng-change="getMemberScheme(scheme_value,key.scheme_id,Mem_ID)" ng-model="scheme_value" value="No">No
+                                <input type="radio" ng-model="key.status" value="Yes">Yes
+                                <input type="radio" ng-model="key.status" value="No">No
                                 <!--<span ng-repeat="a in ['Yes','No']">
                                     <input type="radio" name="{{key.scheme_id}}" ng-change="getMemberScheme(scheme_value,key.scheme_id,Mem_ID)" ng-model="scheme_value" value="{{a}}">{{a}}
                                      {{key.scheme_id}}<input type="radio" name="key.scheme_id" ng-model="key.scheme_id" value="Yes">Yes
@@ -935,8 +935,10 @@
                           </div>
                           <div class="form-group" ng-repeat="(key,val) in getServices">
                                 <label class="control-label col-xs-6">{{key}}</label>
-                                <input type="radio" name="{{getServices[key][0].service_id}}" ng-change="getMemberService(service_value,getServices[key][0].service_id,Mem_ID)" ng-model="service_value" value="Yes">Yes
-                                <input type="radio" name="{{getServices[key][0].service_id}}" ng-change="getMemberService(service_value,getServices[key][0].service_id,Mem_ID)" ng-model="service_value" value="No">No
+                                <input type="radio" ng-model="val[0].status" value="Yes">Yes
+                                <input type="radio" ng-model="val[0].status" value="No">No
+                                <!--<input type="radio" name="{{getServices[key][0].service_id}}" ng-change="getMemberService(service_value,getServices[key][0].service_id,Mem_ID)" ng-model="service_value" value="Yes">Yes
+                                <input type="radio" name="{{getServices[key][0].service_id}}" ng-change="getMemberService(service_value,getServices[key][0].service_id,Mem_ID)" ng-model="service_value" value="No">No-->
                           </div>
                     </accordion-group>
                     <accordion-group>
@@ -1030,8 +1032,10 @@
             </accordion>                        
             <div class="form-group" style="margin:5px;">
                 <input type="submit" class="btn btn-primary" ng-click="next=false" value="<<Previous" />
-                <input type="submit" class="btn btn-primary" ng-click="update_memberScheme(MemschemeList,MemserviceList,DiseaseValue,SurgeryValue,ChronicValue,'continue');" value="Save" />
-                <input type="submit" class="btn btn-primary" ng-click="update_memberScheme(MemschemeList,MemserviceList,DiseaseValue,SurgeryValue,ChronicValue,'exit');" value="Save and Exit" />
+                <input type="submit" class="btn btn-primary" ng-click="update_memberScheme(getSubScheme,getServices,DiseaseValue,SurgeryValue,ChronicValue,'continue');" value="Save" />
+                <input type="submit" class="btn btn-primary" ng-click="update_memberScheme(getSubScheme,getServices,DiseaseValue,SurgeryValue,ChronicValue,'exit');" value="Save and Exit" />
+                <!--<input type="submit" class="btn btn-primary" ng-click="update_memberScheme(MemschemeList,MemserviceList,DiseaseValue,SurgeryValue,ChronicValue,'continue');" value="Save" />
+                <input type="submit" class="btn btn-primary" ng-click="update_memberScheme(MemschemeList,MemserviceList,DiseaseValue,SurgeryValue,ChronicValue,'exit');" value="Save and Exit" />-->
             </div>
     </div>
     </script>

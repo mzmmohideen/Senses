@@ -552,6 +552,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $http.get('/getServiceData/?mem_id='+$scope.Mem_ID,{}).success(function(data) {
                 $scope.service_list = _.keys(data.data,"service")
                 $scope.getServices = data.data;
+                console.log('datascheme',$scope.getServices)
             })
         }
         $scope.update_member = function(data,status) {
@@ -663,14 +664,14 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             }
             $scope.MemserviceList.push({'service_value':service_value,'service_id':service_id,'Mem_ID':Mem_ID})
         }
-        $scope.update_memberScheme = function (MemschemeList,MemserviceList,DiseaseValue,SurgeryValue,ChronicValue,status) {
+        $scope.update_memberScheme = function (getSubScheme,getServices,DiseaseValue,SurgeryValue,ChronicValue,status) {
             console.log('mem_id',DiseaseValue,SurgeryValue,ChronicValue,status)
             $http.post('/updateMemScheme/',{
-                schemeData: MemschemeList,
+                schemeData: getSubScheme,
                 disease_val: DiseaseValue,
                 surgery_val: SurgeryValue,
                 chronic_val: ChronicValue,
-                Servicedata: MemserviceList,
+                Servicedata: getServices,
                 mem_id: $scope.Mem_ID,
             }).success(function(data){
                 // if(data.response == 'Please Select Disease First!') {
@@ -685,7 +686,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
                     $scope.get_memberScheme();
                 }
                 // }
-                $scope.MemschemeList = []
+                // $scope.MemschemeList = []
             })
         }
         $scope.get_memberScheme = function() {
