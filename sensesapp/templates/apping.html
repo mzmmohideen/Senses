@@ -584,16 +584,19 @@
     <script type="text/ng-template" id="reports.html">
         <div class="row" ng-init="getLocation();getMasjidData()">
             <div class="col-lg-12">
-                <h1 class="page-header">Reports</h1>
+                <h1 class="page-header">Reports <select style="display: inline-block;height: 34px;width: 30%;float: right;" ng-model="ReportValues.report_name" ng-options="gen for gen in senses_reports" class="form-control">
+                    <option value="">SELECT REPORT</option>
+                </select>
+                </h1>
             </div>
             <div class=" col-lg-12">
-                <select style="display: inline-block;height: 34px;width: 30%;float: left;" ng-model="ReportValues.district" ng-options="gen for gen in district_list" class="form-control">
+                <select ng-disabled="!ReportValues.report_name" style="display: inline-block;height: 34px;width: 30%;float: left;" ng-model="ReportValues.district" ng-options="gen for gen in district_list" class="form-control">
                     <option value="">SELECT DISTRICT</option>
                 </select>
-                <select style="display: inline-block;height: 34px;width: 25%;float: left;" ng-change="getMasjidList(ReportValues)" ng-model="ReportValues.taluk" ng-options="gen for gen in getTaluk[ReportValues.district]" class="form-control">
+                <select ng-disabled="!ReportValues.district" style="display: inline-block;height: 34px;width: 25%;float: left;" ng-change="getMasjidList(ReportValues)" ng-model="ReportValues.taluk" ng-options="gen for gen in getTaluk[ReportValues.district]" class="form-control">
                     <option value="">SELECT TALUK</option>
                 </select>
-                <select style="display: inline-block;height: 34px;width: 25%;float: left;"  ng-change="getFamilyReport(ReportValues)" ng-model="ReportValues.muhalla" ng-options="gen.name for gen in muhallaList" class="form-control">
+                <select ng-disabled="!ReportValues.taluk" style="display: inline-block;height: 34px;width: 25%;float: left;"  ng-change="getFamilyReport(ReportValues)" ng-model="ReportValues.muhalla" ng-options="gen.name for gen in muhallaList" class="form-control">
                     <option value="">SELECT MUHALLAH</option>
                 </select>
                 <input style="display: inline-block;height: 34px;width: 20%;float: left;" class="form-control" type="text" ng-model="ReportValues.muhalla.mohalla_id" valid-number ng-change="clear_error()" placeholder="Muhalla ID" readonly/>
@@ -607,6 +610,7 @@
                         <th>S.No</th>
                         <th>Details</th>
                         <th>Counts</th>
+                        <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>

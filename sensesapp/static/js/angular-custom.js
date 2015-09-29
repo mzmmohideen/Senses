@@ -444,6 +444,8 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         $scope.muhallaData = _.filter($scope.mahallaList, function(data){ return data.district == val.district && data.taluk == val.taluk })
         console.log('mahalla',$scope.muhallaData)
     }
+    $scope.senses_reports = ['Mohalla Report','Total Family Details','Families Eligible for Jakaath','Medical Needs and Guidance Needers Details','Government Schemes and Guidance Needers Details','Government Schemes and Guidance Needers Details(Non Voters)','Educational Help and Guidance Needers List','Help for Discontinued and Guidance Needers List','Basic Help Needers List','Help for Poor Peoples and Guidance Needers List','Training/Employment Help and Guidance Needers List','Childrens Need to join Makthab Madarasa','Persons Need to join Jumrah Madarasa','Women chldrens Need to join Niswan Madarasa']
+    // ,'தொகுப்பு அறிக்கை'
     $scope.getLocation = function() {
         $http.get('/addLocation/',{}).success(function(data) {
             // console.log('val',data.district)
@@ -456,7 +458,8 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         district : '',
         taluk : '',
         muhalla : '',
-        muhalla_id : '',      
+        muhalla_id : '',
+        report_name : '',      
     }
 
     $scope.add_members = function(data) {
