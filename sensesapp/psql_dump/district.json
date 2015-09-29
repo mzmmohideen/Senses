@@ -1,98 +1,98 @@
 [
-	{'district_name':'Ariyalur',
-	 'district_code':'AR'
+	{"district_name":"Ariyalur",
+	 "district_code":"AR"
 	},
-	{'district_name':'Chennai',
-	 'district_code':'CH'
+	{"district_name":"Chennai",
+	 "district_code":"CH"
 	},
-	{'district_name':'Coimbatore',
-	 'district_code':'CO'
+	{"district_name":"Coimbatore",
+	 "district_code":"CO"
 	},
-	{'district_name':'Cuddalore',
-	 'district_code':'CU'
+	{"district_name":"Cuddalore",
+	 "district_code":"CU"
 	},
-	{'district_name':'Dharmapuri',
-	 'district_code':'DH'
+	{"district_name":"Dharmapuri",
+	 "district_code":"DH"
 	},
-	{'district_name':'Dindigul',
-	 'district_code':'DI'
+	{"district_name":"Dindigul",
+	 "district_code":"DI"
 	},
-	{'district_name':'Erode',
-	 'district_code':'ER'
+	{"district_name":"Erode",
+	 "district_code":"ER"
 	},
-	{'district_name':'Kanchipuram',
-	 'district_code':'KC'
+	{"district_name":"Kanchipuram",
+	 "district_code":"KC"
 	},
-	{'district_name':'Kanyakumari',
-	 'district_code':'KK'
+	{"district_name":"Kanyakumari",
+	 "district_code":"KK"
 	},
-	{'district_name':'Karur',
-	 'district_code':'KRR'
+	{"district_name":"Karur",
+	 "district_code":"KRR"
 	},
-	{'district_name':'Krishnagiri',
-	 'district_code':'KR'
+	{"district_name":"Krishnagiri",
+	 "district_code":"KR"
 	},
-	{'district_name':'Madurai',
-	 'district_code':'MA'
+	{"district_name":"Madurai",
+	 "district_code":"MA"
 	},
-	{'district_name':'Nagapattinam',
-	 'district_code':'NG'
+	{"district_name":"Nagapattinam",
+	 "district_code":"NG"
 	},
-	{'district_name':'Namakkal',
-	 'district_code':'NM'
+	{"district_name":"Namakkal",
+	 "district_code":"NM"
 	},
-	{'district_name':'The Nilgiris',
-	 'district_code':'NI'
+	{"district_name":"The Nilgiris",
+	 "district_code":"NI"
 	},
-	{'district_name':'Perambalur',
-	 'district_code':'PE'
+	{"district_name":"Perambalur",
+	 "district_code":"PE"
 	},
-	{'district_name':'Pudukkottai',
-	 'district_code':'PU'
+	{"district_name":"Pudukkottai",
+	 "district_code":"PU"
 	},
-	{'district_name':'Ramanathapuram',
-	 'district_code':'RA'
+	{"district_name":"Ramanathapuram",
+	 "district_code":"RA"
 	},
-	{'district_name':'Salem',
-	 'district_code':'SA'
+	{"district_name":"Salem",
+	 "district_code":"SA"
 	},
-	{'district_name':'Sivaganga',
-	 'district_code':'SI'
+	{"district_name":"Sivaganga",
+	 "district_code":"SI"
 	},
-	{'district_name':'Thanjavur',
-	 'district_code':'TJ'
+	{"district_name":"Thanjavur",
+	 "district_code":"TJ"
 	},
-	{'district_name':'Theni',
-	 'district_code':'TH'
+	{"district_name":"Theni",
+	 "district_code":"TH"
 	},
-	{'district_name':'Thoothukudi',
-	 'district_code':'TK'
+	{"district_name":"Thoothukudi",
+	 "district_code":"TK"
 	},
-	{'district_name':'Tiruchirappalli',
-	 'district_code':'TC'
+	{"district_name":"Tiruchirappalli",
+	 "district_code":"TC"
 	},
-	{'district_name':'Tirunelveli',
-	 'district_code':'TI'
+	{"district_name":"Tirunelveli",
+	 "district_code":"TI"
 	},
-	{'district_name':'Tiruppur',
-	 'district_code':'TP'
+	{"district_name":"Tiruppur",
+	 "district_code":"TP"
 	},
-	{'district_name':'Tiruvallur',
-	 'district_code':'TL'
+	{"district_name":"Tiruvallur",
+	 "district_code":"TL"
 	},
-	{'district_name':'Tiruvannamalai',
-	 'district_code':'TV'
+	{"district_name":"Tiruvannamalai",
+	 "district_code":"TV"
 	},
-	{'district_name':'Tiruvarur',
-	 'district_code':'TR'
+	{"district_name":"Tiruvarur",
+	 "district_code":"TR"
 	},
-	{'district_name':'Vellore',
-	 'district_code':'VE'
+	{"district_name":"Vellore",
+	 "district_code":"VE"
 	},
-	{'district_name':'Viluppuram',
-	 'district_code':'VL'
+	{"district_name":"Viluppuram",
+	 "district_code":"VL"
 	},
-	{'district_name':'Virudhunagar',
-	 'district_code':'VR'
+	{"district_name":"Virudhunagar",
+	 "district_code":"VR"
 	},
 ]

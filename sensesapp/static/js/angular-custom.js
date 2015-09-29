@@ -446,9 +446,9 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
     }
     $scope.getLocation = function() {
         $http.get('/addLocation/',{}).success(function(data) {
-            // console.log('val',data.district['CHENNAI'][0])
+            // console.log('val',data.district)
             $scope.DisCode = data.district;
-            $scope.district_list = _.keys(data.data)
+            $scope.district_list = _.keys(data.district)
             $scope.getTaluk = data.data;
         })
     }

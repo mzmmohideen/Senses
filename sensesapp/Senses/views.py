@@ -13,18 +13,12 @@ from traceback import format_exc
 from itertools import groupby
 from operator import itemgetter
 
-@csrf_exempt
 def login(request):
     if User.objects.filter(first_name="Admin"):
         return render(request, 'login.html')
     else:
         return render(request, 'signup.html')
 
-# @login_required         
-def apping(request):    
-    return render(request, 'apping.html')        
-
-@csrf_exempt
 def login_page(request):
     a = json.loads(request.body)['data']
     user = authenticate(username=a['username'], password=a['password'])
@@ -34,7 +28,6 @@ def login_page(request):
     else:
         return HttpResponse(content=json.dumps({'data':'failed'}), content_type='Application/json')
 
-@csrf_exempt
 def signup(request):
     data = json.loads(request.body)['data']
     user = User.objects.create(username=data['username'],first_name="Admin")
@@ -42,6 +35,11 @@ def signup(request):
     user.save()    
     return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
 
+# @login_required
+def apping(request):    
+    return render(request, 'apping.html')        
+
+@login_required    
 def addLocation(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -67,6 +65,7 @@ def addLocation(request):
         # taluk = map(lambda x:{'district'}    Taluk.objects.all())
         return HttpResponse(content=json.dumps({'data':data,'district':district}), content_type='Application/json')
 
+@login_required
 def SchemeData(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -102,6 +101,7 @@ def SchemeData(request):
         # taluk = map(lambda x:{'district'}    Taluk.objects.all())
         return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
 
+@login_required
 def getSchemeData(request):
     data = defaultdict(list)
     for i in SubScheme.objects.all():
@@ -113,6 +113,7 @@ def getSchemeData(request):
         data[i.scheme.scheme_type].append({'sub':i.name,'scheme_id':i.subscheme_id,'status':status})
     return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
 
+@login_required
 def add_masjid(request):
     if request.method == 'POST':        
         data = json.loads(request.body)
@@ -127,6 +128,7 @@ def add_masjid(request):
         get_members = map(lambda x:{'name':x.name,'mohalla_id':x.mohalla_id,'taluk':x.taluk.taluk_name,'district':x.taluk.district.district_name,'musallas':x.musallas,'location':x.location},Masjid.objects.all())
         return HttpResponse(content=json.dumps({'data':get_members}),content_type='Application/json')
 
+@login_required
 def masjid_member(request):
     if request.method == 'POST':
         data = json.loads(request.body)
@@ -147,6 +149,7 @@ def masjid_member(request):
             get_members = map(lambda x:{'name':x.member_name,'age':x.age,'mobile':x.mobile,'address':x.address,'designation':x.designation},Masjid_members.objects.filter(masjid=masjid))
         return HttpResponse(content=json.dumps({'data':get_members}),content_type='Application/json')    
 
+@login_required
 def familyData(request):
     if request.method == 'POST':
         data = json.loads(request.body)['value']
@@ -176,6 +179,7 @@ def familyData(request):
         family = map(lambda x:{'family_id':x.family_id,'muhalla':x.muhalla.name,'language':x.language,'taluk':x.muhalla.taluk.taluk_name,'district_name':x.muhalla.taluk.district.district_name,'ration_card':x.ration_card,'address':x.address,'mobile':x.mobile,'house_type':x.house_type,'donor':x.donor,'volunteer':x.volunteer,'health_insurance':x.health_insurance,'family_needs':x.family_needs,'toilet':x.toilet,'financial_status':x.financial_status},Family.objects.all())
         return HttpResponse(content=json.dumps({'data':family}),content_type='Application/json')
 
+@login_required
 def fetchReportData(request):
     if request.method == 'GET':
         muhalla = Masjid.objects.get(mohalla_id=request.GET['muhalla_id'])
@@ -211,6 +215,7 @@ def fetchReportData(request):
         return HttpResponse(content=json.dumps({'get_family':get_family,'get_memdata':get_memData,'reports':rep_data}),content_type='Application/json')
 
 
+@login_required
 def ServiceData(request):
     if request.method == 'POST':
         data = json.loads(request.body)['data']
@@ -231,6 +236,7 @@ def ServiceData(request):
             service = map(lambda x:{'service':x.name,'description':x.description,'service_id':x.service_id},Service.objects.all())
             return HttpResponse(content=json.dumps({'data':service}),content_type='Application/json')
 
+@login_required
 def getServiceData(request):
     print 'request',request.GET['mem_id']
     data = defaultdict(list)
@@ -243,6 +249,7 @@ def getServiceData(request):
         data[i.name].append({'sub':i.name,'service_id':i.service_id,'status':status})
     return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
 
+@login_required
 def FamilyMemberData(request):
     if request.method == 'POST':
         data = json.loads(request.body)['data']
@@ -259,7 +266,8 @@ def FamilyMemberData(request):
     else:
         member = map(lambda x:{'mem_id':x.mem_id,'family':x.family.family_id,'name':x.name,'gender':x.gender,'age':x.age,'relationship':x.Relation,'qualification':x.qualification,'marital_status':x.marital_status,'voter_status':x.voter_status,'curr_location':x.curr_location,'occupation':x.occupation},Member.objects.filter(family=Family.objects.get(family_id=request.GET['family_id'])))
         return HttpResponse(content=json.dumps(member),content_type='Application/json')
-        
+
+@login_required        
 def UpdateFamily_member(request):
     if request.method == 'POST':
         data = json.loads(request.body)['data']
@@ -288,6 +296,7 @@ def UpdateFamily_member(request):
             alive = 'Yes' if member.alive == True else 'No' 
             return HttpResponse(content=json.dumps({'alive':alive,'quran_reading':quran_reading,'namaz':member.namaz,'makthab':makthab,'makthab_detail':member.madarasa_details,'language':member.mother_tongue,'disability':disability,'volunteer':volunteer,'mobile':member.mobile,'donor':donor}),content_type='Application/json')
 
+@login_required
 def updateMemScheme(request):
     if request.method == 'POST':
         schemeData = json.loads(request.body)['schemeData']
@@ -347,6 +356,7 @@ def updateMemScheme(request):
             medical_details = []
         return HttpResponse(content=json.dumps({'medical':medical_details,'surgery':surgery_detail,'chronic':chronic_detail}),content_type='Application/json')            
 
+@login_required
 def DiseaseData(request):
     if request.method == 'POST':
         data = json.loads(request.body)
