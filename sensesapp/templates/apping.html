@@ -607,16 +607,13 @@
             <table class="table table-striped table-bordered table-hover ng-scope">
                 <thead>
                     <tr class="ng-scope">
-                        <th>S.No</th>
-                        <th>Details</th>
-                        <th>Counts</th>
-                        <th>Action</th>
+                        <th ng-repeat="header in ReportHeader">{{header}}</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-repeat="(key,val) in getReportData" class="ng-scope">
+                    <tr ng-show="ReportValues.report_name == 'Mohalla Report'" ng-repeat="(key,val) in getReportData" class="ng-scope">
                         <td>{{$index+1}}</td>
-                        <td ng-show="key!='Mother Tongue'" class="ng-binding">{{key}}</td>
+                        <td ng-show="key!='Mother Tongue'" class="ng-binding">{{key}} {{getReportData.length}}</td>
                         <!--<td ng-show="key=='Mother Tongue'" class="ng-binding">
                             <table>
                                 <tr>
@@ -630,6 +627,26 @@
                             </table>
                         </td>-->        
                         <td class="ng-binding">{{val}}</td>
+                        <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
+                    </tr>
+                    <tr ng-show="ReportValues.report_name != 'Mohalla Report' && getReportData.length==0" class="ng-scope">
+                        <td colspan="7">No Data Found!</td>
+                    </tr>
+                    <tr ng-show="ReportValues.report_name == 'Total Family Details' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
+                        <td>{{$index+1}}</td>
+                        <td>{{key.family_head}} <br/> {{key.address}} </td>
+                        <td>{{key.age}} <br/> {{key.gender}} </td>
+                        <td>{{key.familyid}} <br/> {{key.mobile}} </td>
+                        <td>{{key.financial_status.split(' ')[0]}} <br/> {{get_jakaath_status(key.financial_status.split(' ')[0])}} </td>
+                        <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
+                    </tr>
+                    <tr ng-show="ReportValues.report_name == 'Families Eligible for Jakaath' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
+                        <td>{{$index+1}}</td>
+                        <td>{{key.family_head}}</td>
+                        <td>{{key.age}} <br/> {{key.gender}} </td>
+                        <td>{{key.financial_status.split(' ')[0]}} <br/> {{key.familyid}} </td>
+                        <td>{{key.mobile}} </td>
+                        <td> {{key.address}} </td>
                         <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
                     </tr>
                 </tbody>
@@ -762,7 +779,8 @@
                         <th>S.No</th>
                         <th>Name</th>
                         <th>Gender</th>
-                        <th>Age</th>                        
+                        <th>Age</th>
+                        <th>Family Head?</th>                        
                         <th>Relationship</th>
                         <th>Qualification</th>
                         <th>Marital Status</th>
@@ -780,6 +798,9 @@
                             <option value="">SELECT GENDER</option>
                         </select></td>
                         <td><input type="text" placeholder="Age" ng-model="FamilyMember.age" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                        <td><select ng-model="FamilyMember.family_head" ng-options="val for val in ['Yes','No']" class="form-control">
+                            <option value="">FAMILY HEAD?</option>
+                        </select></td>
                         <td><input type="text" placeholder="Relationship" ng-model="FamilyMember.relationship" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
                         <td><input type="text" placeholder="Qualification" ng-model="FamilyMember.qualification" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
                         <td><select ng-model="FamilyMember.marital_status" ng-options="gen for gen in ['Married','Unmarried','Widow','Devorced','Aged Unmarried Woman']" class="form-control">
@@ -805,6 +826,7 @@
                         <td class="ng-binding">{{member.name}}</td>
                         <td class="ng-binding">{{member.gender}}</td>
                         <td class="ng-binding">{{member.age}}</td>
+                        <td class="ng-binding">{{get_booleanval(member.family_head)}}</td>
                         <td class="ng-binding">{{member.relationship}}</td>
                         <td class="ng-binding">{{member.qualification}}</td>
                         <td class="ng-binding">{{member.marital_status}}</td>
@@ -922,6 +944,9 @@
                                 <label class="control-label col-xs-6">{{key.sub}}</label>
                                 <input type="radio" ng-model="key.status" value="Yes">Yes
                                 <input type="radio" ng-model="key.status" value="No">No
+                                <select ng-show="key.status" ng-model="key.solution" ng-options="val for val in ['Solved','Not Yet']" style="width:20%">
+                                    <option value="">SELECT SOLUTION</option>
+                                </select>
                                 <!--<span ng-repeat="a in ['Yes','No']">
                                     <input type="radio" name="{{key.scheme_id}}" ng-change="getMemberScheme(scheme_value,key.scheme_id,Mem_ID)" ng-model="scheme_value" value="{{a}}">{{a}}
                                      {{key.scheme_id}}<input type="radio" name="key.scheme_id" ng-model="key.scheme_id" value="Yes">Yes
@@ -941,6 +966,9 @@
                                 <label class="control-label col-xs-6">{{key}}</label>
                                 <input type="radio" ng-model="val[0].status" value="Yes">Yes
                                 <input type="radio" ng-model="val[0].status" value="No">No
+                                <select ng-show="val[0].status" ng-model="val[0].solution" ng-options="val for val in ['Solved','Not Yet']" style="width:20%">
+                                    <option value="">SELECT SOLUTION</option>
+                                </select>
                                 <!--<input type="radio" name="{{getServices[key][0].service_id}}" ng-change="getMemberService(service_value,getServices[key][0].service_id,Mem_ID)" ng-model="service_value" value="Yes">Yes
                                 <input type="radio" name="{{getServices[key][0].service_id}}" ng-change="getMemberService(service_value,getServices[key][0].service_id,Mem_ID)" ng-model="service_value" value="No">No-->
                           </div>

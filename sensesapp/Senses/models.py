@@ -10,6 +10,7 @@ LOCATION = (('Local','Local'), ('Outstation','Outstation'), ('Foreign','Foreign'
 MADARASA = (('Boys For Makthab 4-15','Boys For Makthab 4-15'), ('Girls For Makthab 4-15','Girls For Makthab 4-15'), ('Adult Makthab','Adult Makthab'), ('Interest in Aalim/Hifz','Interest in Aalim/Hifz'), ('Interest in Niswan','Interest in Niswan'), ('Interest in 1yr Muallim','Interest in 1yr Muallim'))
 SYMPTOMTYPE = (('DISEASE','DISEASE'),('DISORDER','DISORDER'))
 NAMAS = (('5 Times a day','5 Times a day'),('only Jumah','only Jumah'),('Not at All','Not at All'))
+SOLUTION = (('Solved','Solved'),('Not Yet','Not Yet'))
 
 class District(models.Model):
     district_name = models.CharField(max_length=50,unique=True)
@@ -76,6 +77,7 @@ class Member(models.Model):
     gender = models.CharField(max_length=10,choices=GENDER)
     age = models.CharField(max_length=10)
     Relation = models.CharField(max_length=20)
+    family_head = models.BooleanField(default=False)
     marital_status = models.CharField(max_length=20,choices=MARITAL)
     qualification = models.CharField(max_length=100,null=True)
     mother_tongue = models.CharField(max_length=20,null=True)
@@ -97,11 +99,13 @@ class Member_scheme(models.Model):
     member = models.ForeignKey(Member,null=True)
     scheme = models.ForeignKey(SubScheme,null=True)
     status = models.BooleanField(default=False)
+    solution = models.CharField(max_length=20,choices=SOLUTION)
 
 class Member_service(models.Model):
     member = models.ForeignKey(Member,null=True)
     scheme = models.ForeignKey(Service,null=True)
-    status = models.BooleanField(default=False)    
+    status = models.BooleanField(default=False)
+    solution = models.CharField(max_length=20,choices=SOLUTION)    
 
 class Disease(models.Model):
     sym_type = models.CharField(max_length=30,choices=SYMPTOMTYPE)

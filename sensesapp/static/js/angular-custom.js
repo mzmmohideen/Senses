@@ -346,13 +346,31 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         $scope.muhallaList = _.filter($scope.mahallaList,function(num) {return num.district == data.district && num.taluk == data.taluk})
         console.log('val',$scope.masjidList)
     }
-    $scope.getFamilyReport = function(data) {
-        console.log('value',data)
-        $http.get('/fetchReportData/?muhalla_id='+data.muhalla.mohalla_id,{}).success(function(data){
-            console.log('data',data)
-            $scope.getReportData = data.reports;
+    $scope.getFamilyReport = function(fam_data) {
+        console.log('value',fam_data.report_name)
+        $http.get('/fetchReportData/?muhalla_id='+fam_data.muhalla.mohalla_id,{}).success(function(data){
+        // $http.get('/fetchReportData/?muhalla_id='+data.muhalla.mohalla_id+'&report_name='+data.report_name,{}).success(function(data){
+            // $scope.senses_reports = ['Mohalla Report','Total Family Details','Families Eligible for Jakaath','Medical Needs and Guidance Needers Details','Government Schemes and Guidance Needers Details','Government Schemes and Guidance Needers Details(Non Voters)','Educational Help and Guidance Needers List','Help for Discontinued and Guidance Needers List','Basic Help Needers List','Help for Poor Peoples and Guidance Needers List','Training/Employment Help and Guidance Needers List','Childrens Need to join Makthab Madarasa','Persons Need to join Jumrah Madarasa','Women chldrens Need to join Niswan Madarasa']
+            if(fam_data.report_name == 'Mohalla Report') {
+                $scope.ReportHeader = ['S.No','Details','Counts','Action']
+                $scope.getReportData = data.reports;
+            }
+            else if(fam_data.report_name == 'Total Family Details') {
+                $scope.ReportHeader = ['S.No','Name & Address','Age & Gender','Family ID & Mobile NO','Financial Status & Jakaath','Action']
+                $scope.getReportData = data.get_family;
+            }
+            else if(fam_data.report_name == 'Families Eligible for Jakaath') {
+                $scope.ReportHeader = ['S.No','Needers Name','Age & Gender','Financial Status & Family ID','Mobile NO','Address','Action']
+                $scope.getReportData = _.filter(data.get_family,function(val){ return val.financial_status.split(' ')[0] == 'D' || val.financial_status.split(' ')[0] == 'E'});
+            } 
+            console.log('data',$scope.getReportData)
+            // $scope.getReportData = data.reports;
             console.log('reportdata',$scope.getReportData)
         })
+    }
+    $scope.get_jakaath_status = function(financial) {
+        if(financial == 'A' || financial == 'B' || financial == 'C') { return 'NO' }
+        else if(financial == 'D' || financial == 'E') { return 'YES' }
     }
     $scope.getMasjidMember = function(data) {
         console.log('masjid_member',data)
@@ -797,7 +815,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         financial: '',
     }
     $scope.addFamily = function(family,value,status) {
-        console.log('family',family,'value',status)
+        console.log('family',family,'value',value.masjid)
         if(status == 'new') {
             var familyid = '';
             var masjid = value.masjid.name;
@@ -811,6 +829,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             taluk: value.taluk,
             district: value.district,
             masjid: masjid,
+            mohalla_id : value.masjid.mohalla_id,
             toilet: value.toilet,
             language: value.language,
             // donor: value.donor,
@@ -823,18 +842,15 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             house: value.house,
             financial: value.financial,
         }
-        console.log('val',data,familyid,masjid)
         // if(data.masjid_name == "") {
         //     var masjid_val = masjid
         // }
         // else {
         //     var masjid_val = data.masjid_name
         // }
-        console.log('masjid',masjid,'a',data,'b')
         $http.post('/familyData/',{
             value: data,
         }).success(function(data) {
-            console.log('val',data)
             alert(data.data)
             $scope.get_family()
             $scope.getFamilyinfo();
@@ -875,7 +891,8 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         mem_id : '',
         name : '', 
         gender : '', 
-        age : '', 
+        age : '',
+        family_head : '', 
         relationship : '', 
         qualification : '', 
         marital_status : '', 
@@ -900,7 +917,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         console.log('value',familyid)
         $http.get('/FamilyMemberData/?family_id='+ familyid, {}).success(function(data) {
             $scope.FamilyMembersList = data;
-            console.log(data)
+            console.log(data,'voter')
         })
     }
     $scope.get_booleanval = function(val) {

@@ -12,6 +12,7 @@ from datetime import datetime, time
 from traceback import format_exc
 from itertools import groupby
 from operator import itemgetter
+from django.db.models import Q
 
 def login(request):
     if User.objects.filter(first_name="Admin"):
@@ -106,11 +107,14 @@ def getSchemeData(request):
     data = defaultdict(list)
     for i in SubScheme.objects.all():
         if Member_scheme.objects.filter(member=Member.objects.get(mem_id=request.GET['mem_id']),scheme=SubScheme.objects.get(subscheme_id=i.subscheme_id)):
-            checked = Member_scheme.objects.get(member=Member.objects.get(mem_id=request.GET['mem_id']),scheme=SubScheme.objects.get(subscheme_id=i.subscheme_id)).status
+            checked_val = Member_scheme.objects.get(member=Member.objects.get(mem_id=request.GET['mem_id']),scheme=SubScheme.objects.get(subscheme_id=i.subscheme_id))
+            checked = checked_val.status
+            solution = checked_val.solution
         else:
             checked = False
+            solution = ''
         status = 'Yes' if checked == True else 'No'
-        data[i.scheme.scheme_type].append({'sub':i.name,'scheme_id':i.subscheme_id,'status':status})
+        data[i.scheme.scheme_type].append({'sub':i.name,'scheme_id':i.subscheme_id,'status':status,'solution':solution})
     return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
 
 # @login_required
@@ -154,7 +158,7 @@ def familyData(request):
     if request.method == 'POST':
         data = json.loads(request.body)['value']
         taluk = Taluk.objects.get(taluk_name=data['taluk'],district=District.objects.get(district_name=data['district']))
-        masjid = Masjid.objects.get(name=data['masjid'],taluk=taluk)
+        masjid = Masjid.objects.get(mohalla_id=data['mohalla_id'])
         toilet = True if data['toilet'] == 'Yes' else False
         # donor = True if data['donor'] == 'Yes' else False
         # volunteer = True if data['volunteer'] == 'Yes' else False
@@ -183,7 +187,7 @@ def familyData(request):
 def fetchReportData(request):
     if request.method == 'GET':
         muhalla = Masjid.objects.get(mohalla_id=request.GET['muhalla_id'])
-        get_family = map(lambda x:{'familyid':x.family_id,'financial_status':x.financial_status,'muhalla':x.muhalla.name,'ration_card':x.ration_card,'language':x.language},Family.objects.filter(muhalla=muhalla))
+        get_family = map(lambda x:{'familyid':x.family_id,'address':x.address,'mobile':x.mobile,'family_head':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].name if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'family_head_occ':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].occupation if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'age':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].age if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'gender':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].gender if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'fam_member':Member.objects.filter(family=Family.objects.get(family_id=x.family_id)).count(),'financial_status':x.financial_status,'muhalla':x.muhalla.name,'ration_card':x.ration_card,'language':x.language},Family.objects.filter(muhalla=muhalla))
         get_memData = map(lambda x:{'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=Masjid.objects.get(mohalla_id=request.GET['muhalla_id'])))
         married = sum(1 if(x['marital_status']=='Married' or x['marital_status']=='Widow' or x['marital_status']=='Devorced') else 0 for x in get_memData)
         tot_men = sum(1 if(x['gender']=='MALE') else 0 for x in get_memData)
@@ -206,12 +210,8 @@ def fetchReportData(request):
         lang_others = sum(1 if(x['language']=='Others') else 0 for x in get_family)
         widowed = sum(1 if(x['marital_status']=='Widow' and x['gender']=='FEMALE') else 0 for x in get_memData)
         divorced = sum(1 if(x['marital_status']=='Devorced' and x['gender']=='FEMALE') else 0 for x in get_memData)
-        # cat_E1 = len([i['financial_status'] for i in get_family if i['financial_status'].has_key('financial_status')=='E - Very Poor'])
-        # cat_E1 = len(map(get_family,itemgetter('E - Very Poor')))
+        print 'get_family',get_family
         rep_data = {'Taluk':muhalla.taluk.taluk_name,'Taluk Count':1,'Total Family ':len(get_family),'Total Population':len(get_memData),'Total Male':tot_men,'Total Female':tot_women,'Married':married,'Male age 60+':men_age_60,'Female age 60+':women_age_60,'Male age between 22-59':men_age_22to59,'Female age between 22-59':women_age_22to59,'Male age between 11-21':men_age_11to21,'Female age between 11-21':women_age_11to21,'Child upto 11 age ':child_upto11,'A - Well Settled':cat_A,'B - Full Filled':cat_B,'C - Middle Class':cat_C,'D - Poor':cat_D,'E - Very Poor':cat_E,'Widow':widowed,'Divorced':divorced,'Mother Tongue':{'Tamil':lang_tamil,'Urdu':lang_urdu,'Others':lang_others}}
-        # rep_data = [{'tot_family':len(get_family)},{'tot_member':len(get_memData)},{'population':len(get_memData)},{'taluk_count':1},{'taluk':muhalla.taluk.taluk_name},{'tot_men':tot_men},{'tot_women':tot_women},{'married':married},{'men_age_60':men_age_60},{'women_age_60':women_age_60},{'men_age_22to59':men_age_22to59},{'women_age_22to59':women_age_22to59},{'men_age_11to21':men_age_11to21},{'women_age_11to21':women_age_11to21},{'child_upto11':child_upto11},{'cat_A':cat_A},{'cat_B':cat_B},{'cat_C':cat_C},{'cat_D':cat_D},{'cat_E':cat_E},{'widow':widowed},{'divorced':divorced},{'language':{'lang_tamil':lang_tamil,'lang_urdu':lang_urdu,'lang_others':lang_others}}]
-        # for i in get_memData:
-        #     print 'i',i
         return HttpResponse(content=json.dumps({'get_family':get_family,'get_memdata':get_memData,'reports':rep_data}),content_type='Application/json')
 
 
@@ -242,11 +242,14 @@ def getServiceData(request):
     data = defaultdict(list)
     for i in Service.objects.all():
         if Member_service.objects.filter(member=Member.objects.get(mem_id=request.GET['mem_id']),scheme=Service.objects.get(name=i.name)):
-            checked = Member_service.objects.get(member=Member.objects.get(mem_id=request.GET['mem_id']),scheme=Service.objects.get(name=i.name)).status
+            checked_val = Member_service.objects.get(member=Member.objects.get(mem_id=request.GET['mem_id']),scheme=Service.objects.get(name=i.name))
+            checked = checked_val.status
+            solution = checked_val.solution
         else:
             checked = False
+            solution = ''
         status = 'Yes' if checked == True else 'No'
-        data[i.name].append({'sub':i.name,'service_id':i.service_id,'status':status})
+        data[i.name].append({'sub':i.name,'service_id':i.service_id,'status':status,'solution':solution})
     return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
 
 # @login_required
@@ -256,15 +259,34 @@ def FamilyMemberData(request):
         familyid = json.loads(request.body)['familyid']
         family = Family.objects.get(family_id=familyid)
         voter = True if data['voter'] == 'Yes' else False
-        if Member.objects.filter(mem_id=data['mem_id']):
-            member = Member.objects.filter(mem_id=data['mem_id']).update(family=family,muhalla=family.muhalla,name=data['name'],gender=data['gender'],age=data['age'],Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
-        else:
-            member = Member.objects.create(mem_id=data['mem_id'],family=family,muhalla=family.muhalla,name=data['name'],gender=data['gender'],age=data['age'],Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
-            member.mem_id= '%s / %s' %(familyid,member.id)
-            member.save()         
+        # family_head = True if data['family_head'] == 'Yes' else False
+        if data['name'] == '':
+            return HttpResponse(content=json.dumps({'data':'Please Enter Member Name!'}),content_type='Application/json')
+        else:                
+            if Member.objects.filter(mem_id=data['mem_id']):
+                memval = Member.objects.filter(mem_id=data['mem_id']).update(family=family,muhalla=family.muhalla,name=data['name'],gender=data['gender'],age=data['age'],Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
+                member = memval[0]
+            else:
+                member = Member.objects.create(mem_id=data['mem_id'],family=family,muhalla=family.muhalla,name=data['name'],gender=data['gender'],age=data['age'],Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
+                member.mem_id= '%s / %s' %(familyid,member.id)
+                member.save()  
+        if Member.objects.filter(family=family):
+            if data['family_head'] == 'Yes':
+                fam_head1 = Member.objects.filter(family=family,mem_id=member.mem_id).update(family_head=True) 
+                fam_head2 = Member.objects.filter(Q(family=family),~Q(mem_id=member.mem_id)).update(family_head=False) 
+            else:
+                fam_head1 = Member.objects.filter(family=family,mem_id=member.mem_id).update(family_head=False)
+                if Member.objects.filter(family=family,family_head=True):
+                    pass
+                else:
+                    fam_head = Member.objects.filter(family=family,mem_id=member.mem_id).update(family_head=True)                     
         return HttpResponse(content=json.dumps({'data':'success'}),content_type='Application/json')
     else:
-        member = map(lambda x:{'mem_id':x.mem_id,'family':x.family.family_id,'name':x.name,'gender':x.gender,'age':x.age,'relationship':x.Relation,'qualification':x.qualification,'marital_status':x.marital_status,'voter_status':x.voter_status,'curr_location':x.curr_location,'occupation':x.occupation},Member.objects.filter(family=Family.objects.get(family_id=request.GET['family_id'])))
+        family = Family.objects.get(family_id=request.GET['family_id'])
+        if not Member.objects.filter(family=family,family_head=True):
+            memval = Member.objects.filter(family=family)
+            fam_head = Member.objects.filter(family=family,mem_id=memval[0].mem_id).update(family_head=True)                     
+        member = map(lambda x:{'mem_id':x.mem_id,'family':x.family.family_id,'name':x.name,'gender':x.gender,'age':x.age,'relationship':x.Relation,'qualification':x.qualification,'marital_status':x.marital_status,'voter_status':x.voter_status,'family_head':x.family_head,'curr_location':x.curr_location,'occupation':x.occupation},Member.objects.filter(family=Family.objects.get(family_id=request.GET['family_id'])))
         return HttpResponse(content=json.dumps(member),content_type='Application/json')
 
 # @login_required        
@@ -310,28 +332,27 @@ def updateMemScheme(request):
             for i in schemeData[key]:
                 scheme = SubScheme.objects.get(subscheme_id=i['scheme_id'])
                 status = True if i['status'] == 'Yes' else False
+                solution = i['solution'] if status else 'Not Yet'
                 if Member_scheme.objects.filter(member=member_obj,scheme=scheme,status=status):
-                    continue
+                    update_mem = Member_scheme.objects.filter(member=member_obj,scheme=scheme,status=status).update(solution=solution)
                 elif Member_scheme.objects.filter(member=member_obj,scheme=scheme):
-                    member = Member_scheme.objects.filter(member=member_obj,scheme=scheme).update(status=status)           
+                    member = Member_scheme.objects.filter(member=member_obj,scheme=scheme).update(status=status,solution=solution)           
                 else:
-                    member = Member_scheme.objects.create(member=member_obj,scheme=scheme,status=status)           
+                    member = Member_scheme.objects.create(member=member_obj,scheme=scheme,status=status,solution=solution)
         for k in Servicedata.keys():
             service = Service.objects.get(service_id=Servicedata[k][0]['service_id'])
             status = True if Servicedata[k][0]['status'] == 'Yes' else False
+            solution = Servicedata[k][0]['solution'] if status else 'Not Yet'
+            # mem_data_update = Member_service.objects.filter(member=member_obj,scheme=service,status=status).update(solution=solution) if Member_service.objects.filter(member=member_obj,scheme=service,status=status) Member_service.objects.filter(member=member_obj,scheme=service).update(status=status,solution=solution) elif Member_service.objects.filter(member=member_obj,scheme=service) else Member_service.objects.create(member=member_obj,scheme=service,status=status,solution=solution)
             if Member_service.objects.filter(member=member_obj,scheme=service,status=status):
-                continue
+                Member_service.objects.filter(member=member_obj,scheme=service,status=status).update(solution=solution)
             elif Member_service.objects.filter(member=member_obj,scheme=service):
-                member = Member_service.objects.filter(member=member_obj,scheme=service).update(status=status)           
+                member = Member_service.objects.filter(member=member_obj,scheme=service).update(status=status,solution=solution)
             else:
-                member = Member_service.objects.create(member=member_obj,scheme=service,status=status)
-        # if disease_val['name'] == "SELECT or ADD DISEASE" or surgery_val['name'] == "SELECT or ADD DISEASE" or chronic_val['name'] == "SELECT or ADD DISEASE":
-        #     return HttpResponse(content=json.dumps({'response':'Please Select Disease First!'}),content_type='Application/json')
-        # else:            
+                member = Member_service.objects.create(member=member_obj,scheme=service,status=status,solution=solution)           
         if disease_val['name'] != '':
             disease = Disease.objects.get(disease_name=disease_val['name']) if Disease.objects.filter(disease_name=disease_val['name']) else Disease.objects.create(sym_type=disease_val['sym_type'],disease_name=disease_val['name'])
             medical_needs = Medical.objects.filter(member=member_obj).update(medicine_needs=disease_val['medicine'],cost=disease_val['cost']) if Medical.objects.filter(member=member_obj,disease=disease) else Medical.objects.create(member=member_obj,disease=disease,medicine_needs=disease_val['medicine'],cost=disease_val['cost'])
-            # medical_needs = Medical.objects.filter(member=member_obj,disease=disease).update(medicine_needs=disease_val['medicine'],cost=disease_val['cost']) if Medical.objects.filter(member=member_obj,disease=disease) else Medical.objects.create(member=member_obj,disease=disease,medicine_needs=disease_val['medicine'],cost=disease_val['cost'])
         if surgery_val['surgery_val'] == 'Yes':
             disease = Disease.objects.get(disease_name=surgery_val['name']) if Disease.objects.filter(disease_name=surgery_val['name']) else Disease.objects.create(sym_type=surgery_val['sym_type'],disease_name=surgery_val['name'])
             surgery_help = Surgery.objects.filter(member=member_obj).update(hospital_name=surgery_val['hospital_name'],cost=surgery_val['operation_cost'],cash_inHand=surgery_val['cash_hand'],details=surgery_val['details']) if Surgery.objects.filter(member=member_obj,disease=disease) else Surgery.objects.create(member=member_obj,disease=disease,hospital_name=surgery_val['hospital_name'],cost=surgery_val['operation_cost'],cash_inHand=surgery_val['cash_hand'],details=surgery_val['details'])
