@@ -346,8 +346,9 @@
                     </tr>
                     <tr ng-show="getTaluk[district_val].length!=0" ng-repeat="taluk in getTaluk[district_val]" class="ng-scope">
                         <td>{{$index+1}}</td>
-                        <td class="ng-binding">{{taluk}}</td>
-                        <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
+                        <td class="ng-binding"><span ng-show="!editT">{{taluk}}</span><input ng-show="editT" type="text" ng-model="taluk" value="{{taluk}}"></td>
+                        <td><a ng-show="!editT" ng-click="editT=true" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a>
+                            <a ng-show="editT" ng-click="editTaluk(district_val,taluk,getTaluk,$index,'edit');editT=false" class="color-edit"><i class="glyphicon glyphicon-plus"></i></a><a ng-confirm-click="Are you Sure you want to Delete?" confirmed-click="editTaluk(district_val,taluk,getTaluk,$index,'delete')" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
                     </tr>
                 </tbody>
             </table>
@@ -378,11 +379,12 @@
                     <input ng-show="new_masjid" style="display: inline-block;height: 34px;width: 50%;float: left;" placeholder="Enter Mohalla ID" ng-model="MasjidAddValue.mohalla_id" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
                     <span style="position: absolute;float: left;left: 20%;top: 10%;color: red;" ng-show="masjidList.indexOf(MasjidAddValue.mohalla_id)>-1 && new_masjid">* Mohalla ID Exist!</span>
                     
-                    <button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)==-1" type="submit" style="width:13%;height: 34px;" ng-click="addMasjid(masjid_val,MasjidAddValue)" class="btn-sm btn btn-primary">Update</button>
-                    <button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)==-1" type="submit" style="width:13%;height: 34px;" ng-click="new_masjid=true;getMasjidData();" class="btn-sm btn btn-primary">Cancel</button>
-                    <button ng-show="new_masjid" ng-disabled="masjidList.indexOf(MasjidAddValue.mohalla_id)!=-1 || MasjidAddValue.mohalla_id==''" type="submit" style="width:13%;height: 34px;" ng-click="addMasjid(masjid_val,MasjidAddValue)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Save New</button>
-                    <button ng-show="new_masjid" type="submit" style="width:13%;height: 34px;" ng-click="new_masjid=false;getMasjidData();" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Cancel</button>
-                    <button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)!=-1" type="submit" style="width:13%;height: 34px;" ng-click="new_masjid=true" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New</button>
+                    <button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)==-1" type="submit" style="width:10%;height: 34px;" ng-click="addMasjid(masjid_val,MasjidAddValue,'new')" class="btn-sm btn btn-primary">Update</button>
+                    <button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)==-1" type="submit" style="width:10%;height: 34px;" ng-click="addMasjid(masjid_val,MasjidAddValue,'delete')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-trash"></i> Delete</button>
+                    <button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)==-1" type="submit" style="width:10%;height: 34px;" ng-click="new_masjid=true;getMasjidData();" class="btn-sm btn btn-primary">Cancel</button>
+                    <button ng-show="new_masjid" ng-disabled="masjidList.indexOf(MasjidAddValue.mohalla_id)!=-1 || MasjidAddValue.mohalla_id==''" type="submit" style="width:10%;height: 34px;" ng-click="addMasjid(masjid_val,MasjidAddValue,'new')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Save New</button>
+                    <button ng-show="new_masjid" type="submit" style="width:10%;height: 34px;" ng-click="new_masjid=false;getMasjidData();" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Cancel</button>
+                    <button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)!=-1" type="submit" style="width:10%;height: 34px;" ng-click="new_masjid=true" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> New</button>
                 </div>
             </div>
         <div class=" col-lg-12" style="padding-bottom: 34px;">
@@ -420,12 +422,14 @@
                     </tr>
                     <tr ng-repeat="member in masjid_member_list" class="ng-scope">
                         <td>{{$index+1}}</td>
-                        <td class="ng-binding">{{member.name}}</td>
-                        <td class="ng-binding">{{member.age}}</td>
-                        <td class="ng-binding">{{member.designation}}</td>
-                        <td class="ng-binding">{{member.mobile}}</td>
-                        <td class="ng-binding">{{member.address}}</td>
-                        <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
+                        <td class="ng-binding"><span ng-show="!updateMem">{{member.name}}</span><input type="text" ng-show="updateMem" ng-model="member.name"></td>
+                        <td class="ng-binding"><span ng-show="!updateMem">{{member.age}}</span><input type="text" ng-show="updateMem" ng-model="member.age"></td>
+                        <td class="ng-binding"><span ng-show="!updateMem">{{member.designation}}</span><input type="text" ng-show="updateMem" ng-model="member.designation"></td>
+                        <td class="ng-binding"><span ng-show="!updateMem">{{member.mobile}}</span><input type="text" ng-show="updateMem" ng-model="member.mobile"></td>
+                        <td class="ng-binding"><span ng-show="!updateMem">{{member.address}}</span><input type="text" ng-show="updateMem" ng-model="member.address"></td>
+                        <td><a ng-show="!updateMem" ng-click="updateMem=true;" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a>
+                            <a ng-show="updateMem" ng-click="updateMem=false;UpdateMember(MasjidAddValue.mohalla_id,member,member.name,member.age,member.designation,member.mobile,member.address)" class="color-edit"><i class="glyphicon glyphicon-plus"></i></a>
+                            <a ng-confirm-click="Are you Sure you want to Delete?" confirmed-click="DeleteMember(MasjidAddValue.mohalla_id,member)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
                     </tr>
                     <!-- end ngRepeat: cat in categorys track by $index| filter:searchText -->
                 </tbody>
@@ -663,6 +667,14 @@
                         <td> {{key.needer}} for<br/>{{key.needs}} </td>
                     </tr>
                     <tr ng-show="ReportValues.report_name == 'Educational Help and Guidance Needers List' || ReportValues.report_name == 'Help for Discontinued and Guidance Needers List' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
+                        <td>{{$index+1}}</td>
+                        <td>{{key.name}} <br/> {{key.address}}</td>
+                        <td>{{key.age}} <br/> {{key.gender}} </td>
+                        <td>{{key.financial.split(' ')[0]}} <br/> {{key.familyid}} </td>
+                        <td>{{key.mobile}} </td>
+                        <td> {{key.needs}} <br/> Qualification: {{key.qualification}} </td>
+                    </tr>
+                    <tr ng-show="ReportValues.report_name == 'Childrens Need to join Makthab Madarasa' || ReportValues.report_name == 'Persons Need to join Jumrah Madarasa' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td>{{key.name}} <br/> {{key.address}}</td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>
@@ -923,7 +935,7 @@
                         <div ng-show="MemberUpdate.makthab" class="form-group" style="margin:5px;">
                             <label class="control-label col-xs-7">Makthab Madarasa Category</label>
                             <div class="col-xs-5">
-                                <select ng-model="MemberUpdate.makthab_detail" ng-options="val for val in ['Boys For Makthab 4-15','Girls For Makthab 4-15','Adult Makthab','Interest in Aalim/Hifz','Interest in Niswan','Interest in 1yr Muallim']" class="form-control">
+                                <select ng-model="MemberUpdate.makthab_detail" ng-options="val for val in makthabData()" class="form-control">
                                     <option value="">Makthab Category</option>
                                 </select>
                             </div>

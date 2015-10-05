@@ -10,7 +10,7 @@ admin.autodiscover()
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-	url(r'^$', login),
+	url(r'^$', home),
 	url(r'^login/$', login),
 	url(r'^signup/$', signup),
     url(r'^login_page/$', login_page),

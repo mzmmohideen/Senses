@@ -198,6 +198,18 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
 
         }
     }
+    $scope.editTaluk = function(district_val,taluk,tot_taluk,index,status) {
+        console.log(district_val,taluk,tot_taluk[district_val][index])
+        $http.post('/addLocation/',{
+            district : district_val,
+            edit_taluk : taluk,
+            taluk : tot_taluk[district_val][index],
+            status : status,
+        }).success(function(response){
+            alert(response.data)
+            $scope.getLocation()
+        })
+    }
     $scope.DiseaseVal = {
         sym_type: '',
         name: '',
@@ -398,7 +410,19 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
                 else if(fam_data.report_name == 'Government Schemes and Guidance Needers Details') {
                     $scope.getReportData = data.get_mem_scheme;
                 }
-            } 
+            }
+            else if(fam_data.report_name == 'Persons Need to join Jumrah Madarasa' || fam_data.report_name == 'Childrens Need to join Makthab Madarasa'  || fam_data.report_name == 'Women chldrens Need to join Niswan Madarasa') {
+                $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
+                if(fam_data.report_name == 'Persons Need to join Jumrah Madarasa') {
+                    $scope.getReportData = _.filter(data.get_memData,function(val) {return val.makthab == true && val.makthab_status == 'Jumrah Madarasa for Boys'});
+                }
+                else if(fam_data.report_name == 'Childrens Need to join Makthab Madarasa') {
+                    $scope.getReportData = _.filter(data.get_memData,function(val) {return val.makthab == true && val.makthab_status == 'Boys For Makthab 4-15'});
+                }
+                else if(fam_data.report_name == 'Women chldrens Need to join Niswan Madarasa') {
+                    $scope.getReportData = _.filter(data.get_memData,function(val) {return val.makthab == true && val.makthab_status == 'Girls For Makthab 4-15'});
+                }
+            }
             console.log('data',$scope.getReportData)
             // $scope.getReportData = data.reports;
             console.log('reportdata',$scope.getReportData)
@@ -416,8 +440,34 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             console.log('data',data)
         })
     }
-
-    $scope.addMasjid = function(masjid,data) {
+    $scope.UpdateMember = function(mohalla_id,member,name,age,designation,mobile,address) {
+            console.log('valllll',mohalla_id,member,name,age,designation,mobile,address)
+            $http.post('/masjid_member/',{
+                mohalla_id: mohalla_id,
+                data: member,
+                name: name,
+                age: age,
+                designation: designation,
+                mobile: mobile,
+                address: address,
+                status: 'edit',
+            }).success(function(response) {
+                alert(response.data)
+            })
+    }
+    $scope.DeleteMember = function(mohalla_id,member) {
+        $http.post('/masjid_member/',{
+        mohalla_id: mohalla_id,
+        data: member,
+        status: 'delete',
+        }).success(function(response) {
+            alert(response.data)
+            $http.get('/masjid_member/?masjid_id=' + mohalla_id).success(function(data){
+                $scope.masjid_member_list = data.data;
+            })
+        })
+    }
+    $scope.addMasjid = function(masjid,data,status) {
         console.log(data,masjid)
         if(data.mohalla_id == "") {
             var masjid_val = masjid
@@ -433,6 +483,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             mohalla_id: masjid_val,
             musallas: data.musallas,
             address: data.address,
+            status: status,
         }).success(function(data) {
             console.log('val',data)
             alert(data.data)
@@ -446,6 +497,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             district: district,
             district_code: district_code,
             taluk: taluk,
+            status : 'new',
         }).success(function(data) {
             console.log('data',data)
             alert(data.data)
@@ -535,13 +587,17 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         var data = masjid_data.get_MasjidData();
         $scope.add_member = function(member_name,age,designation,mobile,address,status) {
             console.log('member_name',member_name,data)
+            if(mobile == undefined) { var mobile_no = ''} else {var mobile_no = mobile}
+            if(address == undefined) { var address_val = ''} else {var address_val = address}    
+            console.log('member_name',mobile_no,address_val)
             $http.post('/masjid_member/',{
                 member_name: member_name,
                 data: data,
                 age: age,
                 designation: designation,
-                mobile: mobile,
-                address: address,
+                mobile: mobile_no,
+                address: address_val,
+                status: 'new',
             }).success(function(response) {
                 alert(response.data)
                 if(status == 'continue') {
@@ -584,7 +640,9 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             physical : '', 
             alive : '',
             makthab : '',
-            makthab_detail : '', 
+            makthab_detail : '',
+            age : '',
+            gender : '', 
         }
         $scope.GetMemData = function() {
             $http.get('/UpdateFamily_member/?mem_id='+$scope.Mem_ID,{}).success(function(data){
@@ -598,6 +656,8 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
                 $scope.MemberUpdate.language = data.language;
                 $scope.MemberUpdate.physical = data.disability;
                 $scope.MemberUpdate.alive = data.alive;
+                $scope.MemberUpdate.age = data.age;
+                $scope.MemberUpdate.gender = data.gender;
             })
         }
         $scope.GetMemData()
@@ -615,6 +675,25 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
                 console.log('datascheme',$scope.getServices)
             })
         }
+        // ['Boys For Makthab 4-15','Girls For Makthab 4-15','Adult Makthab','Interest in Aalim/Hifz','Interest in Niswan','Interest in 1yr Muallim']
+        $scope.makthabData = function() {
+            if($scope.MemberUpdate.makthab == 'Yes') {
+                if($scope.MemberUpdate.gender == 'FEMALE' && 4<=parseInt($scope.MemberUpdate.age) && parseInt($scope.MemberUpdate.age)<=15) {
+                    return ['Girls For Makthab 4-15','Interest in Niswan']
+                }
+                else if($scope.MemberUpdate.gender == 'MALE' && 4<=parseInt($scope.MemberUpdate.age) && parseInt($scope.MemberUpdate.age)<=15) {
+                    return ['Boys For Makthab 4-15','Jumrah Madarasa for Boys']
+                }
+                else if(parseInt($scope.MemberUpdate.age)>15) {
+                    return ['Interest in Aalim/Hifz','Adult Makthab','Interest in 1yr Muallim']
+                }
+                // else if($scope.MemberUpdate.gender == 'FEMALE' && parseInt($scope.MemberUpdate.age)>15) {
+                //     console.log('yes',$scope.MemberUpdate)
+                //     return ['Interest in Aalim/Hifz','Adult Makthab','Interest in 1yr Muallim']
+                // }
+            }
+        }
+        // $scope.makthabData()
         $scope.update_member = function(data,status) {
             console.log('member_name',status,data,$scope.Mem_ID)
             $http.post('/UpdateFamily_member/',{
@@ -640,7 +719,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
                     }
                     else if(status == 'exit') {
                         $modalInstance.dismiss('cancel');
-                        window.location.reload();
+                        // window.location.reload();
                     }
                 }
                 else if (response == '"notfound"') { $modalInstance.dismiss('cancel');};

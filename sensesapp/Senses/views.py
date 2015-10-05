@@ -14,11 +14,8 @@ from itertools import groupby
 from operator import itemgetter
 from django.db.models import Q
 
-def login(request):
-    if User.objects.filter(first_name="Admin"):
-        return render(request, 'login.html')
-    else:
-        return render(request, 'signup.html')
+def home(request):
+    return render(request, 'home.html')
 
 def login_page(request):
     a = json.loads(request.body)['data']
@@ -44,17 +41,27 @@ def apping(request):
 def addLocation(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        try:
-            district = District.objects.get(district_name=data['district'],district_code=data['district_code'])
-            if Taluk.objects.filter(district=district,taluk_name=data['taluk']):
-                return HttpResponse(content=json.dumps({'data':'District and Taluk Exist!'}), content_type='Application/json')
-            else:
+        if data['status'] == 'new':
+            try:
+                district = District.objects.get(district_name=data['district'],district_code=data['district_code'])
+                if Taluk.objects.filter(district=district,taluk_name=data['taluk']):
+                    return HttpResponse(content=json.dumps({'data':'District and Taluk Exist!'}), content_type='Application/json')
+                else:
+                    taluk = Taluk.objects.create(district=district,taluk_name=data['taluk'])
+                    return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
+            except:
+                # print '?????',repr(format_exc())
+                district = District.objects.create(district_name=data['district'],district_code=data['district_code'])
                 taluk = Taluk.objects.create(district=district,taluk_name=data['taluk'])
-                return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
-        except:
-            # print '?????',repr(format_exc())
-            district = District.objects.create(district_name=data['district'],district_code=data['district_code'])
-            taluk = Taluk.objects.create(district=district,taluk_name=data['taluk'])
+        elif data['status'] == 'edit':
+            district = District.objects.get(district_name=data['district'])
+            taluk = Taluk.objects.get(district=district,taluk_name=data['taluk'])
+            taluk.taluk_name = data['edit_taluk']
+            taluk.save()                
+        elif data['status'] == 'delete':
+            district = District.objects.get(district_name=data['district'])
+            taluk = Taluk.objects.get(district=district,taluk_name=data['taluk'])
+            taluk.delete()                    
         return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
     else:
         data = defaultdict(list)
@@ -121,12 +128,16 @@ def getSchemeData(request):
 def add_masjid(request):
     if request.method == 'POST':        
         data = json.loads(request.body)
-        taluk = Taluk.objects.get(district=District.objects.get(district_name=data['district']),taluk_name=data['taluk'])
-        if Masjid.objects.filter(mohalla_id=data['mohalla_id']):
-            masjid = Masjid.objects.filter(mohalla_id=data['mohalla_id']).update(taluk=taluk,name=data['masjid_name'],musallas=data['musallas'],location=data['address'])
-            return HttpResponse(content=json.dumps({'data':'updated!'}),content_type='Application/json')
-        else:
-            masjid = Masjid.objects.create(mohalla_id=data['mohalla_id'],taluk=taluk,name=data['masjid_name'],musallas=data['musallas'],location=data['address'])
+        if data['status'] == 'new':            
+            taluk = Taluk.objects.get(district=District.objects.get(district_name=data['district']),taluk_name=data['taluk'])
+            if Masjid.objects.filter(mohalla_id=data['mohalla_id']):
+                masjid = Masjid.objects.filter(mohalla_id=data['mohalla_id']).update(taluk=taluk,name=data['masjid_name'],musallas=data['musallas'],location=data['address'])
+                return HttpResponse(content=json.dumps({'data':'updated!'}),content_type='Application/json')
+            else:
+                masjid = Masjid.objects.create(mohalla_id=data['mohalla_id'],taluk=taluk,name=data['masjid_name'],musallas=data['musallas'],location=data['address'])
+                return HttpResponse(content=json.dumps({'data':'success!'}),content_type='Application/json')
+        elif data['status'] == 'delete':
+            masjid = Masjid.objects.filter(mohalla_id=data['mohalla_id']).delete()
             return HttpResponse(content=json.dumps({'data':'success!'}),content_type='Application/json')
     else:
         get_members = map(lambda x:{'name':x.name,'mohalla_id':x.mohalla_id,'taluk':x.taluk.taluk_name,'district':x.taluk.district.district_name,'musallas':x.musallas,'location':x.location},Masjid.objects.all())
@@ -137,14 +148,22 @@ def masjid_member(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         # taluk = Taluk.objects.get(district=District.objects.get(district_name=data['data']['district']),taluk_name=data['data']['taluk'])
-        masjid_val = Masjid.objects.get(mohalla_id=data['data']['mohalla_id'])
-        if Masjid_members.objects.filter(masjid=masjid_val,member_name=data['member_name'],designation=data['designation']):
-            masjid = Masjid_members.objects.filter(masjid=masjid_val,member_name=data['member_name'],designation=data['designation']).update(age=data['age'],mobile=data['mobile'],address=data['address'])
-            response = 'updated'
-        else:
-            masjid = Masjid_members.objects.create(masjid=masjid_val,member_name=data['member_name'],designation=data['designation'],age=data['age'],mobile=data['mobile'],address=data['address'])
-            response = 'success'
-        return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')
+        if data['status'] == 'new':
+            masjid_val = Masjid.objects.get(mohalla_id=data['data']['mohalla_id'])
+            if Masjid_members.objects.filter(masjid=masjid_val,member_name=data['member_name'],designation=data['designation']):
+                masjid = Masjid_members.objects.filter(masjid=masjid_val,member_name=data['member_name'],designation=data['designation']).update(age=data['age'],mobile=data['mobile'],address=data['address'])
+                response = 'updated'
+            else:
+                masjid = Masjid_members.objects.create(masjid=masjid_val,member_name=data['member_name'],designation=data['designation'],age=data['age'],mobile=data['mobile'],address=data['address'])
+                response = 'success'
+            return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')    
+        elif data['status'] == 'edit':
+            print 'edit'
+            masjid = Masjid_members.objects.filter(masjid=Masjid.objects.get(mohalla_id=data['mohalla_id']),member_name=data['name'],designation=data['designation']).update(age=data['age'],mobile=data['mobile'],address=data['address'],member_name=data['name'],designation=data['designation'])
+            return HttpResponse(content=json.dumps({'data':'updated'}),content_type='Application/json')
+        elif data['status'] == 'delete':
+            masjid = Masjid_members.objects.filter(masjid=Masjid.objects.get(mohalla_id=data['mohalla_id']),member_name=data['data']['name'],designation=data['data']['designation']).delete()                
+            return HttpResponse(content=json.dumps({'data':'Deleted'}),content_type='Application/json')
     else:
         data = request.GET
         # taluk = Taluk.objects.get(taluk_name=data['taluk'],district=District.objects.get(district_name=data['district']))
@@ -199,7 +218,7 @@ def fetchReportData(request):
             for m in Member_service.objects.filter(member=i):
                 get_mem_service.append({'name':m.member.name,'qualification':m.member.qualification,'status':m.status,'solution':m.solution,'address':m.member.family.address,'age':m.member.age,'gender':m.member.gender,'financial':m.member.family.financial_status,'familyid':m.member.family.family_id,'mobile':m.member.family.mobile,'needs':m.scheme.name,'needer':'Need Other/NGO Guidance'})    
         # Government Voter ID Needers
-        get_memData = map(lambda x:{'familyid':x.family.family_id,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=Masjid.objects.get(mohalla_id=request.GET['muhalla_id'])))
+        get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=Masjid.objects.get(mohalla_id=request.GET['muhalla_id'])))
         married = sum(1 if(x['marital_status']=='Married' or x['marital_status']=='Widow' or x['marital_status']=='Devorced') else 0 for x in get_memData)
         tot_men = sum(1 if(x['gender']=='MALE') else 0 for x in get_memData)
         tot_women = sum(1 if(x['gender']=='FEMALE') else 0 for x in get_memData)
@@ -327,7 +346,7 @@ def UpdateFamily_member(request):
             quran_reading = 'Yes' if member.quran_reading == True else 'No'
             volunteer = 'Yes' if member.volunteer == True else 'No'
             alive = 'Yes' if member.alive == True else 'No' 
-            return HttpResponse(content=json.dumps({'alive':alive,'quran_reading':quran_reading,'namaz':member.namaz,'makthab':makthab,'makthab_detail':member.madarasa_details,'language':member.mother_tongue,'disability':disability,'volunteer':volunteer,'mobile':member.mobile,'donor':donor}),content_type='Application/json')
+            return HttpResponse(content=json.dumps({'alive':alive,'quran_reading':quran_reading,'namaz':member.namaz,'makthab':makthab,'makthab_detail':member.madarasa_details,'language':member.mother_tongue,'disability':disability,'volunteer':volunteer,'mobile':member.mobile,'donor':donor,'age':member.age,'gender':member.gender}),content_type='Application/json')
 
 # @login_required
 def updateMemScheme(request):
