@@ -11,6 +11,7 @@ MADARASA = (('Boys For Makthab 4-15','Boys For Makthab 4-15'), ('Girls For Makth
 SYMPTOMTYPE = (('DISEASE','DISEASE'),('DISORDER','DISORDER'))
 NAMAS = (('5 Times a day','5 Times a day'),('only Jumah','only Jumah'),('Not at All','Not at All'))
 SOLUTION = (('Solved','Solved'),('Not Yet','Not Yet'))
+NEWMEMTYPE = (('Mohalla User','Mohalla User'),('End Users & Donors','End Users & Donors'))
 
 class District(models.Model):
     district_name = models.CharField(max_length=50,unique=True)
@@ -134,5 +135,9 @@ class ChronicDisease(models.Model):
     status = models.BooleanField(default=False)
     details = models.CharField(max_length=300,null=True)
 
+class SensesMembers(models.Model):
+    user = models.OneToOneField(User)
+    member_type = models.CharField(max_length=30,choices=NEWMEMTYPE)
+    masjid = models.ForeignKey(Masjid)
     
 # Create your models here.

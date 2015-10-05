@@ -68,6 +68,9 @@ app.config(['$routeProvider',
         when('/location', {
             templateUrl: 'location.html',
         }).
+        when('/member', {
+            templateUrl: 'member.html',
+        }).
         when('/masjid', {
             templateUrl: 'masjid.html',
         }).
@@ -366,6 +369,35 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         $scope.ReportValues.muhalla.mohalla_id = ''
         $scope.ReportHeader = []
         $scope.getReportData = []
+    }
+    $scope.moh_user = {
+        member_type : '',
+        district : '',
+        taluk : '',
+        muhalla : '',
+        username : '',
+        password : '',
+    }
+    $scope.moh_user_create = function(data,status) {
+        console.log('data',data)
+        $http.post('/new_member/',{
+            mohalla_id: data.muhalla.mohalla_id,
+            username: data.username,
+            password: data.password,
+            member_type: data.member_type,
+            status: status,
+        }).success(function(response) {
+            alert(response.data)
+            $scope.getMohallaUser(data)
+            console.log('data',response)
+        })
+    }
+    $scope.getMohallaUser = function(data) {
+        console.log('data',data)
+        $http.get('/new_member/?muhalla_id='+data.muhalla.mohalla_id,{}).success(function(data){
+            console.log('data',data)
+            $scope.fetched_moh_user = _.filter(data.data,function(val){ return val.Member_type == data.member_type});
+        })
     }
     $scope.getFamilyReport = function(fam_data) {
         console.log('value',fam_data.report_name)

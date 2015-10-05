@@ -4,8 +4,10 @@ from django.contrib.auth.models import User
 from django.core.context_processors import csrf
 from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import *
+from django.http import HttpResponseRedirect
 import json,csv
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth import logout
 from collections import defaultdict
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime, time
@@ -14,13 +16,25 @@ from itertools import groupby
 from operator import itemgetter
 from django.db.models import Q
 
-def home(request):
-    return render(request, 'home.html')
+def login_check(request):
+    if User.objects.filter(first_name="Admin"):
+        return render(request, 'login.html')
+    else:
+        return render(request, 'signup.html')
+
+def logout_view(request):
+    print 'login'
+    logout(request)
+    request.session.flush()
+    return HttpResponseRedirect('/login/')
 
 def login_page(request):
+    # check_browser = browser_check(request.user_agent.browser)
+    # if check_browser: 
     a = json.loads(request.body)['data']
     user = authenticate(username=a['username'], password=a['password'])
     if user:
+        login(request,user)
         # return render(request, 'apping.html')
         return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
     else:
@@ -33,7 +47,7 @@ def signup(request):
     user.save()    
     return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
 
-# @login_required
+@login_required(login_url='/login/')
 def apping(request):    
     return render(request, 'apping.html')        
 
@@ -429,4 +443,34 @@ def DiseaseData(request):
             disease = Disease.objects.filter(disease_name=request.GET['disease']).delete()
             return HttpResponse(content=json.dumps({'response':'Disease Deleted Successfully!'}),content_type='Application/json')
 
+def new_member(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        get_mohalla = Masjid.objects.get(mohalla_id=data['mohalla_id'])
+        if data['status'] == 'new':            
+            if User.objects.filter(username=data['username']):
+                response = 'Username Exist!'
+            else:
+                user = User.objects.create(username=data['username'])
+                user.set_password(data['password'])
+                user.save()
+                if SensesMembers.objects.filter(user=user,member_type=data['member_type'],masjid=get_mohalla):
+                    response =  'Given Data Exist!'
+                else:
+                    user_add = SensesMembers.objects.create(user=user,member_type=data['member_type'],masjid=get_mohalla)
+                    response = 'Member Created Successfully!'
+        elif data['status'] == 'edit':
+            user = User.objects.filter(username=data['username'])
+            sense_member = SensesMembers.objects.filter(user=user,masjid=get_mohalla).update(member_type=data['member_type'])
+            response = 'Updated Successfully!'
+        elif data['status'] == 'delete':
+            user = User.objects.filter(username=data['username'])
+            sense_member = SensesMembers.objects.filter(user=user,masjid=get_mohalla,member_type=data['member_type']).delete()
+            response = 'Deleted Successfully!'           
+        return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')
+    else:
+        muhalla = Masjid.objects.get(mohalla_id=request.GET['muhalla_id'])
+        sense_member = map(lambda x:{'username':x.user.username,'Member_type':x.member_type},SensesMembers.objects.filter(masjid=muhalla))
+        return HttpResponse(content=json.dumps({'data':sense_member}),content_type='Application/json')
+        
         
