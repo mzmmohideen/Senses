@@ -377,6 +377,8 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         muhalla : '',
         username : '',
         password : '',
+        re_username : '',
+        re_password : '',
     }
     $scope.moh_user_create = function(data,status) {
         console.log('data',data)
@@ -384,19 +386,24 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             mohalla_id: data.muhalla.mohalla_id,
             username: data.username,
             password: data.password,
+            re_password: data.re_password,
             member_type: data.member_type,
             status: status,
         }).success(function(response) {
             alert(response.data)
             $scope.getMohallaUser(data)
+            $scope.moh_user.username = ''
+            $scope.moh_user.password = ''
+            $scope.moh_user.re_password = ''
             console.log('data',response)
         })
     }
-    $scope.getMohallaUser = function(data) {
-        console.log('data',data)
-        $http.get('/new_member/?muhalla_id='+data.muhalla.mohalla_id,{}).success(function(data){
+    $scope.getMohallaUser = function(mohalla_data) {
+        console.log('mohalla_data',mohalla_data)
+        $http.get('/new_member/?muhalla_id='+mohalla_data.muhalla.mohalla_id,{}).success(function(data){
             console.log('data',data)
-            $scope.fetched_moh_user = _.filter(data.data,function(val){ return val.Member_type == data.member_type});
+            $scope.fetched_moh_user = _.filter(data.data,function(val){ return val.Member_type == mohalla_data.member_type});
+            console.log('scope',$scope.fetched_moh_user.length)
         })
     }
     $scope.getFamilyReport = function(fam_data) {
@@ -464,9 +471,9 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         if(financial == 'A' || financial == 'B' || financial == 'C') { return 'NO' }
         else if(financial == 'D' || financial == 'E') { return 'YES' }
     }
-    $scope.getMasjidMember = function(data) {
-        console.log('masjid_member',data)
-        $http.get('/masjid_member/?masjid_id=' + data.mohalla_id).success(function(data){
+    $scope.getMasjidMember = function(masjid_data) {
+        console.log('masjid_member',masjid_data)
+        $http.get('/masjid_member/?masjid_id=' + masjid_data.mohalla_id).success(function(data){
         // $http.get('/masjid_member/?masjid=' + data.masjid_name+'&taluk='+data.taluk+'&district='+ data.district).success(function(data){
             $scope.masjid_member_list = data.data;
             console.log('data',data)

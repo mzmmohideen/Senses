@@ -23,7 +23,6 @@ def login_check(request):
         return render(request, 'signup.html')
 
 def logout_view(request):
-    print 'login'
     logout(request)
     request.session.flush()
     return HttpResponseRedirect('/login/')
@@ -35,8 +34,21 @@ def login_page(request):
     user = authenticate(username=a['username'], password=a['password'])
     if user:
         login(request,user)
+        user_val=User.objects.get(username=a['username'])
+        print 'admin',user_val.first_name
+        if user_val.first_name == "Admin":
+            print 'admin'
+            return HttpResponse(content=json.dumps({'data':'admin_dash'}), content_type='Application/json')
+        elif SensesMembers.objects.filter(user=user_val):
+            get_mem_data = SensesMembers.objects.get(user=user_val)
+            if get_mem_data.member_type == 'Mohalla User':
+                return HttpResponse(content=json.dumps({'data':'mohalla_user'}), content_type='Application/json')
+            elif get_mem_data.member_type == 'End Users & Donors':
+                return HttpResponse(content=json.dumps({'data':'end_user'}), content_type='Application/json')
+        else:
+            return HttpResponse(content=json.dumps({'data':'invalid'}), content_type='Application/json')
         # return render(request, 'apping.html')
-        return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
+        # return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
     else:
         return HttpResponse(content=json.dumps({'data':'failed'}), content_type='Application/json')
 
@@ -50,6 +62,14 @@ def signup(request):
 @login_required(login_url='/login/')
 def apping(request):    
     return render(request, 'apping.html')        
+
+@login_required(login_url='/login/')
+def mohallauser(request):    
+    return render(request, 'mohuser.html')
+
+@login_required(login_url='/login/')
+def enduser(request):    
+    return render(request, 'enduser.html')    
 
 # @login_required    
 def addLocation(request):
@@ -157,6 +177,10 @@ def add_masjid(request):
         get_members = map(lambda x:{'name':x.name,'mohalla_id':x.mohalla_id,'taluk':x.taluk.taluk_name,'district':x.taluk.district.district_name,'musallas':x.musallas,'location':x.location},Masjid.objects.all())
         return HttpResponse(content=json.dumps({'data':get_members}),content_type='Application/json')
 
+def get_mahallauser_data(request):
+    mohallaData = SensesMembers.objects.get(user=request.user)
+    muhalla = {'uname':request.user.username,'mohalla_id':mohallaData.masjid.mohalla_id,'musallas':mohallaData.masjid.musallas,'address':mohallaData.masjid.location,'mohalla':mohallaData.masjid.name,'taluk':mohallaData.masjid.taluk.taluk_name,'district':mohallaData.masjid.taluk.district.district_name}
+    return HttpResponse(content=json.dumps({'muhalla':muhalla}),content_type='Application/json')
 # @login_required
 def masjid_member(request):
     if request.method == 'POST':
@@ -460,9 +484,12 @@ def new_member(request):
                     user_add = SensesMembers.objects.create(user=user,member_type=data['member_type'],masjid=get_mohalla)
                     response = 'Member Created Successfully!'
         elif data['status'] == 'edit':
-            user = User.objects.filter(username=data['username'])
-            sense_member = SensesMembers.objects.filter(user=user,masjid=get_mohalla).update(member_type=data['member_type'])
-            response = 'Updated Successfully!'
+            print 'data',data
+            user = User.objects.get(username=data['username'])
+            user.set_password(data['re_password'])
+            user.save()
+            # sense_member = SensesMembers.objects.filter(user=user,masjid=get_mohalla).update(member_type=data['member_type'])
+            response = 'Password Updated Successfully!'
         elif data['status'] == 'delete':
             user = User.objects.filter(username=data['username'])
             sense_member = SensesMembers.objects.filter(user=user,masjid=get_mohalla,member_type=data['member_type']).delete()

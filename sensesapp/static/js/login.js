@@ -23,9 +23,18 @@ app.controller('loginCtrl',function($scope,$http,$location) {
         $http.post('/login_page/', {
         	data: data,
         }).success(function (response) {
-		if(response.data == 'success') {
+		if(response.data == 'admin_dash') {
 			window.location.href = '/home/'
 		}
+		else if(response.data == 'mohalla_user') {
+			window.location.href = '/mohallauser/'
+		}
+		else if(response.data == 'end_user') {
+			window.location.href = '/enduser/'
+		}
+	   	else if(response.data == 'invalid') {
+            alert("Invalid Login Details!")
+        }
 	   	else if(response.data == 'failed') {
             alert("Incorrect username or password.")
         }

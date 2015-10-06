@@ -9,7 +9,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
-    <title>Dashboard Template for Bootstrap</title>
+    <title>Admin Dashboard</title>
     <!-- Bootstrap core CSS -->
     <link href="{{STATIC_URL}}bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <!-- Custom styles for this template -->
@@ -361,7 +361,7 @@
         <div class="row" ng-init="getLocation();getMasjidData()">
             <div class="col-lg-12">
                 <h1 class="page-header">Members <select style="display: inline-block;height: 34px;width: 30%;float: right;" ng-model="moh_user.member_type" ng-change="report_value_change()" ng-options="gen for gen in ['Mohalla User','End Users & Donors']" class="form-control">
-                    <option value="">Member Creations</option>
+                    <option value="">Select Member Type</option>
                 </select>
                 </h1>
             </div>
@@ -380,25 +380,34 @@
             <div class="form-group" style="margin-top:20%">            
                 <input style="display: inline-block;height: 34px;width: 35%;float: left;" type="text" placeholder="Username" ng-model="moh_user.username" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
                 <input style="display: inline-block;height: 34px;width: 35%;float: left;" class="form-control" type="password" ng-model="moh_user.password" placeholder="Password" />
-                <button  ng-disabled="!moh_user.username || !moh_user.password || !moh_user.mohalla_id" type="submit" style="width:30%;height: 34px;float:right;" ng-click="moh_user_create(moh_user,'new')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Create</button>
+                <button  ng-disabled="!moh_user.username || !moh_user.password || !moh_user.muhalla.mohalla_id" type="submit" style="width:30%;height: 34px;float:right;" ng-click="moh_user_create(moh_user,'new')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Create</button>
             </div>    
             <table class="table table-striped table-bordered table-hover ng-scope" style="margin-top:20%">
                 <thead>
                     <tr class="ng-scope">
                         <th>S.No</th>
                         <th>Mohalla Username</th>
-                        <th>Member Type</th>
+                        <th>Password</th>
                         <th>Actions</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-show="fetched_moh_user.length!=0 && moh_user.mohalla_id" ng-repeat="val in fetched_moh_user" class="ng-scope">
+                    <tr ng-show="fetched_moh_user.length != 0 && moh_user.muhalla.mohalla_id" ng-repeat="val in fetched_moh_user" class="ng-scope">
                         <td>{{$index+1}}</td>
-                        <td class="ng-binding">{{val.username}}</td>
-                        <td class="ng-binding">{{val.Member_type}}</td>
-                        <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
+                        <td class="ng-binding" ng-init="moh_user.username=val.username">
+                            <span>{{val.username}}</span>
+                            <!--<span ng-show="editMohMember"><input style="display: inline-block;height: 34px;width: 35%;float: left;" type="text" placeholder="Username" ng-model="moh_user.re_username" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                            </span>-->
+                        </td>
+                        <td class="ng-binding">
+                            <span ng-show="!editMohMember">*****</span>
+                            <span ng-show="editMohMember"><input style="display: inline-block;height: 34px;width: 35%;float: left;" class="form-control" type="password" ng-model="moh_user.re_password" placeholder="Password" /></span>
+                        </td>
+                        <td><a ng-show="!editMohMember" ng-click="editMohMember=true" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a>
+                            <a ng-show="editMohMember" ng-click="editMohMember=false;moh_user_create(moh_user,'edit')" class="color-edit"><i class="glyphicon glyphicon-plus"></i></a>
+                            <a ng-click="moh_user_create(moh_user,'delete')" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
                     </tr>
-                    <tr ng-show="fetched_moh_user.length == 0 && moh_user.mohalla_id" class="ng-scope">
+                    <tr ng-show="fetched_moh_user.length == 0 && moh_user.muhalla.mohalla_id" class="ng-scope">
                         <td colspan="4">No Data Found!</td>
                     </tr>
                     <tr ng-show="!moh_user.mohalla_id && !fetched_moh_user" class="ng-scope">
