@@ -17,10 +17,20 @@ from operator import itemgetter
 from django.db.models import Q
 
 def login_check(request):
-    if User.objects.filter(first_name="Admin"):
-        return render(request, 'login.html')
+    if request.user.is_authenticated():
+        if request.user.first_name == "Admin":
+            return HttpResponseRedirect('/home/')
+        elif SensesMembers.objects.filter(user=request.user):
+            get_mem_data = SensesMembers.objects.get(user=request.user)
+            if get_mem_data.member_type == 'Mohalla User':
+                return HttpResponseRedirect('/mohallauser/')
+            elif get_mem_data.member_type == 'End Users & Donors':
+                return HttpResponseRedirect('/enduser/')                
     else:
-        return render(request, 'signup.html')
+        if User.objects.filter(first_name="Admin"):
+            return render(request, 'login.html')
+        else:
+            return render(request, 'signup.html')
 
 def logout_view(request):
     logout(request)

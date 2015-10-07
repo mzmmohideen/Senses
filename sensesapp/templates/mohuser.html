@@ -70,12 +70,118 @@
             </div>
         </div>        
     </script> 
-    <script type="text/ng-template" id="family_members.html">
+    <script type="text/ng-template" id="family_members.html">    
+        <span style="float:right">Welcome! {{muhalla_values.uname}}.</span>
         <div class="row">
             <div class="col-lg-12">
                 <h1 class="page-header">Family Members</h1>
             </div>
-        </div>        
+            <div class=" col-lg-12">
+                <span style="width:25%;float:left;">District</span>
+                <span style="width:25%;float:left;">Taluk</span>
+                <span style="width:25%;float:left;">Mohalla</span>
+                <span style="width:25%;float:left;">Mohalla ID</span>
+            </div>
+            <div class=" col-lg-12">
+                <input style="display: inline-block;height: 34px;width: 25%;float: left;" class="form-control" type="text" ng-model="muhalla_values.district" readonly/>
+                <input style="display: inline-block;height: 34px;width: 25%;float: left;" class="form-control" type="text" ng-model="muhalla_values.taluk" readonly/>
+                <input style="display: inline-block;height: 34px;width: 25%;float: left;" class="form-control" type="text" ng-model="muhalla_values.mohalla" readonly/>
+                <input style="display: inline-block;height: 34px;width: 25%;float: left;" class="form-control" type="text" ng-model="muhalla_values.mohalla_id" readonly/>
+            </div>
+            <div class="col-lg-12"><br/></div>
+            <div class=" col-lg-12" style="padding-right: 20px;border-right: 1px solid #E2E2E2;">
+                <div class="form-group" style="padding-bottom: 34px;">
+                    <ui-select ng-show="!new_family" style="display: inline-block;height: 34px;width: 50%;float: left;" on-select="familyid=FamilyValue.familyid;get_family(familyid)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="FamilyValue.familyid">
+                        <ui-select-match placeholder="{{family_val}}">{{family_val}}</ui-select-match>
+                        <ui-select-choices refresh="familyid=$select.search;get_family(familyid)" repeat="mod in familyList | filter:$select.search">
+                            <div ng-bind-html="mod.family_id | highlight: $select.search"></div>
+                        </ui-select-choices>
+                    </ui-select>
+                    <!--<input ng-show="new_family" style="display: inline-block;height: 34px;width: 50%;float: left;" placeholder="Enter Family ID" ng-model="FamilyValue.familyid" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">-->
+                    <button ng-show="!new_family" ng-disabled="family_val=='' || family_val=='Type or Select Family ID from the List'" type="submit" style="width:13%;height: 34px;" ng-click="addFamily(family_val,FamilyValue,'update')" class="btn-sm btn btn-primary">Update</button>
+                    <button ng-show="!new_family" ng-disabled="family_val=='' || family_val=='Type or Select Family ID from the List'" type="submit" style="width:13%;height: 34px;" ng-click="new_family=true;get_family();" class="btn-sm btn btn-primary">Cancel</button>
+                    <!--<button ng-show="!new_family" ng-disabled="familyList.indexOf(family_val)==-1">-->
+                    <button ng-show="new_family" type="submit" style="width:13%;height: 34px;" ng-click="addFamily(family_val,FamilyValue,'new')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Save New</button>
+                    <button ng-show="new_family" type="submit" style="width:13%;height: 34px;" ng-click="new_family=false;get_family()" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Cancel</button>
+                    <button ng-show="!new_family" ng-disabled="familyList.indexOf(family_val)>-1" type="submit" style="width:13%;height: 34px;" ng-click="new_family=true;get_family()" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New</button>
+                </div>
+            </div>
+            <div class=" col-lg-12" style="padding-bottom: 34px;">
+                <input style="display: inline-block;width: 13%;height: 34px;float: left;" type="text" placeholder="Ration Card Number" ng-model="FamilyValue.ration_card" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                <input style="display: inline-block;width: 13%;height: 34px;float: left;" type="text" placeholder="Mobile Number" ng-model="FamilyValue.mobile_no" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                <select style="display: inline-block;height: 34px;width: 15%;float: left;" ng-model="FamilyValue.language" ng-options="house for house in ['Tamil','Urdu','Others']" class="form-control">
+                    <option value="">Mother Tongue</option>
+                </select>
+                <!--<input style="display: inline-block;height: 34px;width: 15%;float: left;" class="form-control" type="text" ng-model="FamilyValue.language" placeholder="Mother Tongue" />-->
+                <input style="display: inline-block;width: 29%;height: 34px;float: left;" type="text" placeholder="Address" ng-model="FamilyValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                <input style="display: inline-block;width: 30%;height: 34px;float: left;" type="text" placeholder="Any Emergency Needs in this Family?" ng-model="FamilyValue.family_needs" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+        </div>
+        <div class=" col-lg-12" style="padding-bottom: 34px;">
+                <select style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="FamilyValue.house" ng-options="house for house in ['Rent','Own']" class="form-control">
+                    <option value="">House Type</option>
+                </select>
+                <!--<select style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="FamilyValue.donor" ng-options="donor for donor in ['Yes','No']" class="form-control">
+                    <option value="">Willing to be a Financial Donor?</option>
+                </select>
+                <select style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="FamilyValue.volunteer" ng-options="volunteer for volunteer in ['Yes','No']" class="form-control">
+                    <option value="">Want to be a Volunteer?</option>
+                </select>-->               
+                <select style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="FamilyValue.health_insurance" ng-options="health for health in ['Yes','No']" class="form-control">
+                    <option value="">Health Insurance Scheme Card Available?</option>
+                </select>
+                <select style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="FamilyValue.toilet" ng-options="toilet for toilet in ['Yes','No']" class="form-control">
+                    <option value="">Toilet Available?</option>
+                </select>
+                <select style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="FamilyValue.financial" ng-options="financial for financial in ['A - Well Settled','B - Full Filled','C - Middle Class','D - Poor','E - Very Poor']" class="form-control">
+                    <option value="">Financial Status</option>
+                </select>
+                
+        </div>
+        </div>    
+        <div class="row">
+            <div class="col-lg-12">
+                <h1 class="page-header">Members</h1>
+            </div>
+            <table class="table table-striped table-bordered table-hover ng-scope">
+                <thead>
+                    <tr>
+                        <th>S.No</th>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Post</th>
+                        <th>Contact</th>
+                        <th>Address</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr class="ng-scope">                        
+                        <td><input type="text" placeholder="1" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required" readonly></td>
+                        <td><input class="form-control" type="text" ng-model="member_name" placeholder="Member Name"/></td>
+                        <td><input class="form-control" type="text" ng-model="age" valid-number placeholder="Age"/></td>
+                        <td><input class="form-control" type="text" ng-model="designation" placeholder="Designation"/></td>
+                        <td><input class="form-control" type="text" ng-model="mobile" placeholder="Mobile Number"/></td>
+                        <td><input class="form-control" type="text" ng-model="address" placeholder="Address" /></td>                
+                        <td><button ng-disabled="!member_name || !designation || !age" type="submit" ng-click="add_member(member_name,age,designation,mobile,address,'new')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>Add</button></td>
+                    </tr>
+                    <tr ng-show="masjid_member_list.length==0">
+                        <td colspan="7" style="text-align:center;" class="ng-binding">No Member Data Found!</td>
+                    </tr>
+                    <tr ng-repeat="member in masjid_member_list" class="ng-scope">
+                        <td>{{$index+1}}</td>
+                        <td class="ng-binding"><span ng-show="!updateMem">{{member.name}}</span><input style="display: inline-block;height: 34px;width: 200px;float: left;margin-right: -90px;" type="text" ng-show="updateMem" ng-model="member.name"></td>
+                        <td class="ng-binding"><span ng-show="!updateMem">{{member.age}}</span><input style="display: inline-block;height: 34px;width: 30px;float: left;" type="text" ng-show="updateMem" ng-model="member.age"></td>
+                        <td class="ng-binding"><span ng-show="!updateMem">{{member.designation}}</span><input style="display: inline-block;height: 34px;width: 130px;float: left;margin-right: -65px;" type="text" ng-show="updateMem" ng-model="member.designation"></td>
+                        <td class="ng-binding"><span ng-show="!updateMem">{{member.mobile}}</span><input style="display: inline-block;height: 34px;width: 130px;float: left;margin-right: -65px;" type="text" ng-show="updateMem" ng-model="member.mobile"></td>
+                        <td class="ng-binding"><span ng-show="!updateMem">{{member.address}}</span><input style="display: inline-block;height: 34px;width: 110px;float: left;margin-right: -45px;" type="text" ng-show="updateMem" ng-model="member.address"></td>
+                        <td><a ng-show="!updateMem" ng-click="updateMem=true;" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a>
+                            <a ng-show="updateMem" ng-click="updateMem=false;UpdateMember(muhalla_values.mohalla_id,member,member.name,member.age,member.designation,member.mobile,member.address)" class="color-edit"><i class="glyphicon glyphicon-plus"></i></a>
+                            <a ng-confirm-click="Are you Sure you want to Delete?" confirmed-click="DeleteMember(muhalla_values.mohalla_id,member)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
+                    </tr>
+                    <!-- end ngRepeat: cat in categorys track by $index| filter:searchText -->
+                </tbody>
+            </table>
+        </div>
     </script>
     <script type="text/ng-template" id="muhalla.html">
         <span style="float:right">Welcome! {{muhalla_values.uname}}.</span>
@@ -155,6 +261,9 @@
     <script src="{{STATIC_URL}}js/angular/ui-bootstrap-tpls.js"></script>
     <script src="{{STATIC_URL}}js/angular/angular-cookies.min.js"></script>
     <script src="{{STATIC_URL}}js/angular/angular-route.min.js"></script>
+    <script src="{{STATIC_URL}}js/angular/angular-sanitize.min.js"></script>
+    <script src="{{STATIC_URL}}js/underscore.js"></script>
+    <script src="{{STATIC_URL}}js/select.js"></script>
     <script src="{{STATIC_URL}}js/mohuser.js"></script>
     </body>
     </html> 

@@ -1,7 +1,25 @@
-var app = angular.module('mohalla_user', ['ngCookies', 'ngRoute']);
+var underscore = angular.module('underscore', []);
+underscore.factory('_', function() {
+    'use strict';
+    return window._; // assumes underscore has already been loaded on the page
+});
+var app = angular.module('mohalla_user', ['ngCookies', 'ui.bootstrap', 'ngRoute', 'ui.select', 'underscore','ngSanitize']);
 app.run(function($http, $cookies) {
     console.log($cookies.csrftoken,'csrrf')
     $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
+});
+app.directive('ngEnter', function() {
+    return function(scope, element, attrs) {
+        element.bind("keydown keypress", function(event) {
+            if (event.which === 13) {
+                scope.$apply(function() {
+                    scope.$eval(attrs.ngEnter);
+                });
+
+                event.preventDefault();
+            }
+        });
+    };
 });
 app.config(['$routeProvider',
     function($routeProvider) {
@@ -38,7 +56,7 @@ app.directive('ngConfirmClick', [
             }
         };
 }])
-app.controller('MohallaUserCtrl', function($scope, $http, $location) {
+app.controller('MohallaUserCtrl', function($scope, _, $http, $location,$modal) {
     $scope.user_logout = function() {
         console.log('triger')
         window.location.href = '/logout_view/'
@@ -113,5 +131,50 @@ app.controller('MohallaUserCtrl', function($scope, $http, $location) {
         $http.get('/masjid_member/?masjid_id=' + masjid_data.mohalla_id).success(function(data){
             $scope.masjid_member_list = data.data;
         })
+    }
+    $scope.FamilyValue = {
+        familyid: '',
+        masjid: '',
+        ration_card: '',
+        address: '',
+        mobile: '',
+        district: '',
+        taluk: '',
+        district_code: '',
+        house: '',
+        toilet: '',
+        language: '',
+        health_insurance: '', 
+        family_needs: '', 
+        financial: '',
+    }
+    $scope.get_family = function(family) {
+        if(!family) {
+            console.log(family,'family')
+            $scope.family_val = 'Type or Select Family ID from the List';
+            $scope.FamilyValue.familyid='';
+            $scope.FamilyValue.ration_card = '';
+            $scope.FamilyValue.mobile_no = '';
+            $scope.FamilyValue.address = '';
+            $scope.FamilyValue.house = '';
+            $scope.FamilyValue.toilet = '';
+            $scope.FamilyValue.financial = '';
+            $scope.FamilyValue.language = '';
+            $scope.FamilyValue.health_insurance = '';
+            $scope.FamilyValue.family_needs = '';
+        }
+        else {
+            $scope.family_val = family.family_id;
+            $scope.FamilyValue.ration_card = family.ration_card;
+            $scope.FamilyValue.mobile_no = family.mobile;
+            $scope.FamilyValue.address = family.address;
+            $scope.FamilyValue.house = family.house_type;
+            if(family.toilet == true) { $scope.FamilyValue.toilet = 'Yes'; } else if(family.toilet == false) { $scope.FamilyValue.toilet = 'No'; }
+            $scope.FamilyValue.financial = family.financial_status;
+            $scope.FamilyValue.language = family.language;
+            if(family.health_insurance == true) { $scope.FamilyValue.health_insurance = 'Yes'; } else if(family.health_insurance == false) { $scope.FamilyValue.health_insurance = 'No'; }
+            $scope.FamilyValue.family_needs = family.family_needs;
+            $scope.getFamilyMembers(family.family_id)
+        }
     }		
 })
