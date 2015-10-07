@@ -97,10 +97,8 @@
                             <div ng-bind-html="mod.family_id | highlight: $select.search"></div>
                         </ui-select-choices>
                     </ui-select>
-                    <!--<input ng-show="new_family" style="display: inline-block;height: 34px;width: 50%;float: left;" placeholder="Enter Family ID" ng-model="FamilyValue.familyid" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">-->
                     <button ng-show="!new_family" ng-disabled="family_val=='' || family_val=='Type or Select Family ID from the List'" type="submit" style="width:13%;height: 34px;" ng-click="addFamily(family_val,FamilyValue,'update')" class="btn-sm btn btn-primary">Update</button>
                     <button ng-show="!new_family" ng-disabled="family_val=='' || family_val=='Type or Select Family ID from the List'" type="submit" style="width:13%;height: 34px;" ng-click="new_family=true;get_family();" class="btn-sm btn btn-primary">Cancel</button>
-                    <!--<button ng-show="!new_family" ng-disabled="familyList.indexOf(family_val)==-1">-->
                     <button ng-show="new_family" type="submit" style="width:13%;height: 34px;" ng-click="addFamily(family_val,FamilyValue,'new')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Save New</button>
                     <button ng-show="new_family" type="submit" style="width:13%;height: 34px;" ng-click="new_family=false;get_family()" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Cancel</button>
                     <button ng-show="!new_family" ng-disabled="familyList.indexOf(family_val)>-1" type="submit" style="width:13%;height: 34px;" ng-click="new_family=true;get_family()" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New</button>
@@ -140,45 +138,70 @@
         </div>    
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Members</h1>
+                <h1 class="page-header">Members </h1>
             </div>
             <table class="table table-striped table-bordered table-hover ng-scope">
                 <thead>
                     <tr>
                         <th>S.No</th>
                         <th>Name</th>
+                        <th>Gender</th>
                         <th>Age</th>
-                        <th>Post</th>
-                        <th>Contact</th>
-                        <th>Address</th>
+                        <th>Family Head?</th>                        
+                        <th>Relationship</th>
+                        <th>Qualification</th>
+                        <th>Marital Status</th>
+                        <th>Having Voter ID?</th>
+                        <th>Occupation</th>
+                        <th>Current Location</th>
                         <th>Action</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr class="ng-scope">                        
+                    <tr class="ng-scope">
                         <td><input type="text" placeholder="1" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required" readonly></td>
-                        <td><input class="form-control" type="text" ng-model="member_name" placeholder="Member Name"/></td>
-                        <td><input class="form-control" type="text" ng-model="age" valid-number placeholder="Age"/></td>
-                        <td><input class="form-control" type="text" ng-model="designation" placeholder="Designation"/></td>
-                        <td><input class="form-control" type="text" ng-model="mobile" placeholder="Mobile Number"/></td>
-                        <td><input class="form-control" type="text" ng-model="address" placeholder="Address" /></td>                
-                        <td><button ng-disabled="!member_name || !designation || !age" type="submit" ng-click="add_member(member_name,age,designation,mobile,address,'new')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>Add</button></td>
+                        <td><input type="text" placeholder="Name" ng-model="FamilyMember.name" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                        <td><select ng-model="FamilyMember.gender" ng-options="gen for gen in ['MALE','FEMALE']" class="form-control">
+                            <option value="">SELECT GENDER</option>
+                        </select></td>
+                        <td><input type="text" placeholder="Age" ng-model="FamilyMember.age" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                        <td><select ng-model="FamilyMember.family_head" ng-options="val for val in ['Yes','No']" class="form-control">
+                            <option value="">FAMILY HEAD?</option>
+                        </select></td>
+                        <td><input type="text" placeholder="Relationship" ng-model="FamilyMember.relationship" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                        <td><input type="text" placeholder="Qualification" ng-model="FamilyMember.qualification" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                        <td><select ng-model="FamilyMember.marital_status" ng-options="gen for gen in ['Married','Unmarried','Widow','Devorced','Aged Unmarried Woman']" class="form-control">
+                            <option value="">MARITAL STATUS</option>
+                        </select>
+                        <td><select ng-model="FamilyMember.voter" ng-options="gen for gen in ['Yes','No']" class="form-control">
+                            <option value="">VOTER ID?</option>
+                        </select></td>
+                        <td><input type="text" placeholder="Occupation" ng-model="FamilyMember.occupation" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                        <td><select ng-model="FamilyMember.location" ng-options="gen for gen in ['Local','Outstation','Foreign']" class="form-control">
+                            <option value="">LOCATION</option>
+                        </select></td>
+                        <td><button ng-disabled="!FamilyValue.familyid" type="submit" ng-click="add_Familymembers(FamilyMember,FamilyValue,'new')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>Add</button></td>
                     </tr>
-                    <tr ng-show="masjid_member_list.length==0">
-                        <td colspan="7" style="text-align:center;" class="ng-binding">No Member Data Found!</td>
+                    <tr ng-show="FamilyMembersList.length==0">
+                        <td colspan="11" style="text-align:center;" class="ng-binding">No Member Data Found!</td>
                     </tr>
-                    <tr ng-repeat="member in masjid_member_list" class="ng-scope">
+                    <tr ng-show="!FamilyMembersList">
+                        <td colspan="11" style="text-align:center;" class="ng-binding">Please Select Family First!</td>
+                    </tr>
+                    <tr ng-repeat="member in FamilyMembersList" class="ng-scope">
                         <td>{{$index+1}}</td>
-                        <td class="ng-binding"><span ng-show="!updateMem">{{member.name}}</span><input style="display: inline-block;height: 34px;width: 200px;float: left;margin-right: -90px;" type="text" ng-show="updateMem" ng-model="member.name"></td>
-                        <td class="ng-binding"><span ng-show="!updateMem">{{member.age}}</span><input style="display: inline-block;height: 34px;width: 30px;float: left;" type="text" ng-show="updateMem" ng-model="member.age"></td>
-                        <td class="ng-binding"><span ng-show="!updateMem">{{member.designation}}</span><input style="display: inline-block;height: 34px;width: 130px;float: left;margin-right: -65px;" type="text" ng-show="updateMem" ng-model="member.designation"></td>
-                        <td class="ng-binding"><span ng-show="!updateMem">{{member.mobile}}</span><input style="display: inline-block;height: 34px;width: 130px;float: left;margin-right: -65px;" type="text" ng-show="updateMem" ng-model="member.mobile"></td>
-                        <td class="ng-binding"><span ng-show="!updateMem">{{member.address}}</span><input style="display: inline-block;height: 34px;width: 110px;float: left;margin-right: -45px;" type="text" ng-show="updateMem" ng-model="member.address"></td>
-                        <td><a ng-show="!updateMem" ng-click="updateMem=true;" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a>
-                            <a ng-show="updateMem" ng-click="updateMem=false;UpdateMember(muhalla_values.mohalla_id,member,member.name,member.age,member.designation,member.mobile,member.address)" class="color-edit"><i class="glyphicon glyphicon-plus"></i></a>
-                            <a ng-confirm-click="Are you Sure you want to Delete?" confirmed-click="DeleteMember(muhalla_values.mohalla_id,member)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
+                        <td class="ng-binding">{{member.name}}</td>
+                        <td class="ng-binding">{{member.gender}}</td>
+                        <td class="ng-binding">{{member.age}}</td>
+                        <td class="ng-binding">{{get_booleanval(member.family_head)}}</td>
+                        <td class="ng-binding">{{member.relationship}}</td>
+                        <td class="ng-binding">{{member.qualification}}</td>
+                        <td class="ng-binding">{{member.marital_status}}</td>
+                        <td class="ng-binding">{{get_booleanval(member.voter_status)}}</td>
+                        <td class="ng-binding">{{member.occupation}}</td>
+                        <td class="ng-binding">{{member.curr_location}}</td>
+                        <td><a ng-click="Familymembersupdate(member.mem_id);" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="fa fa-plus"></i></a><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
                     </tr>
-                    <!-- end ngRepeat: cat in categorys track by $index| filter:searchText -->
                 </tbody>
             </table>
         </div>

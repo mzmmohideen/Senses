@@ -65,6 +65,8 @@ app.controller('MohallaUserCtrl', function($scope, _, $http, $location,$modal) {
         $http.get('/get_mahallauser_data/',{}).success(function(response){
             $scope.muhalla_values = response.muhalla;
             $scope.getMasjidMember(response.muhalla)
+            $scope.getFamilyinfo()
+            console.log('scope',$scope.muhalla_values)
         })
     }
     $scope.get_muhallaData()
@@ -176,5 +178,58 @@ app.controller('MohallaUserCtrl', function($scope, _, $http, $location,$modal) {
             $scope.FamilyValue.family_needs = family.family_needs;
             $scope.getFamilyMembers(family.family_id)
         }
-    }		
+    }
+    $scope.addFamily = function(family,value,status) {
+        if(status == 'new') {
+            var familyid = '';
+            var masjid = value.masjid.name;
+        }
+        else if(status == 'update') {
+            var familyid = family;
+            var masjid = value.masjid;
+        }
+        var data = {
+            mobile_no: value.mobile_no,
+            taluk: value.taluk,
+            district: value.district,
+            masjid: masjid,
+            mohalla_id : value.masjid.mohalla_id,
+            toilet: value.toilet,
+            language: value.language,
+            health_insurance: value.health_insurance,
+            familyid: familyid,
+            ration_card: value.ration_card,
+            address: value.address,
+            family_needs: value.family_needs,
+            house: value.house,
+            financial: value.financial,
+        }
+        $http.post('/familyData/',{
+            value: data,
+        }).success(function(data) {
+            alert(data.data)
+            $scope.get_family()
+            $scope.getFamilyinfo();
+        })
+    }
+
+    $scope.getFamilyinfo = function() {
+        $scope.FamilyValue.masjid = $scope.muhalla_values.mohalla;
+        $scope.FamilyValue.district = $scope.muhalla_values.district;
+        $scope.FamilyValue.taluk = $scope.muhalla_values.taluk;
+        console.log('get',$scope.FamilyValue)
+        $http.get('/familyData/', {}).success(function(data) {
+            console.log('varerror',data[2],$scope.FamilyValue.masjid)
+            $scope.familyList = _.filter(data.data,function(data_val) { return data_val.taluk == $scope.FamilyValue.taluk && data_val.district_name == $scope.FamilyValue.district && data_val.muhalla == $scope.FamilyValue.masjid });
+            
+            console.log('val',$scope.familyList)
+        })
+    }
+    $scope.getFamilyMembers = function(familyid) {
+        console.log('value',familyid)
+        $http.get('/FamilyMemberData/?family_id='+ familyid, {}).success(function(data) {
+            $scope.FamilyMembersList = data;
+            console.log(data,'voter')
+        })
+    }
 })
