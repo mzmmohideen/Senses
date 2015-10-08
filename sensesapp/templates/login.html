@@ -14,16 +14,31 @@
 				<div class="app-title">
 					<h1>Login</h1>
 				</div>
-				<div class="login-form">
+				<div ng-show="!correct_pwd" class="login-form">
 					<div class="control-group">
 					<input type="text" ng-model="name" placeholder="&nbsp;&nbsp;&nbsp;username">
 					</div>
 					<div class="control-group">
 					<input type="password" ng-model="password" placeholder="&nbsp;&nbsp;&nbsp;password"  ng-enter="login(name,password)">
 					</div>
-					<a class="forgotpass" href="#">Forgot password?</a>
-					<span class="btn btn-primary btn-large btn-block" ng-click="login(name,password)">login</span>
-					
+					<a class="forgotpass" style="cursor:pointer;color:blue;" ng-click="correct_pwd=true">Forgot password?</a>
+					<button ng-disabled="!name || !password" class="btn btn-primary btn-large btn-block" ng-click="login(name,password)">login</button>					
+				</div>
+				<div ng-show="correct_pwd" class="login-form">
+					<div class="control-group">
+					<input type="text" ng-model="name" placeholder="&nbsp;&nbsp;&nbsp;username">
+					</div>
+					<div class="control-group">
+					<input type="text" ng-model="email" placeholder="&nbsp;&nbsp;&nbsp;Email">
+					</div>
+					<div class="control-group">
+					<input type="password" ng-model="password" placeholder="&nbsp;&nbsp;&nbsp;Password">
+					</div>
+					<div class="control-group">
+					<input type="password" ng-model="re_password" placeholder="&nbsp;&nbsp;&nbsp;Re-type Password">
+					</div>
+					<div class="control-group"  style="color:red;" ng-show="password && re_password && password!=re_password"> * Password Not Matching</div>
+					<button ng-disabled="!name || !email || !password || !re_password || password!=re_password" class="btn btn-primary btn-large btn-block" ng-click="forgot_password(name,email,password)">Change Password</button>					
 				</div>
 			</div>
 		</div>

@@ -23,9 +23,11 @@
 					</div>					
 					<div class="control-group">
 					<input type="password" ng-model="password" placeholder="&nbsp;&nbsp;&nbsp;password">
+					</div>
+					<div class="control-group">
 					<input type="password" ng-model="confirm_password" placeholder="&nbsp;&nbsp;&nbsp;confirm password"  ng-enter="signup(name, email, password, confirm_password)">
 					</div>
-					<span class="btn btn-primary btn-large btn-block" ng-click="signup(name, email, password, confirm_password)">Signup</span>
+					<button class="btn btn-primary btn-large btn-block" ng-disabled="!name || email || !password || !confirm_password" ng-click="signup(name, email, password, confirm_password)">Signup</button>
 					
 				</div>
 			</div>

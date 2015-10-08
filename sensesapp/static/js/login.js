@@ -16,6 +16,7 @@ app.directive('ngEnter', function() {
 });
 app.controller('loginCtrl',function($scope,$http,$location) {
 	$scope.login = function(name,password) {
+		console.log('val',name,password)
 		var data = {
 			username : name,
 			password : password,
@@ -65,6 +66,22 @@ app.controller('loginCtrl',function($scope,$http,$location) {
 			    }
 			})
         }
+	}
+	$scope.forgot_password = function(name,email,password) {
+		$http.post('/change_password/',{
+			email: email,
+            username: name,
+            password: password,
+            status: 'forgot',
+        }).success(function(data){
+            if(data.data == 'Password Changed Successfully!') {
+            	alert(data.data)
+            	window.location.href = '/login/'
+            }
+            else {
+            	alert(data.data)
+            }
+        })
 	}
 	
 })

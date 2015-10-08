@@ -374,25 +374,35 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         member_type : '',
         district : '',
         taluk : '',
+        email : '',
         muhalla : '',
         username : '',
         password : '',
         re_username : '',
         re_password : '',
+        re_email : '',
     }
     $scope.moh_user_create = function(data,status) {
+        if(data.re_password == '') {
+            var password_val = data.password;
+        }
+        else {
+            var password_val = data.re_password;
+        }
         console.log('data',data)
         $http.post('/new_member/',{
             mohalla_id: data.muhalla.mohalla_id,
             username: data.username,
+            email: data.email,
             password: data.password,
-            re_password: data.re_password,
+            re_password: password_val,
             member_type: data.member_type,
             status: status,
         }).success(function(response) {
             alert(response.data)
             $scope.getMohallaUser(data)
             $scope.moh_user.username = ''
+            $scope.moh_user.email = ''
             $scope.moh_user.password = ''
             $scope.moh_user.re_password = ''
             console.log('data',response)
@@ -1013,7 +1023,18 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.getFamilyinfo();
         })
     }
-
+    $scope.deleteFamily = function(familyid) {
+        console.log('familyid',familyid)
+        $http.post('/familyData/',{
+            familyid: familyid,
+            status: 'delete',
+        }).success(function(data) {
+            alert(data.data)
+            $scope.get_family()
+            $scope.getFamilyinfo();
+            $scope.FamilyMembersList = false
+        })
+    }
     $scope.getFamilyinfo = function() {
         console.log('get',$scope.FamilyValue)
         // $http.get('/add_masjid/').success(function(data){
@@ -1078,7 +1099,16 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         })
     }
     $scope.get_booleanval = function(val) {
-        if(val == true) { return 'Yes' } else if(val == false) { return 'No' }
+        if(val == true) { return 'Yes' } else if(val == false) { return 'No' } else if(val == 'Yes') { return 'Yes' } else if(val == 'No') { return 'No' }
+    }
+    $scope.UpdateFamMember = function(member,status) {
+        $http.post('/UpdateFamilyMember/',{
+            data: member,
+            status: status,
+        }).success(function(response){
+            alert(response.data)
+            $scope.getFamilyMembers(member.family)
+        })
     }
 
     $scope.positionUpdated = function(module,session) {

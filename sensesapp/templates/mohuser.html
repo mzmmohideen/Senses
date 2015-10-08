@@ -57,9 +57,31 @@
         </div>    
     </div>
     <script type="text/ng-template" id="settings.html">
+        <span style="float:right">Welcome! {{muhalla_values.uname}}.</span>
         <div class="row">
             <div class="col-lg-12">
                 <h1 class="page-header">Settings</h1>
+            </div>
+        </div>
+        <div style="background-color: #FFF;padding: 20px;border-radius: 5px">
+            <div style="text-align: center;color: #777;">
+                <h1>Change Password</h1>
+            </div>
+            <div style="text-align: center;">
+                <div style="margin-bottom: 10px;">
+                    <input style="text-align: center;background-color: #ECF0F1;border: 2px solid transparent;border-radius: 5px;font-size: 16px;font-weight: 200;padding: 10px 0;width: 250px;transition: border .5s;" type="password" ng-model="get_password.curr_password" placeholder="&nbsp;&nbsp;&nbsp;Current Password">
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <input style="text-align: center;background-color: #ECF0F1;border: 2px solid transparent;border-radius: 5px;font-size: 16px;font-weight: 200;padding: 10px 0;width: 250px;transition: border .5s;" type="password" ng-model="get_password.re_password" placeholder="&nbsp;&nbsp;&nbsp;New Password">
+                </div>
+                <div style="margin-bottom: 10px;">
+                    <input style="text-align: center;background-color: #ECF0F1;border: 2px solid transparent;border-radius: 5px;font-size: 16px;font-weight: 200;padding: 10px 0;width: 250px;transition: border .5s;" type="password" ng-model="get_password.password" placeholder="&nbsp;&nbsp;&nbsp;Re-type Password">
+                </div>
+                <div style="color:red;" ng-show="get_password.password != get_password.re_password && get_password.re_password && get_password.password">* Password Not Matching</div>
+                <div style="width:250px;margin-left:38%;">
+                <button ng-disabled="!get_password.curr_password || get_password.password != get_password.re_password || !get_password.re_password || !get_password.password" class="btn btn-primary btn-large btn-block" ng-click="change_password(muhalla_values.uname,get_password)">login</button>
+                </div>
+                
             </div>
         </div>        
     </script>
@@ -91,13 +113,14 @@
             <div class="col-lg-12"><br/></div>
             <div class=" col-lg-12" style="padding-right: 20px;border-right: 1px solid #E2E2E2;">
                 <div class="form-group" style="padding-bottom: 34px;">
-                    <ui-select ng-show="!new_family" style="display: inline-block;height: 34px;width: 50%;float: left;" on-select="familyid=FamilyValue.familyid;get_family(familyid)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="FamilyValue.familyid">
+                    <ui-select ng-show="!new_family" style="display: inline-block;height: 34px;width: 45%;float: left;" on-select="familyid=FamilyValue.familyid;get_family(familyid)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="FamilyValue.familyid">
                         <ui-select-match placeholder="{{family_val}}">{{family_val}}</ui-select-match>
                         <ui-select-choices refresh="familyid=$select.search;get_family(familyid)" repeat="mod in familyList | filter:$select.search">
                             <div ng-bind-html="mod.family_id | highlight: $select.search"></div>
                         </ui-select-choices>
                     </ui-select>
                     <button ng-show="!new_family" ng-disabled="family_val=='' || family_val=='Type or Select Family ID from the List'" type="submit" style="width:13%;height: 34px;" ng-click="addFamily(family_val,FamilyValue,'update')" class="btn-sm btn btn-primary">Update</button>
+                    <button ng-show="!new_family" ng-disabled="family_val=='' || family_val=='Type or Select Family ID from the List'" type="submit" style="width:13%;height: 34px;" ng-confirm-click="Are you Sure you want to Delete?" confirmed-click="deleteFamily(family_val)" class="btn-sm btn btn-primary">Delete</button>
                     <button ng-show="!new_family" ng-disabled="family_val=='' || family_val=='Type or Select Family ID from the List'" type="submit" style="width:13%;height: 34px;" ng-click="new_family=true;get_family();" class="btn-sm btn btn-primary">Cancel</button>
                     <button ng-show="new_family" type="submit" style="width:13%;height: 34px;" ng-click="addFamily(family_val,FamilyValue,'new')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Save New</button>
                     <button ng-show="new_family" type="submit" style="width:13%;height: 34px;" ng-click="new_family=false;get_family()" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Cancel</button>
@@ -183,28 +206,301 @@
                         <td><button ng-disabled="!FamilyValue.familyid" type="submit" ng-click="add_Familymembers(FamilyMember,FamilyValue,'new')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>Add</button></td>
                     </tr>
                     <tr ng-show="FamilyMembersList.length==0">
-                        <td colspan="11" style="text-align:center;" class="ng-binding">No Member Data Found!</td>
+                        <td colspan="12" style="text-align:center;" class="ng-binding">No Member Data Found!</td>
                     </tr>
                     <tr ng-show="!FamilyMembersList">
-                        <td colspan="11" style="text-align:center;" class="ng-binding">Please Select Family First!</td>
+                        <td colspan="12" style="text-align:center;" class="ng-binding">Please Select Family First!</td>
                     </tr>
                     <tr ng-repeat="member in FamilyMembersList" class="ng-scope">
                         <td>{{$index+1}}</td>
-                        <td class="ng-binding">{{member.name}}</td>
-                        <td class="ng-binding">{{member.gender}}</td>
-                        <td class="ng-binding">{{member.age}}</td>
-                        <td class="ng-binding">{{get_booleanval(member.family_head)}}</td>
-                        <td class="ng-binding">{{member.relationship}}</td>
-                        <td class="ng-binding">{{member.qualification}}</td>
-                        <td class="ng-binding">{{member.marital_status}}</td>
-                        <td class="ng-binding">{{get_booleanval(member.voter_status)}}</td>
-                        <td class="ng-binding">{{member.occupation}}</td>
-                        <td class="ng-binding">{{member.curr_location}}</td>
-                        <td><a ng-click="Familymembersupdate(member.mem_id);" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="fa fa-plus"></i></a><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
+                        <td class="ng-binding">
+                            <span ng-show="!updateFamMem">{{member.name}}</span>
+                            <input style="display: inline-block;height: 34px;width: 75px;float: left;" type="text" ng-show="updateFamMem" ng-model="member.name">
+                        </td>
+                        <td class="ng-binding">
+                            <span ng-show="!updateFamMem">{{member.gender}}</span>
+                            <select ng-show="updateFamMem" ng-model="member.gender" ng-options="gen for gen in ['MALE','FEMALE']" class="form-control">
+                                <option value="">SELECT GENDER</option>
+                            </select> 
+                        </td>
+                        <td class="ng-binding">
+                            <span ng-show="!updateFamMem">{{member.age}}</span>
+                            <input style="display: inline-block;height: 34px;width: 75px;float: left;" type="text" ng-show="updateFamMem" ng-model="member.age">
+                        </td>
+                        <td class="ng-binding">
+                            <span ng-show="!updateFamMem">{{get_booleanval(member.family_head)}}</span>
+                            <select ng-show="updateFamMem" ng-init="member.family_head=get_booleanval(member.family_head)" ng-model="member.family_head" ng-options="val for val in ['Yes','No']" class="form-control">
+                                <option value="">FAMILY HEAD?</option>
+                             </select>
+                        </td>
+                        <td class="ng-binding">
+                            <span ng-show="!updateFamMem">{{member.relationship}}</span>
+                            <input style="display: inline-block;height: 34px;width: 75px;float: left;" type="text" ng-show="updateFamMem" ng-model="member.relationship">
+                        </td>
+                        <td class="ng-binding">
+                            <span ng-show="!updateFamMem">{{member.qualification}}</span>
+                            <input style="display: inline-block;height: 34px;width: 75px;float: left;" type="text" ng-show="updateFamMem" ng-model="member.qualification">
+                        </td>
+                        <td class="ng-binding">
+                            <span ng-show="!updateFamMem">{{member.marital_status}}</span>
+                            <select ng-show="updateFamMem" ng-model="member.marital_status" ng-options="gen for gen in ['Married','Unmarried','Widow','Devorced','Aged Unmarried Woman']" class="form-control">
+                                <option value="">MARITAL STATUS</option>
+                            </select>
+                        </td>
+                        <td class="ng-binding">
+                            <span ng-show="!updateFamMem">{{get_booleanval(member.voter_status)}}</span>
+                            <select ng-show="updateFamMem"  ng-init="member.voter_status=get_booleanval(member.voter_status)" ng-model="member.voter_status" ng-options="gen for gen in ['Yes','No']" class="form-control">
+                                <option value="">VOTER ID?</option>
+                            </select>    
+                        </td>
+                        <td class="ng-binding">
+                            <span ng-show="!updateFamMem">{{member.occupation}}</span>
+                            <input style="display: inline-block;height: 34px;width: 75px;float: left;" type="text" ng-show="updateFamMem" ng-model="member.occupation">
+                        </td>
+                        <td class="ng-binding">
+                            <span ng-show="!updateFamMem">{{member.curr_location}}</span>
+                            <select ng-show="updateFamMem" ng-model="member.curr_location" ng-options="gen for gen in ['Local','Outstation','Foreign']" class="form-control">
+                                <option value="">LOCATION</option>
+                            </select>
+                        </td>
+                        <td><a ng-click="Familymembersupdate(member.mem_id);" class="color-edit"><i class="fa fa-plus"></i>
+                            <a ng-show="!updateFamMem" ng-click="updateFamMem=true" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a>
+                            <a ng-show="updateFamMem" ng-click="updateFamMem=false;UpdateFamMember(member,'update')" class="color-edit"><i class="fa fa-check"></i></a>
+                            <a ng-confirm-click="Are you Sure you want to Delete?" confirmed-click="UpdateFamMember(member,'delete')" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
                     </tr>
                 </tbody>
             </table>
         </div>
+    </script>
+    <script type="text/ng-template" id="add_Familymembers_modal">
+     <div ng-show="!next" id="add_watchlist_popup" style="">
+            <div class="popup-header">
+                <span style="margin-left:35%">Update Member Details {{Mem_ID}}</span>
+                <span class="ng-modal-close" ng-click="cancel()"><i id="closing" style="font-size:14px;float:right;cursor:pointer;" class="fa fa-times"></i></span>
+            </div>
+             <form class="form-horizontal">
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-7">Volounteer?</label>
+                            <div class="col-xs-5">
+                                <select ng-model="MemberUpdate.volunteer" ng-options="volunteer for volunteer in ['Yes','No']" class="form-control">
+                                    <option value="">Want to be a Volunteer?</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-7">Donor?</label>
+                            <div class="col-xs-5">
+                                <select ng-model="MemberUpdate.donor" ng-options="donor for donor in ['Yes','No']" class="form-control">
+                                    <option value="">Willing to be a Financial Donor?</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-7">Namaz Status?</label>
+                            <div class="col-xs-5">
+                                <select ng-model="MemberUpdate.namaz" ng-options="n for n in ['5 Times a day','only Jumah','Not at All']" class="form-control">
+                                    <option value="">Namaz Status</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-7">Quran Reading?</label>
+                            <div class="col-xs-5">
+                                <select ng-model="MemberUpdate.quran_reading" ng-options="k for k in ['Yes','No']" class="form-control">
+                                    <option value="">Quran Reading</option>
+                                </select>
+                            </div>
+                        </div>
+                        <!--<div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-7">Mother Tongue</label>
+                            <div class="col-xs-5">
+                                <input class="form-control" type="text" ng-model="MemberUpdate.language" ng-change="clear_error()" placeholder="Mother Tongue" />
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-7">Mobile</label>
+                            <div class="col-xs-5">
+                                <input class="form-control" type="text" ng-model="MemberUpdate.mobile" ng-change="clear_error()" placeholder="Mobile Number" />
+                            </div>
+                        </div>-->
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-7">Interested to join Makthab Madarasa?</label>
+                            <div class="col-xs-5">
+                                <input type="radio" name="madarasa" ng-model="MemberUpdate.makthab" value="Yes">Yes
+                                <input type="radio" name="madarasa" ng-model="MemberUpdate.makthab" value="No">No
+                            </div>
+                        </div>
+                        <div ng-show="MemberUpdate.makthab" class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-7">Makthab Madarasa Category</label>
+                            <div class="col-xs-5">
+                                <select ng-model="MemberUpdate.makthab_detail" ng-options="val for val in makthabData()" class="form-control">
+                                    <option value="">Makthab Category</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-7">Physically Handicaped?</label>
+                            <div class="col-xs-5">
+                                <input type="radio" name="physical" ng-model="MemberUpdate.physical" value="Yes">Yes
+                                <input type="radio" name="physical" ng-model="MemberUpdate.physical" value="No">No
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-7">Whether Alive or Not?</label>
+                            <div class="col-xs-5">
+                                <input type="radio" name="alive" ng-model="MemberUpdate.alive" value="Yes">Yes
+                                <input type="radio" name="alive" ng-model="MemberUpdate.alive" value="No">No
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:5px;">
+                            <input type="submit" class="btn btn-primary" ng-click="update_member(MemberUpdate,'continue');" value="Save" />
+                            <input type="submit" class="btn btn-primary" ng-click="next=true;" value="Next>>" />
+                            <input type="submit" class="btn btn-primary" ng-click="update_member(MemberUpdate,'exit');" value="Save and Exit" />
+                        </div>
+                    </form>
+    </div>
+     <div ng-show="next" id="add_watchlist_popup" style="">
+            <div class="popup-header">
+                <span style="margin-left:35%">Update Member Details </span>
+                <span class="ng-modal-close" ng-click="cancel()"><i id="closing" style="font-size:14px;float:right;cursor:pointer;" class="fa fa-times"></i></span>
+            </div>
+            <accordion ng-init="getScheme();getService();get_memberScheme()">
+                    <accordion-group ng-repeat="header in scheme_list">
+                            <accordion-heading>
+                                <h4 class="panel-title">
+                                            <a data-toggle="collapse" style="text-decoration:none;" data-parent="#accordion"  aria-expanded="true" aria-controls="collapseOne">{{header}}</a>
+                                        </h4>
+                            </accordion-heading>
+                            <div class="form-group" ng-repeat="key in getSubScheme[header]">
+                                <label class="control-label col-xs-6">{{key.sub}}</label>
+                                <input type="radio" ng-model="key.status" value="Yes">Yes
+                                <input type="radio" ng-model="key.status" value="No">No
+                                <select ng-show="key.status" ng-model="key.solution" ng-options="val for val in ['Solved','Not Yet']" style="width:20%">
+                                    <option value="">SELECT SOLUTION</option>
+                                </select>
+                                <!--<span ng-repeat="a in ['Yes','No']">
+                                    <input type="radio" name="{{key.scheme_id}}" ng-change="getMemberScheme(scheme_value,key.scheme_id,Mem_ID)" ng-model="scheme_value" value="{{a}}">{{a}}
+                                     {{key.scheme_id}}<input type="radio" name="key.scheme_id" ng-model="key.scheme_id" value="Yes">Yes
+                                    <input type="radio" name="key.scheme_id" ng-model="key.scheme_id" value="No">No
+                                </span>-->
+                            </div>
+                    </accordion-group>
+                    <accordion-group>
+                          <div style="background-color:#F5F5F5 !important;">
+                            <accordion-heading>
+                                <h4 class="panel-title">
+                                            <a data-toggle="collapse" style="text-decoration:none;" data-parent="#accordion"  aria-expanded="true" aria-controls="collapseOne">Services</a>
+                                        </h4>
+                            </accordion-heading>
+                          </div>
+                          <div class="form-group" ng-repeat="(key,val) in getServices">
+                                <label class="control-label col-xs-6">{{key}}</label>
+                                <input type="radio" ng-model="val[0].status" value="Yes">Yes
+                                <input type="radio" ng-model="val[0].status" value="No">No
+                                <select ng-show="val[0].status" ng-model="val[0].solution" ng-options="val for val in ['Solved','Not Yet']" style="width:20%">
+                                    <option value="">SELECT SOLUTION</option>
+                                </select>
+                                <!--<input type="radio" name="{{getServices[key][0].service_id}}" ng-change="getMemberService(service_value,getServices[key][0].service_id,Mem_ID)" ng-model="service_value" value="Yes">Yes
+                                <input type="radio" name="{{getServices[key][0].service_id}}" ng-change="getMemberService(service_value,getServices[key][0].service_id,Mem_ID)" ng-model="service_value" value="No">No-->
+                          </div>
+                    </accordion-group>
+                    <accordion-group>
+                          <div style="background-color:#F5F5F5 !important;">
+                            <accordion-heading>
+                                <h4 class="panel-title">
+                                            Disease
+                                        </h4>
+                            </accordion-heading>
+                          </div>
+                          <div class="form-group" ng-init="get_memberScheme()">
+                                <select ng-change="getDisease(DiseaseValue.sym_type)" style="display: inline-block;height: 34px;width: 40%;float: left;" ng-model="DiseaseValue.sym_type" ng-options="val for val in ['DISEASE','DISORDER']" class="form-control">
+                                    <option value="">SELECT TYPE</option>
+                                </select>
+                                <ui-select style="display: inline-block;height: 34px;width: 60%;float: left;" on-select="getDisease=DiseaseValue.name;get_disease(getDisease)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="DiseaseValue.name">
+                                    <ui-select-match placeholder="{{disease_val}}">{{disease_val}}
+                                    </ui-select-match>
+                                    <ui-select-choices refresh="getDisease=$select.search;get_disease(getDisease)" repeat="mod in disease_list | filter:$select.search">
+                                    <div ng-bind-html="mod | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                          </div>
+                          <div class="form-group" ng-init="DiseaseValue.name=disease_val">      
+                                <input style="display: inline-block;height: 34px;width: 50%;float: left;" type="text" ng-model="DiseaseValue.medicine" placeholder="Medicine Name">
+                                <input style="display: inline-block;height: 34px;width: 50%;float: left;" type="text" ng-model="DiseaseValue.cost" placeholder="Medicine Cost">
+                          </div>
+                    </accordion-group>
+                    <accordion-group>
+                          <div style="background-color:#F5F5F5 !important;">
+                            <accordion-heading>
+                                <h4 class="panel-title">
+                                            Surgery
+                                        </h4>
+                            </accordion-heading>
+                          </div>
+                          <div class="form-group" ng-init='SurgeryValue.surgery_val="No";get_memberScheme();'>
+                                <label class="control-label col-xs-6">Surgery Needed?</label>
+                                <input type="radio" name="surgery" ng-model="SurgeryValue.surgery_val" value="Yes">Yes
+                                <input type="radio" name="surgery" ng-model="SurgeryValue.surgery_val" value="No">No
+                          </div>
+                          <div ng-show="SurgeryValue.surgery_val" class="form-group">
+                                <select ng-change="getDisease(SurgeryValue.sym_type)" style="display: inline-block;height: 34px;width: 40%;float: left;" ng-model="SurgeryValue.sym_type" ng-options="val for val in ['DISEASE','DISORDER']" class="form-control">
+                                    <option value="">SELECT TYPE</option>
+                                </select>
+                                <ui-select style="display: inline-block;height: 34px;width: 60%;float: left;" on-select="getDisease=SurgeryValue.name;sur_get_disease(getDisease)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="SurgeryValue.name">
+                                    <ui-select-match placeholder="{{sur_disease_val}}">{{sur_disease_val}}
+                                    </ui-select-match>
+                                    <ui-select-choices refresh="getDisease=$select.search;sur_get_disease(getDisease)" repeat="mod in disease_list | filter:$select.search">
+                                    <div ng-bind-html="mod | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                          </div>
+                          <div ng-show="SurgeryValue.surgery_val" class="form-group" ng-init="SurgeryValue.name=sur_disease_val">      
+                                <input style="display: inline-block;height: 34px;width: 50%;float: left;" type="text" ng-model="SurgeryValue.operation_cost" placeholder="Operation Cost">
+                                <input style="display: inline-block;height: 34px;width: 50%;float: left;" type="text" ng-model="SurgeryValue.cash_hand" placeholder="Cash in Hand">
+                                <input style="display: inline-block;height: 34px;width: 50%;float: left;" type="text" ng-model="SurgeryValue.hospital_name" placeholder="Hospital Name">
+                                <input style="display: inline-block;height: 34px;width: 50%;float: left;" type="text" ng-model="SurgeryValue.details" placeholder="Surgery Details">
+                          </div>
+                    </accordion-group>
+                    <accordion-group>
+                          <div style="background-color:#F5F5F5 !important;">
+                            <accordion-heading>
+                                <h4 class="panel-title">
+                                            Are you ever Cured from Chronic Disease?
+                                        </h4>
+                            </accordion-heading>
+                          </div>
+                          <div class="form-group" ng-init='ChronicValue.chronic_val="No";get_memberScheme()'>
+                                <label class="control-label col-xs-6">cured from Chronic Disease?</label>
+                                <input type="radio" name="chronic" ng-model="ChronicValue.chronic_val" value="Yes">Yes
+                                <input type="radio" name="chronic" ng-model="ChronicValue.chronic_val" value="No">No
+                          </div>
+                          <div ng-show="ChronicValue.chronic_val" class="form-group">
+                                <select ng-change="getDisease(ChronicValue.sym_type)" style="display: inline-block;height: 34px;width: 40%;float: left;" ng-model="ChronicValue.sym_type" ng-options="val for val in ['DISEASE','DISORDER']" class="form-control">
+                                    <option value="">SELECT TYPE</option>
+                                </select>
+                                <ui-select style="display: inline-block;height: 34px;width: 60%;float: left;" on-select="getDisease=ChronicValue.name;chr_get_disease(getDisease)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="ChronicValue.name">
+                                    <ui-select-match placeholder="{{chr_disease_val}}">{{chr_disease_val}}
+                                    </ui-select-match>
+                                    <ui-select-choices refresh="getDisease=$select.search;chr_get_disease(getDisease)" repeat="mod in disease_list | filter:$select.search">
+                                    <div ng-bind-html="mod | highlight: $select.search"></div>
+                                    </ui-select-choices>
+                                </ui-select>
+                          </div>
+                          <div ng-show="ChronicValue.chronic_val" class="form-group" ng-init="ChronicValue.name=chr_disease_val">      
+                                <input style="display: inline-block;height: 34px;width: 50%;float: left;" type="text" ng-model="ChronicValue.doctor" placeholder="Doctor Name">
+                                <input style="display: inline-block;height: 34px;width: 50%;float: left;" type="text" ng-model="ChronicValue.tot_cost" placeholder="Total Cost for Treatment">
+                                <input style="display: inline-block;height: 34px;width: 100%;float: left;" type="text" ng-model="ChronicValue.details" placeholder="Disease Details">
+                          </div>
+                    </accordion-group>    
+            </accordion>                        
+            <div class="form-group" style="margin:5px;">
+                <input type="submit" class="btn btn-primary" ng-click="next=false" value="<<Previous" />
+                <input type="submit" class="btn btn-primary" ng-click="update_memberScheme(getSubScheme,getServices,DiseaseValue,SurgeryValue,ChronicValue,'continue');" value="Save" />
+                <input type="submit" class="btn btn-primary" ng-click="update_memberScheme(getSubScheme,getServices,DiseaseValue,SurgeryValue,ChronicValue,'exit');" value="Save and Exit" />
+                <!--<input type="submit" class="btn btn-primary" ng-click="update_memberScheme(MemschemeList,MemserviceList,DiseaseValue,SurgeryValue,ChronicValue,'continue');" value="Save" />
+                <input type="submit" class="btn btn-primary" ng-click="update_memberScheme(MemschemeList,MemserviceList,DiseaseValue,SurgeryValue,ChronicValue,'exit');" value="Save and Exit" />-->
+            </div>
+    </div>
     </script>
     <script type="text/ng-template" id="muhalla.html">
         <span style="float:right">Welcome! {{muhalla_values.uname}}.</span>

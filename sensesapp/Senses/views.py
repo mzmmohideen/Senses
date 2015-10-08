@@ -223,29 +223,36 @@ def masjid_member(request):
 # @login_required
 def familyData(request):
     if request.method == 'POST':
-        data = json.loads(request.body)['value']
-        taluk = Taluk.objects.get(taluk_name=data['taluk'],district=District.objects.get(district_name=data['district']))
-        masjid = Masjid.objects.get(mohalla_id=data['mohalla_id'])
-        toilet = True if data['toilet'] == 'Yes' else False
-        # donor = True if data['donor'] == 'Yes' else False
-        # volunteer = True if data['volunteer'] == 'Yes' else False
-        insurance = True if data['health_insurance'] == 'Yes' else False
-        try:            
-            if data['familyid'] != '':
-                family = Family.objects.filter(family_id=data['familyid']).update(muhalla=masjid,language=data['language'],ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
-                # family_data = Family.objects.get(id=family)
-                # family_data.family_id = '%s / %s%s / %s' %(taluk.district.district_code,'%02d'%taluk.id,'%02d'%masjid.id,family_data.id)
-                # family_data.save()
-                response = 'Family Data Updated Successfully!'
-            else:
-                family = Family.objects.create(family_id=data['familyid'],muhalla=masjid,language=data['language'],ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
-                # family.family_id = '%s / %s%s / %s' %(taluk.district.district_code,'%02d'%taluk.id,'%02d'%masjid.id,family.id)
-                family.family_id = '%s / %s / %s' %(taluk.district.district_code,masjid.mohalla_id,family.id)
-                family.save()
-                response = 'Family Data Saved Successfully!'
-            return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')
-        except:
-            print repr(format_exc())            
+        if json.loads(request.body)['status'] == 'feed':
+            data = json.loads(request.body)['value']
+            print 'data1',data
+            taluk = Taluk.objects.get(taluk_name=data['taluk'],district=District.objects.get(district_name=data['district']))
+            masjid = Masjid.objects.get(mohalla_id=data['mohalla_id'])
+            toilet = True if data['toilet'] == 'Yes' else False
+            # donor = True if data['donor'] == 'Yes' else False
+            # volunteer = True if data['volunteer'] == 'Yes' else False
+            insurance = True if data['health_insurance'] == 'Yes' else False
+            try:            
+                if data['familyid'] != '':
+                    family = Family.objects.filter(family_id=data['familyid']).update(muhalla=masjid,language=data['language'],ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
+                    # family_data = Family.objects.get(id=family)
+                    # family_data.family_id = '%s / %s%s / %s' %(taluk.district.district_code,'%02d'%taluk.id,'%02d'%masjid.id,family_data.id)
+                    # family_data.save()
+                    response = 'Family Data Updated Successfully!'
+                else:
+                    family = Family.objects.create(family_id=data['familyid'],muhalla=masjid,language=data['language'],ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
+                    # family.family_id = '%s / %s%s / %s' %(taluk.district.district_code,'%02d'%taluk.id,'%02d'%masjid.id,family.id)
+                    family.family_id = '%s / %s / %s' %(taluk.district.district_code,masjid.mohalla_id,family.id)
+                    family.save()
+                    response = 'Family Data Saved Successfully!'
+                return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')
+            except:
+                print repr(format_exc())
+        elif json.loads(request.body)['status'] == 'delete':
+            data = json.loads(request.body)
+            print 'data2',data
+            family = Family.objects.filter(family_id=data['familyid']).delete()
+            return HttpResponse(content=json.dumps({'data':'Family Data Deleted Successfully!'}),content_type='Application/json')
     else:
         family = map(lambda x:{'family_id':x.family_id,'muhalla':x.muhalla.name,'language':x.language,'taluk':x.muhalla.taluk.taluk_name,'district_name':x.muhalla.taluk.district.district_name,'ration_card':x.ration_card,'address':x.address,'mobile':x.mobile,'house_type':x.house_type,'donor':x.donor,'volunteer':x.volunteer,'health_insurance':x.health_insurance,'family_needs':x.family_needs,'toilet':x.toilet,'financial_status':x.financial_status},Family.objects.all())
         return HttpResponse(content=json.dumps({'data':family}),content_type='Application/json')
@@ -363,10 +370,29 @@ def FamilyMemberData(request):
         family = Family.objects.get(family_id=request.GET['family_id'])
         if not Member.objects.filter(family=family,family_head=True):
             memval = Member.objects.filter(family=family)
-            fam_head = Member.objects.filter(family=family,mem_id=memval[0].mem_id).update(family_head=True)                     
+            if memval:
+                fam_head = Member.objects.filter(family=family,mem_id=memval[0].mem_id).update(family_head=True)
+            else:
+                pass                
         member = map(lambda x:{'mem_id':x.mem_id,'family':x.family.family_id,'name':x.name,'gender':x.gender,'age':x.age,'relationship':x.Relation,'qualification':x.qualification,'marital_status':x.marital_status,'voter_status':x.voter_status,'family_head':x.family_head,'curr_location':x.curr_location,'occupation':x.occupation},Member.objects.filter(family=Family.objects.get(family_id=request.GET['family_id'])))
         return HttpResponse(content=json.dumps(member),content_type='Application/json')
 
+def UpdateFamilyMember(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)['data']
+        print 'data',data
+        voter = True if data['voter_status'] == 'Yes' else False
+        familyHead = True if data['family_head'] == 'Yes' else False
+        if Member.objects.filter(mem_id=data['mem_id']):
+            if json.loads(request.body)['status'] == 'update':
+                memval = Member.objects.filter(mem_id=data['mem_id']).update(name=data['name'],gender=data['gender'],age=data['age'],Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],family_head=familyHead,voter_status=voter,curr_location=data['curr_location'],occupation=data['occupation'])
+                response = 'Member Details Updated Successfully!'
+            elif json.loads(request.body)['status'] == 'delete':
+                memval = Member.objects.filter(mem_id=data['mem_id']).delete()
+                response = 'Member Deleted Successfully!'                
+        else:
+            response = 'Something Went Wrong!'
+    return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')            
 # @login_required        
 def UpdateFamily_member(request):
     if request.method == 'POST':
@@ -484,8 +510,10 @@ def new_member(request):
         if data['status'] == 'new':            
             if User.objects.filter(username=data['username']):
                 response = 'Username Exist!'
+            elif User.objects.filter(email=data['email']):
+                response = 'Email ID Exist!'    
             else:
-                user = User.objects.create(username=data['username'])
+                user = User.objects.create(username=data['username'],email=data['email'])
                 user.set_password(data['password'])
                 user.save()
                 if SensesMembers.objects.filter(user=user,member_type=data['member_type'],masjid=get_mohalla):
@@ -496,18 +524,42 @@ def new_member(request):
         elif data['status'] == 'edit':
             print 'data',data
             user = User.objects.get(username=data['username'])
-            user.set_password(data['re_password'])
-            user.save()
+            if User.objects.filter(email=data['email']):
+                response = 'Email ID Exist!'
+            else:
+                user.email = data['email']
+                user.set_password(data['re_password'])
+                user.save()
             # sense_member = SensesMembers.objects.filter(user=user,masjid=get_mohalla).update(member_type=data['member_type'])
-            response = 'Password Updated Successfully!'
+                response = 'Updated Successfully!'
         elif data['status'] == 'delete':
-            user = User.objects.filter(username=data['username'])
-            sense_member = SensesMembers.objects.filter(user=user,masjid=get_mohalla,member_type=data['member_type']).delete()
+            user = User.objects.filter(username=data['username']).delete()
+            # sense_member = SensesMembers.objects.filter(user=user,masjid=get_mohalla,member_type=data['member_type']).delete()
             response = 'Deleted Successfully!'           
         return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')
     else:
         muhalla = Masjid.objects.get(mohalla_id=request.GET['muhalla_id'])
-        sense_member = map(lambda x:{'username':x.user.username,'Member_type':x.member_type},SensesMembers.objects.filter(masjid=muhalla))
+        sense_member = map(lambda x:{'username':x.user.username,'email':x.user.email,'Member_type':x.member_type},SensesMembers.objects.filter(masjid=muhalla))
         return HttpResponse(content=json.dumps({'data':sense_member}),content_type='Application/json')
-        
-        
+
+def change_password(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        if data['status'] == 'edit':
+            user = authenticate(username=data['username'], password=data['password'])
+            if user:
+                get_user = User.objects.get(username=data['username'])
+                get_user.set_password(data['change_pwd'])
+                get_user.save()
+                response = 'Password Changed Successfully!'
+            else:
+                response = 'Old Password is incorrect!'
+        elif data['status'] == 'forgot':
+            if User.objects.filter(username=data['username'],email=data['email']):
+                get_user = User.objects.get(username=data['username'],email=data['email'])
+                get_user.set_password(data['password'])
+                get_user.save()
+                response = 'Password Changed Successfully!'
+            else:
+                response = 'Username & Email Not Matching!'               
+        return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')
