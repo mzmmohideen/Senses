@@ -410,7 +410,7 @@
                             <span ng-show="editMohMember"><input style="display: inline-block;height: 34px;width: 35%;float: left;" class="form-control" type="password" ng-model="moh_user.re_password" placeholder="Password" /></span>
                         </td>
                         <td><a ng-show="!editMohMember" ng-click="editMohMember=true" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a>
-                            <a ng-show="editMohMember" ng-click="editMohMember=false;moh_user_create(moh_user,'edit')" class="color-edit"><i class="glyphicon glyphicon-plus"></i></a>
+                            <a ng-show="editMohMember" ng-click="editMohMember=false;moh_user_create(val,moh_user,'edit')" class="color-edit"><i class="glyphicon glyphicon-plus"></i></a>
                             <a ng-confirm-click="Are you Sure you want to Delete?" confirmed-click="moh_user_create(moh_user,'delete')" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
                     </tr>
                     <tr ng-show="fetched_moh_user.length == 0 && moh_user.muhalla.mohalla_id" class="ng-scope">

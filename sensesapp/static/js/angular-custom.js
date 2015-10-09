@@ -382,18 +382,23 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         re_password : '',
         re_email : '',
     }
-    $scope.moh_user_create = function(data,status) {
+    $scope.moh_user_create = function(values,data,status) {
         if(data.re_password == '') {
             var password_val = data.password;
         }
         else {
             var password_val = data.re_password;
         }
-        console.log('data',data)
+        if(data.re_email == values.email) {
+            var email = values.email;
+        }
+        else {
+            var email = data.re_email;
+        }
         $http.post('/new_member/',{
             mohalla_id: data.muhalla.mohalla_id,
             username: data.username,
-            email: data.email,
+            email: email,
             password: data.password,
             re_password: password_val,
             member_type: data.member_type,
@@ -405,7 +410,6 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.moh_user.email = ''
             $scope.moh_user.password = ''
             $scope.moh_user.re_password = ''
-            console.log('data',response)
         })
     }
     $scope.getMohallaUser = function(mohalla_data) {

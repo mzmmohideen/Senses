@@ -522,16 +522,20 @@ def new_member(request):
                     user_add = SensesMembers.objects.create(user=user,member_type=data['member_type'],masjid=get_mohalla)
                     response = 'Member Created Successfully!'
         elif data['status'] == 'edit':
-            print 'data',data
             user = User.objects.get(username=data['username'])
             if User.objects.filter(email=data['email']):
                 response = 'Email ID Exist!'
             else:
                 user.email = data['email']
+                user.save()
+                response = 'Updated Successfully!'
+            if data['re_password'] == '':
+                pass
+            else:
                 user.set_password(data['re_password'])
                 user.save()
-            # sense_member = SensesMembers.objects.filter(user=user,masjid=get_mohalla).update(member_type=data['member_type'])
                 response = 'Updated Successfully!'
+            # sense_member = SensesMembers.objects.filter(user=user,masjid=get_mohalla).update(member_type=data['member_type'])
         elif data['status'] == 'delete':
             user = User.objects.filter(username=data['username']).delete()
             # sense_member = SensesMembers.objects.filter(user=user,masjid=get_mohalla,member_type=data['member_type']).delete()
