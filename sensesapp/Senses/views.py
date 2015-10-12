@@ -69,6 +69,9 @@ def signup(request):
     user.save()    
     return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
 
+def user_signup(request):    
+    return render(request, 'user_signup.html')
+
 @login_required(login_url='/login/')
 def apping(request):    
     return render(request, 'apping.html')        
@@ -507,7 +510,8 @@ def new_member(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         get_mohalla = Masjid.objects.get(mohalla_id=data['mohalla_id'])
-        if data['status'] == 'new':            
+        if data['status'] == 'new':
+            print 'status',data['status']     
             if User.objects.filter(username=data['username']):
                 response = 'Username Exist!'
             elif User.objects.filter(email=data['email']):

@@ -1,4 +1,4 @@
-var app = angular.module('login',['ngCookies','ngRoute']);
+var app = angular.module('login',['ngCookies','ngRoute', 'underscore']);
 app.run(function ($http, $cookies) {
     $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
 });
@@ -14,7 +14,7 @@ app.directive('ngEnter', function() {
             });
         };
 });
-app.controller('loginCtrl',function($scope,$http,$location) {
+app.controller('loginCtrl',function($scope,$http,_,$location) {
 	$scope.login = function(name,password) {
 		console.log('val',name,password)
 		var data = {
@@ -67,6 +67,22 @@ app.controller('loginCtrl',function($scope,$http,$location) {
 			})
         }
 	}
+	$scope.user_signup = function(name, email, password, FamilyValue) {
+		console.log('FamilyValue',FamilyValue.masjid.mohalla_id)
+		$http.post('/new_member/',{
+            mohalla_id: FamilyValue.masjid.mohalla_id,
+            username: name,
+            email: email,
+            password: password,
+            member_type: 'End Users & Donors',
+            status: 'new',
+        }).success(function(response) {
+            alert(response.data)
+            if(response.data == 'Member Created Successfully!') {
+            	window.location.href = '/login/'
+            }
+        })
+	}
 	$scope.forgot_password = function(name,email,password) {
 		$http.post('/change_password/',{
 			email: email,
@@ -83,7 +99,28 @@ app.controller('loginCtrl',function($scope,$http,$location) {
             }
         })
 	}
-	
+
+	//user signup
+	$scope.FamilyValue = {
+        masjid: '',
+        district: '',
+        taluk: '',
+    }
+	$scope.getMahallaData = function(val) {
+        $scope.muhallaData = _.filter($scope.mahallaList, function(data){ return data.district == val.district && data.taluk == val.taluk })
+    }
+    $scope.getLocation = function() {
+        $http.get('/addLocation/',{}).success(function(data) {
+            $scope.DisCode = data.district;
+            $scope.district_list = _.keys(data.district)
+            $scope.getTaluk = data.data;
+        })
+    }
+    $scope.getMasjidData = function() {
+        $http.get('/add_masjid/').success(function(data){
+            $scope.mahallaList = data.data;
+        })
+    }	
 })
 
 

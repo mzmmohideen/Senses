@@ -21,7 +21,10 @@
 					<div class="control-group">
 					<input type="password" ng-model="password" placeholder="&nbsp;&nbsp;&nbsp;password"  ng-enter="login(name,password)">
 					</div>
-					<a class="forgotpass" style="cursor:pointer;color:blue;" ng-click="correct_pwd=true">Forgot password?</a>
+					<div class="control-group">
+						<a class="forgotpass" style="margin-top: 0px;margin-left: 5px;cursor:pointer;color:blue;float:left;" ng-click="correct_pwd=true">Forgot password?</a>
+						<a class="forgotpass" style="margin-top: 0px;margin-left: 5px;cursor:pointer;color:blue;float:right;" href="/user_signup/">User Signup!</a>
+					</div>
 					<button ng-disabled="!name || !password" class="btn btn-primary btn-large btn-block" ng-click="login(name,password)">login</button>					
 				</div>
 				<div ng-show="correct_pwd" class="login-form">
@@ -52,6 +55,7 @@
 <script src="{{STATIC_URL}}js/angular/angular-cookies.min.js"></script>
 <script src="{{STATIC_URL}}js/angular/angular-route.min.js"></script>
 <script src="{{STATIC_URL}}js/angular/angular-sanitize.min.js"></script>
+<script src="{{STATIC_URL}}js/underscore.js"></script>
 <script src="{{STATIC_URL}}js/select.js"></script>
 <script src="{{STATIC_URL}}js/angular-custom.js"></script>
 <script src="{{STATIC_URL}}metisMenu/metisMenu.min.js"></script>

@@ -14,7 +14,16 @@
 				<div class="app-title">
 					<h1>Signup</h1>
 				</div>
-				<div class="login-form">
+				<div class="login-form" ng-init="getLocation();getMasjidData()">
+					<select style="display: inline-block;height: 34px;width: 100%;float: left;" ng-model="FamilyValue.district" ng-options="gen for gen in district_list" class="form-control">
+                    <option value="">SELECT DISTRICT</option>
+	                </select>
+	                <select ng-change="getMahallaData(FamilyValue);FamilyValue.masjid=''" style="display: inline-block;height: 34px;width: 100%;float: left;" ng-model="FamilyValue.taluk" ng-options="gen for gen in getTaluk[FamilyValue.district]" class="form-control">
+	                    <option value="">SELECT TALUK</option>
+	                </select>
+	                <select ng-change="getFamilyinfo();" style="display: inline-block;height: 34px;width: 100%;float: left;" ng-model="FamilyValue.masjid" ng-options="gen.name for gen in muhallaData" class="form-control">
+	                    <option value="">SELECT MUHALLA </option>
+	                </select>
 					<div class="control-group">
 					<input type="text" ng-model="name" placeholder="&nbsp;&nbsp;&nbsp;username">
 					</div>
@@ -25,10 +34,11 @@
 					<input type="password" ng-model="password" placeholder="&nbsp;&nbsp;&nbsp;password">
 					</div>
 					<div class="control-group">
-					<input type="password" ng-model="confirm_password" placeholder="&nbsp;&nbsp;&nbsp;confirm password"  ng-enter="signup(name, email, password, confirm_password)">
+					<input type="password" ng-model="confirm_password" placeholder="&nbsp;&nbsp;&nbsp;confirm password"  ng-enter="user_signup(name, email, password, FamilyValue)">
 					</div>
 					<div class="control-group"  style="color:red;" ng-show="password && confirm_password && password!=confirm_password"> * Password Not Matching</div>
-					<button class="btn btn-primary btn-large btn-block" ng-disabled="!name || !email || !password || !confirm_password || password!=confirm_password" ng-click="signup(name, email, password, confirm_password)">Signup</button>					
+					<button class="btn btn-primary btn-large btn-block" ng-disabled="!name || !email || !FamilyValue.masjid || !password || !confirm_password || password!=confirm_password" ng-click="user_signup(name, email, password, FamilyValue)">Signup</button>
+					
 				</div>
 			</div>
 		</div>
