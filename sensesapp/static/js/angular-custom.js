@@ -123,6 +123,13 @@ app.directive('ngConfirmClick', [
         };
 }])
 app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,$modal) {
+    // $scope.formats = ['dd-MMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
+    // $scope.format = $scope.formats[0];
+    $scope.today = function() {
+        $scope.dt = new Date();
+        console.log('dayt',$scope.dt)
+    };
+    $scope.today();
     $scope.group_value="Select the Group in the list or Enter New...";
     $scope.get_group = function(prog,sem) {
         console.log('program',prog,sem,$scope.group_data)
@@ -978,6 +985,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         familyid: '',
         masjid: '',
         ration_card: '',
+        report_date: $scope.dt,
         address: '',
         mobile: '',
         district: '',
@@ -993,7 +1001,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         financial: '',
     }
     $scope.addFamily = function(family,value,status) {
-        console.log('family',family,'value',value.masjid)
+        console.log('family',family,'value',value)
         if(status == 'new') {
             var familyid = '';
             var masjid = value.masjid.name;
@@ -1006,6 +1014,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             mobile_no: value.mobile_no,
             taluk: value.taluk,
             district: value.district,
+            report_date: value.report_date,
             masjid: masjid,
             mohalla_id : value.masjid.mohalla_id,
             toilet: value.toilet,
@@ -1028,6 +1037,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         // }
         $http.post('/familyData/',{
             value: data,
+            status: 'feed',
         }).success(function(data) {
             alert(data.data)
             $scope.get_family()

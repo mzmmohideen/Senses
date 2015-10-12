@@ -22,8 +22,8 @@
 					<input type="password" ng-model="password" placeholder="&nbsp;&nbsp;&nbsp;password"  ng-enter="login(name,password)">
 					</div>
 					<div class="control-group">
-						<a class="forgotpass" style="margin-top: 0px;margin-left: 5px;cursor:pointer;color:blue;float:left;" ng-click="correct_pwd=true">Forgot password?</a>
-						<a class="forgotpass" style="margin-top: 0px;margin-left: 5px;cursor:pointer;color:blue;float:right;" href="/user_signup/">User Signup!</a>
+						<a class="forgotpass" style="margin-top: 0px;margin-left: 5px;cursor:pointer;color:blue;float:left;text-decoration: none;" ng-click="correct_pwd=true">Forgot password?</a>
+						<a class="forgotpass" style="margin-top: 0px;margin-left: 5px;cursor:pointer;color:blue;float:right;text-decoration: none;" href="/user_signup/">User Signup!</a>
 					</div>
 					<button ng-disabled="!name || !password" class="btn btn-primary btn-large btn-block" ng-click="login(name,password)">login</button>					
 				</div>

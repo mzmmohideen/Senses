@@ -37,6 +37,7 @@
 					<input type="password" ng-model="confirm_password" placeholder="&nbsp;&nbsp;&nbsp;confirm password"  ng-enter="user_signup(name, email, password, FamilyValue)">
 					</div>
 					<div class="control-group"  style="color:red;" ng-show="password && confirm_password && password!=confirm_password"> * Password Not Matching</div>
+					<a class="forgotpass" style="margin-top: 0px;margin-left: 5px;cursor:pointer;color:blue;float:right;text-decoration: none;" href="/login/">Sign in!</a>
 					<button class="btn btn-primary btn-large btn-block" ng-disabled="!name || !email || !FamilyValue.masjid || !password || !confirm_password || password!=confirm_password" ng-click="user_signup(name, email, password, FamilyValue)">Signup</button>
 					
 				</div>

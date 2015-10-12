@@ -69,8 +69,18 @@ def signup(request):
     user.save()    
     return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
 
-def user_signup(request):    
-    return render(request, 'user_signup.html')
+def user_signup(request):
+    if request.user.is_authenticated():
+        if request.user.first_name == "Admin":
+            return HttpResponseRedirect('/home/')
+        elif SensesMembers.objects.filter(user=request.user):
+            get_mem_data = SensesMembers.objects.get(user=request.user)
+            if get_mem_data.member_type == 'Mohalla User':
+                return HttpResponseRedirect('/mohallauser/')
+            elif get_mem_data.member_type == 'End Users & Donors':
+                return HttpResponseRedirect('/enduser/')
+    else:
+        return render(request, 'user_signup.html')
 
 @login_required(login_url='/login/')
 def apping(request):    
@@ -228,7 +238,8 @@ def familyData(request):
     if request.method == 'POST':
         if json.loads(request.body)['status'] == 'feed':
             data = json.loads(request.body)['value']
-            print 'data1',data
+            # print 'data1',type(datetime.strptime(data['report_date'].split('.')[0], "%Y-%m-%d %H:%M:%S"))
+            # exit()
             taluk = Taluk.objects.get(taluk_name=data['taluk'],district=District.objects.get(district_name=data['district']))
             masjid = Masjid.objects.get(mohalla_id=data['mohalla_id'])
             toilet = True if data['toilet'] == 'Yes' else False

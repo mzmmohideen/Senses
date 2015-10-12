@@ -805,13 +805,13 @@
                 <h1 class="page-header">Families</h1>
             </div>
             <div class=" col-lg-12" style="padding-bottom: 34px;">
-                <select style="display: inline-block;height: 34px;width: 35%;float: left;" ng-model="FamilyValue.district" ng-options="gen for gen in district_list" class="form-control">
+                <select ng-change="get_family()" style="display: inline-block;height: 34px;width: 35%;float: left;" ng-model="FamilyValue.district" ng-options="gen for gen in district_list" class="form-control">
                     <option value="">SELECT DISTRICT</option>
                 </select>
-                <select ng-change="getMahallaData(FamilyValue);FamilyValue.masjid=''" style="display: inline-block;height: 34px;width: 35%;float: left;" ng-model="FamilyValue.taluk" ng-options="gen for gen in getTaluk[FamilyValue.district]" class="form-control">
+                <select ng-change="getMahallaData(FamilyValue);FamilyValue.masjid='';get_family();" style="display: inline-block;height: 34px;width: 35%;float: left;" ng-model="FamilyValue.taluk" ng-options="gen for gen in getTaluk[FamilyValue.district]" class="form-control">
                     <option value="">SELECT TALUK</option>
                 </select>
-                <select ng-change="getFamilyinfo();" style="display: inline-block;height: 34px;width: 30%;float: left;" ng-model="FamilyValue.masjid" ng-options="gen.name for gen in muhallaData" class="form-control">
+                <select ng-change="getFamilyinfo();get_family();" style="display: inline-block;height: 34px;width: 30%;float: left;" ng-model="FamilyValue.masjid" ng-options="gen.name for gen in muhallaData" class="form-control">
                     <option value="">SELECT MUHALLA </option>
                 </select>
                 <!--<select ng-if="FamilyValue.masjid" ng-change="getFamilyinfo();" style="display: inline-block;height: 34px;width: 30%;float: left;" ng-model="FamilyValue.masjid" ng-options="gen.name for gen in muhallaData" class="form-control">
@@ -837,14 +837,15 @@
                 </div>
             </div>
         <div class=" col-lg-12" style="padding-bottom: 34px;">
-                <input style="display: inline-block;width: 13%;height: 34px;float: left;" type="text" placeholder="Ration Card Number" ng-model="FamilyValue.ration_card" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <input style="display: inline-block;width: 13%;height: 34px;float: left;" type="text" placeholder="Mobile Number" ng-model="FamilyValue.mobile_no" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <select style="display: inline-block;height: 34px;width: 15%;float: left;" ng-model="FamilyValue.language" ng-options="house for house in ['Tamil','Urdu','Others']" class="form-control">
+                <input style="display: inline-block;width: 12%;height: 34px;float: left;" type="text" placeholder="Ration Card Number" ng-model="FamilyValue.ration_card" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                <input style="display: inline-block;width: 12%;height: 34px;float: left;" type="text" placeholder="Mobile Number" ng-model="FamilyValue.mobile_no" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                <select style="display: inline-block;height: 34px;width: 12%;float: left;" ng-model="FamilyValue.language" ng-options="house for house in ['Tamil','Urdu','Others']" class="form-control">
                     <option value="">Mother Tongue</option>
                 </select>
+                <input style="display: inline-block;width: 15%;height: 34px;float: left;" type="date" id="date_input" type="text" datepicker-popup="{{format}}" ng-model="FamilyValue.report_date" is-open="opened" min-date="minDate" max-date="maxDate" close-on-date-selection='false' datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" class="form-control"/>
                 <!--<input style="display: inline-block;height: 34px;width: 15%;float: left;" class="form-control" type="text" ng-model="FamilyValue.language" placeholder="Mother Tongue" />-->
-                <input style="display: inline-block;width: 29%;height: 34px;float: left;" type="text" placeholder="Address" ng-model="FamilyValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <input style="display: inline-block;width: 30%;height: 34px;float: left;" type="text" placeholder="Any Emergency Needs in this Family?" ng-model="FamilyValue.family_needs" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                <input style="display: inline-block;width: 24%;height: 34px;float: left;" type="text" placeholder="Address" ng-model="FamilyValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
+                <input style="display: inline-block;width: 24%;height: 34px;float: left;" type="text" placeholder="Any Emergency Needs in this Family?" ng-model="FamilyValue.family_needs" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
         </div>
         <div class=" col-lg-12" style="padding-bottom: 34px;">
                 <select style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="FamilyValue.house" ng-options="house for house in ['Rent','Own']" class="form-control">
