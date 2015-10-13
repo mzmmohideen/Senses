@@ -934,7 +934,7 @@
                     <button ng-show="!new_family" ng-disabled="family_val=='' || family_val=='Type or Select Family ID from the List'" type="submit" style="width:13.2%;background-color: #d9534f;border-color: #d9534f;height: 34px;" ng-confirm-click="Are you Sure you want to Delete?" confirmed-click="deleteFamily(family_val)" class="btn-sm btn btn-primary">Delete</button>
                     <button ng-show="!new_family" ng-disabled="family_val=='' || family_val=='Type or Select Family ID from the List'" type="submit" style="width:13.2%;height: 34px;" ng-click="new_family=true;get_family();" class="btn-sm btn btn-primary">Cancel</button>
                     <!--<button ng-show="!new_family" ng-disabled="familyList.indexOf(family_val)==-1">-->
-                    <button ng-show="new_family" type="submit" style="width:13%;height: 34px;" ng-click="addFamily(family_val,FamilyValue,'new')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Save New</button>
+                    <button ng-show="new_family" ng-disabled="!FamilyValue.masjid" type="submit" style="width:13%;height: 34px;" ng-click="addFamily(family_val,FamilyValue,'new');new_family=false;" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Save New </button>
                     <button ng-show="new_family" type="submit" style="width:13%;height: 34px;" ng-click="new_family=false;get_family()" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Cancel</button>
                     <button ng-show="!new_family" ng-disabled="familyList.indexOf(family_val)>-1" type="submit" style="width:13.2%;height: 34px;" ng-click="new_family=true;get_family()" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New</button>
                 </div>
@@ -1014,8 +1014,9 @@
                         <td style="padding-left: 1px; padding-right: 1px;"><select ng-model="FamilyMember.gender" ng-options="gen for gen in ['MALE','FEMALE']" style="font-size: 11px;height: 29px;padding: 2px 0px 3px;" class="form-control">
                             <option value="">SELECT GENDER</option>
                         </select></td>
-                        <td style="padding-left: 1px; padding-right: 1px;"><input type="text" style="font-size: 10px; padding-left: 8px; padding-right: 1px; height: 29px;" placeholder="Age" ng-model="FamilyMember.age" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
-                        <td><select ng-model="FamilyMember.family_head" ng-options="val for val in ['Yes','No']" style="font-size: 12px; padding-left: 1px; padding-right: 1px;height: 29px;"class="form-control">
+                        <td><input type="date" id="date_input" type="text" datepicker-popup="{{format}}" ng-model="FamilyMember.dateofbirth" is-open="opened" min-date="minDate" max-date="maxDate" close-on-date-selection='false' datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" class="form-control"/></td>
+                        <!--<td><input type="text" placeholder="Age" ng-model="FamilyMember.age" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>-->
+                        <td><select ng-model="FamilyMember.family_head" ng-options="val for val in ['Yes','No']" class="form-control">
                             <option value="">FAMILY HEAD?</option>
                         </select></td>
                         <td><input type="text" style="padding-left: 3px; padding-right: 1px;" placeholder="Relationship" ng-model="FamilyMember.relationship" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
@@ -1051,9 +1052,13 @@
                             </select> 
                         </td>
                         <td class="ng-binding">
+                            <span ng-show="!updateFamMem">{{member.dateofbirth}}</span>
+                            <input ng-show="updateFamMem" style="display: inline-block;height: 34px;width: 175px;float: left;" type="date" id="date_input" type="text" datepicker-popup="{{format}}" ng-model="member.dateofbirth" is-open="opened" min-date="minDate" max-date="maxDate" close-on-date-selection='false' datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" class="form-control"/>
+                        </td>
+                        <!--<td class="ng-binding">
                             <span ng-show="!updateFamMem">{{member.age}}</span>
                             <input style="display: inline-block;height: 34px;width: 75px;float: left;" type="text" ng-show="updateFamMem" ng-model="member.age">
-                        </td>
+                        </td>-->
                         <td class="ng-binding">
                             <span ng-show="!updateFamMem">{{get_booleanval(member.family_head)}}</span>
                             <select ng-show="updateFamMem" ng-init="member.family_head=get_booleanval(member.family_head)" ng-model="member.family_head" ng-options="val for val in ['Yes','No']" class="form-control">
@@ -1795,6 +1800,8 @@
     <script src="{{STATIC_URL}}js/angular-custom.js"></script>
     <script src="{{STATIC_URL}}metisMenu/metisMenu.min.js"></script>
     <script src="{{STATIC_URL}}bootstrap/dashboard/js/sb-admin-2.js"></script>
+    <script src="{{STATIC_URL}}js/moment.js"></script>
+    <script src="{{STATIC_URL}}js/moment-timezone.js"></script>
     <!-- Just to make our placeholder images work. Don't actually copy the next line! - ->
     <script src="../../assets/js/vendor/holder.min.js"></script>
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug - ->

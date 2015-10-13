@@ -10,7 +10,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from collections import defaultdict
 from django.core.exceptions import ObjectDoesNotExist
-from datetime import datetime, time
+from datetime import datetime, time, timedelta
 from traceback import format_exc
 from itertools import groupby
 from operator import itemgetter
@@ -233,12 +233,18 @@ def masjid_member(request):
             get_members = map(lambda x:{'name':x.member_name,'age':x.age,'mobile':x.mobile,'address':x.address,'designation':x.designation},Masjid_members.objects.filter(masjid=masjid))
         return HttpResponse(content=json.dumps({'data':get_members}),content_type='Application/json')    
 
+def convert_to_IST(timestamp, convert=None):
+    ist_time = timestamp+timedelta(minutes=330)
+    if convert:
+        ist_time = ist_time.strftime(convert)
+    return ist_time
 # @login_required
 def familyData(request):
     if request.method == 'POST':
         if json.loads(request.body)['status'] == 'feed':
             data = json.loads(request.body)['value']
-            # print 'data1',type(datetime.strptime(data['report_date'].split('.')[0], "%Y-%m-%d %H:%M:%S"))
+            data_date = datetime.strptime(data['report_date'], "%a, %d %b %Y %H:%M:%S %Z")
+            # print type(data_date.strftime('%Y-%m-%d'))
             # exit()
             taluk = Taluk.objects.get(taluk_name=data['taluk'],district=District.objects.get(district_name=data['district']))
             masjid = Masjid.objects.get(mohalla_id=data['mohalla_id'])
@@ -248,18 +254,24 @@ def familyData(request):
             insurance = True if data['health_insurance'] == 'Yes' else False
             try:            
                 if data['familyid'] != '':
-                    family = Family.objects.filter(family_id=data['familyid']).update(muhalla=masjid,language=data['language'],ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
-                    # family_data = Family.objects.get(id=family)
+                    family = Family.objects.filter(family_id=data['familyid']).update(muhalla=masjid,report_date=data_date,language=data['language'],ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
+                    try:
+                        family_data = Family.objects.get(family_id=data['familyid'])
+                        family_val = {'family_id':family_data.family_id,'date':convert_to_IST(family_data.report_date).strftime('%Y-%m-%d'),'muhalla':family_data.muhalla.name,'language':family_data.language,'taluk':family_data.muhalla.taluk.taluk_name,'district_name':family_data.muhalla.taluk.district.district_name,'ration_card':family_data.ration_card,'address':family_data.address,'mobile':family_data.mobile,'house_type':family_data.house_type,'donor':family_data.donor,'volunteer':family_data.volunteer,'health_insurance':family_data.health_insurance,'family_needs':family_data.family_needs,'toilet':family_data.toilet,'financial_status':family_data.financial_status}
+                    except:
+                        family_val = []                        
                     # family_data.family_id = '%s / %s%s / %s' %(taluk.district.district_code,'%02d'%taluk.id,'%02d'%masjid.id,family_data.id)
                     # family_data.save()
+                    # family_val = {'family_id':family[0].family_id,'date':convert_to_IST(family[0].report_date).strftime('%Y-%m-%d'),'muhalla':family[0].muhalla.name,'language':family[0].language,'taluk':family[0].muhalla.taluk.taluk_name,'district_name':family[0].muhalla.taluk.district.district_name,'ration_card':family[0].ration_card,'address':family[0].address,'mobile':family[0].mobile,'house_type':family[0].house_type,'donor':family[0].donor,'volunteer':family[0].volunteer,'health_insurance':family[0].health_insurance,'family_needs':family[0].family_needs,'toilet':family[0].toilet,'financial_status':family[0].financial_status}
                     response = 'Family Data Updated Successfully!'
                 else:
-                    family = Family.objects.create(family_id=data['familyid'],muhalla=masjid,language=data['language'],ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
+                    family = Family.objects.create(family_id=data['familyid'],muhalla=masjid,report_date=data_date,language=data['language'],ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
                     # family.family_id = '%s / %s%s / %s' %(taluk.district.district_code,'%02d'%taluk.id,'%02d'%masjid.id,family.id)
                     family.family_id = '%s / %s / %s' %(taluk.district.district_code,masjid.mohalla_id,family.id)
                     family.save()
+                    family_val = {'family_id':family.family_id,'date':convert_to_IST(family.report_date).strftime('%Y-%m-%d'),'muhalla':family.muhalla.name,'language':family.language,'taluk':family.muhalla.taluk.taluk_name,'district_name':family.muhalla.taluk.district.district_name,'ration_card':family.ration_card,'address':family.address,'mobile':family.mobile,'house_type':family.house_type,'donor':family.donor,'volunteer':family.volunteer,'health_insurance':family.health_insurance,'family_needs':family.family_needs,'toilet':family.toilet,'financial_status':family.financial_status}
                     response = 'Family Data Saved Successfully!'
-                return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')
+                return HttpResponse(content=json.dumps({'data':response,'family':family_val}),content_type='Application/json')
             except:
                 print repr(format_exc())
         elif json.loads(request.body)['status'] == 'delete':
@@ -268,7 +280,7 @@ def familyData(request):
             family = Family.objects.filter(family_id=data['familyid']).delete()
             return HttpResponse(content=json.dumps({'data':'Family Data Deleted Successfully!'}),content_type='Application/json')
     else:
-        family = map(lambda x:{'family_id':x.family_id,'muhalla':x.muhalla.name,'language':x.language,'taluk':x.muhalla.taluk.taluk_name,'district_name':x.muhalla.taluk.district.district_name,'ration_card':x.ration_card,'address':x.address,'mobile':x.mobile,'house_type':x.house_type,'donor':x.donor,'volunteer':x.volunteer,'health_insurance':x.health_insurance,'family_needs':x.family_needs,'toilet':x.toilet,'financial_status':x.financial_status},Family.objects.all())
+        family = map(lambda x:{'family_id':x.family_id,'date':convert_to_IST(x.report_date).strftime('%Y-%m-%d'),'muhalla':x.muhalla.name,'language':x.language,'taluk':x.muhalla.taluk.taluk_name,'district_name':x.muhalla.taluk.district.district_name,'ration_card':x.ration_card,'address':x.address,'mobile':x.mobile,'house_type':x.house_type,'donor':x.donor,'volunteer':x.volunteer,'health_insurance':x.health_insurance,'family_needs':x.family_needs,'toilet':x.toilet,'financial_status':x.financial_status},Family.objects.all())
         return HttpResponse(content=json.dumps({'data':family}),content_type='Application/json')
 
 # @login_required
@@ -358,15 +370,24 @@ def FamilyMemberData(request):
         familyid = json.loads(request.body)['familyid']
         family = Family.objects.get(family_id=familyid)
         voter = True if data['voter'] == 'Yes' else False
+        dob_date = datetime.strptime(json.loads(request.body)['dob_date'], "%a, %d %b %Y %H:%M:%S %Z")
+        mem_age = json.loads(request.body)['age']
+        try:
+            if str(mem_age).split('.')[1][0] >= 5:
+                age = str(int(mem_age) + 1)
+            else:
+                age = str(int(mem_age))
+        except:
+            age = str(mem_age)
         # family_head = True if data['family_head'] == 'Yes' else False
         if data['name'] == '':
             return HttpResponse(content=json.dumps({'data':'Please Enter Member Name!'}),content_type='Application/json')
         else:                
             if Member.objects.filter(mem_id=data['mem_id']):
-                memval = Member.objects.filter(mem_id=data['mem_id']).update(family=family,muhalla=family.muhalla,name=data['name'],gender=data['gender'],age=data['age'],Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
+                memval = Member.objects.filter(mem_id=data['mem_id']).update(family=family,dateofbirth=dob_date,muhalla=family.muhalla,name=data['name'],gender=data['gender'],age=age,Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
                 member = memval[0]
             else:
-                member = Member.objects.create(mem_id=data['mem_id'],family=family,muhalla=family.muhalla,name=data['name'],gender=data['gender'],age=data['age'],Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
+                member = Member.objects.create(mem_id=data['mem_id'],family=family,dateofbirth=dob_date,muhalla=family.muhalla,name=data['name'],gender=data['gender'],age=age,Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
                 member.mem_id= '%s / %s' %(familyid,member.id)
                 member.save()  
         if Member.objects.filter(family=family):
@@ -388,18 +409,27 @@ def FamilyMemberData(request):
                 fam_head = Member.objects.filter(family=family,mem_id=memval[0].mem_id).update(family_head=True)
             else:
                 pass                
-        member = map(lambda x:{'mem_id':x.mem_id,'family':x.family.family_id,'name':x.name,'gender':x.gender,'age':x.age,'relationship':x.Relation,'qualification':x.qualification,'marital_status':x.marital_status,'voter_status':x.voter_status,'family_head':x.family_head,'curr_location':x.curr_location,'occupation':x.occupation},Member.objects.filter(family=Family.objects.get(family_id=request.GET['family_id'])))
+        member = map(lambda x:{'mem_id':x.mem_id,'dateofbirth':convert_to_IST(x.dateofbirth).strftime('%Y-%m-%d'),'family':x.family.family_id,'name':x.name,'gender':x.gender,'age':x.age,'relationship':x.Relation,'qualification':x.qualification,'marital_status':x.marital_status,'voter_status':x.voter_status,'family_head':x.family_head,'curr_location':x.curr_location,'occupation':x.occupation},Member.objects.filter(family=Family.objects.get(family_id=request.GET['family_id'])))
         return HttpResponse(content=json.dumps(member),content_type='Application/json')
 
 def UpdateFamilyMember(request):
     if request.method == 'POST':
         data = json.loads(request.body)['data']
-        print 'data',data
+        dob_date = datetime.strptime(json.loads(request.body)['dob_date'], "%a, %d %b %Y %H:%M:%S %Z")
+        mem_age = json.loads(request.body)['age']
+        try:
+            if int(str(mem_age).split('.')[1][0]) >= 5:
+                print 'vall',str(mem_age).split('.')[1][0]
+                age = str(int(mem_age) + 1)
+            else:
+                age = str(int(mem_age))
+        except:
+            age = str(mem_age)
         voter = True if data['voter_status'] == 'Yes' else False
         familyHead = True if data['family_head'] == 'Yes' else False
         if Member.objects.filter(mem_id=data['mem_id']):
             if json.loads(request.body)['status'] == 'update':
-                memval = Member.objects.filter(mem_id=data['mem_id']).update(name=data['name'],gender=data['gender'],age=data['age'],Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],family_head=familyHead,voter_status=voter,curr_location=data['curr_location'],occupation=data['occupation'])
+                memval = Member.objects.filter(mem_id=data['mem_id']).update(name=data['name'],dateofbirth=dob_date,gender=data['gender'],age=age,Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],family_head=familyHead,voter_status=voter,curr_location=data['curr_location'],occupation=data['occupation'])
                 response = 'Member Details Updated Successfully!'
             elif json.loads(request.body)['status'] == 'delete':
                 memval = Member.objects.filter(mem_id=data['mem_id']).delete()

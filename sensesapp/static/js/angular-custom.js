@@ -950,6 +950,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.FamilyValue.toilet = '';
             $scope.FamilyValue.financial = '';
             $scope.FamilyValue.language = '';
+            $scope.FamilyValue.report_date = $scope.dt;
             // $scope.FamilyValue.district = '';
             // $scope.FamilyValue.taluk = '';
             // $scope.FamilyValue.masjid = '';
@@ -961,10 +962,12 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             $scope.FamilyValue.family_needs = '';
         }
         else {
-            console.log('val--family',family)
             $scope.family_val = family.family_id;
+            $scope.FamilyValue.familyid = family.family_id;
             $scope.FamilyValue.ration_card = family.ration_card;
             $scope.FamilyValue.mobile_no = family.mobile;
+            $scope.FamilyValue.report_date = new Date(family.date);
+            console.log('data',$scope.FamilyValue.report_date)
             $scope.FamilyValue.address = family.address;
             $scope.FamilyValue.house = family.house_type;
             if(family.toilet == true) { $scope.FamilyValue.toilet = 'Yes'; } else if(family.toilet == false) { $scope.FamilyValue.toilet = 'No'; }
@@ -1001,7 +1004,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         financial: '',
     }
     $scope.addFamily = function(family,value,status) {
-        console.log('family',family,'value',value)
+        console.log('family',family,'value',value.report_date)
         if(status == 'new') {
             var familyid = '';
             var masjid = value.masjid.name;
@@ -1014,7 +1017,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             mobile_no: value.mobile_no,
             taluk: value.taluk,
             district: value.district,
-            report_date: value.report_date,
+            report_date: value.report_date.toUTCString(),
             masjid: masjid,
             mohalla_id : value.masjid.mohalla_id,
             toilet: value.toilet,
@@ -1040,7 +1043,12 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             status: 'feed',
         }).success(function(data) {
             alert(data.data)
-            $scope.get_family()
+            if (data.family) {
+                $scope.get_family(data.family)
+            }
+            else {
+                $scope.get_family()
+            }
             $scope.getFamilyinfo();
         })
     }
@@ -1091,6 +1099,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         name : '', 
         gender : '', 
         age : '',
+        dateofbirth : $scope.dt,
         family_head : '', 
         relationship : '', 
         qualification : '', 
@@ -1102,8 +1111,20 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
     $scope.add_Familymembers = function(data,family,status) {
         console.log('data',data,family)
         var family_id = family.familyid.family_id;
+        if(data.dateofbirth) {
+            var dob = data.dateofbirth.toUTCString()
+            var user_dob_date = moment(data.dateofbirth);
+        }
+        else {
+            var dob = $scope.dt.toUTCString()
+            var user_dob_date = moment($scope.dt);
+        }
+        var tod_date = moment($scope.dt)
+        var age = moment.duration(tod_date.diff(user_dob_date)).asYears();
         $http.post('/FamilyMemberData/',{
             data: data,
+            dob_date: dob,
+            age: age,
             status: status,
             familyid: family_id,
         }).success(function(response) {
@@ -1123,8 +1144,20 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         if(val == true) { return 'Yes' } else if(val == false) { return 'No' } else if(val == 'Yes') { return 'Yes' } else if(val == 'No') { return 'No' }
     }
     $scope.UpdateFamMember = function(member,status) {
+        if(member.dateofbirth) {
+            var dob = member.dateofbirth.toUTCString()
+            var user_dob_date = moment(member.dateofbirth);
+        }
+        else {
+            var dob = $scope.dt.toUTCString()
+            var user_dob_date = moment($scope.dt);
+        }
+        var tod_date = moment($scope.dt)
+        var age = moment.duration(tod_date.diff(user_dob_date)).asYears();
         $http.post('/UpdateFamilyMember/',{
             data: member,
+            dob_date: dob,
+            age: age,
             status: status,
         }).success(function(response){
             alert(response.data)
