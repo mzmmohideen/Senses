@@ -1111,8 +1111,14 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         occupation : '', 
     }
     $scope.add_Familymembers = function(data,family,status) {
-        console.log('data',data,family)
-        var family_id = family.familyid.family_id;
+        console.log('data',data,typeof(family),typeof(family.familyid))
+        if(typeof(family.familyid) == 'object') {
+            var family_id = family.familyid.family_id;
+        }
+        else if(typeof(family.familyid) == 'string') {
+            var family_id = family.familyid;
+        }
+        console.log('data',family_id)
         if(data.dateofbirth) {
             var dob = data.dateofbirth.toUTCString()
             var user_dob_date = moment(data.dateofbirth);
