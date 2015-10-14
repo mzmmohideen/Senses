@@ -23,7 +23,7 @@ class Taluk(models.Model):
 
 class Masjid(models.Model):
     taluk = models.ForeignKey(Taluk)
-    mohalla_id = models.CharField(max_length=10,unique=True)
+    mohalla_id = models.CharField(max_length=20,unique=True)
     name = models.CharField(max_length=30)
     musallas = models.CharField(max_length=20)
     location = models.CharField(max_length=30)
@@ -61,13 +61,13 @@ class Condition(models.Model):
     value = models.CharField(max_length=20,null=True)
 
 class Service(models.Model):
-    service_id = models.CharField(max_length=10,unique=True)
+    service_id = models.CharField(max_length=20,unique=True)
     name = models.CharField(max_length=50,unique=True)
     description = models.TextField(null=True)
 
 class SubScheme(models.Model):
     scheme = models.ForeignKey(Scheme)    
-    subscheme_id = models.CharField(max_length=10,unique=True)
+    subscheme_id = models.CharField(max_length=20,unique=True)
     name = models.CharField(max_length=50)
     conditions = models.ManyToManyField(Condition,blank=True)
     description = models.CharField(max_length=30,null=True)
@@ -113,6 +113,7 @@ class Member_service(models.Model):
 class Disease(models.Model):
     sym_type = models.CharField(max_length=30,choices=SYMPTOMTYPE)
     disease_name = models.CharField(max_length=50,unique=True)
+    disease_id = models.CharField(max_length=20,unique=True)
     description = models.TextField(null=True)
 
 class Surgery(models.Model):

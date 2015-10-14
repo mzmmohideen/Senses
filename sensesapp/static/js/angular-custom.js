@@ -223,6 +223,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
     $scope.DiseaseVal = {
         sym_type: '',
         name: '',
+        disease_id: '',
         description: '',
     }
     $scope.disease_val = 'SELECT or ADD DISEASE';
@@ -257,6 +258,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         $http.post('/DiseaseData/',{
             sym_type: symptom_type,
             description: data.description,
+            disease_id: data.disease_id,
             disease: disease_val, 
         }).success(function(data){
             alert(data.response)

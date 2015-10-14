@@ -691,6 +691,7 @@
             <tr>
                 <td> <label for="male">Select Type</label> </td>
                 <td> <label for="male">Add Disease</label> </td>
+                <td> <label for="male">Disease ID</label> </td>
                 <td> <label for="male">description</label> </td>
             </tr>
             <tr>
@@ -703,6 +704,7 @@
                         <div ng-bind-html="mod | highlight: $select.search"></div>
                     </ui-select-choices>
                 </ui-select></td>
+                <td><input style="display: inline-block;height: 34px;width: 98%;border-radius: 2px;float: left;" type="text" placeholder="Disease ID" ng-model="DiseaseVal.disease_id" class="form-control"></td>
                 <td><input style="display: inline-block;height: 34px;width: 98%;border-radius: 2px;float: left;" class="form-control" type="text" ng-model="DiseaseVal.description" placeholder="Description(optional)" /></td>
                 <td><button  ng-disabled="disease_val=='' || disease_val=='SELECT or ADD DISEASE' || !DiseaseVal.sym_type" type="submit" style="width:100%;height: 34px;float:right;" ng-click="add_disease(disease_val,DiseaseVal)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button></td>
             </tr>
@@ -712,7 +714,9 @@
                 <thead>
                     <tr class="ng-scope">
                         <th style="width: 5%; text-align: center;">S.No</th>
-                        <th style="text-align: center;">Diseases</th>
+                        <th ng-show="DiseaseVal.sym_type" style="text-align: center;">{{DiseaseVal.sym_type}}</th>
+                        <th ng-show="!DiseaseVal.sym_type" style="text-align: center;">Symptom Type</th>
+                        <th style="text-align: center;">Disease ID</th>
                         <th style="text-align: center;">Description</th>
                         <th style="text-align: center;">Actions</th>
                     </tr>
@@ -727,6 +731,7 @@
                     <tr ng-show="getDiseaseData.length!=0" ng-repeat="sub in getDiseaseData" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td class="ng-binding">{{sub.name}}</td>
+                        <td class="ng-binding">{{sub.disease_id}}</td>
                         <td class="ng-binding">{{sub.description}}</td>
                         <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-confirm-click="Are you Sure you want to Delete?" confirmed-click="deleteDisease(sub)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
                     </tr>

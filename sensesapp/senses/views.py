@@ -529,11 +529,13 @@ def updateMemScheme(request):
 def DiseaseData(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        if Disease.objects.filter(disease_name=data['disease']):
-            disease = Disease.objects.filter(disease_name=data['disease']).update(description=data['description'])
+        if Disease.objects.filter(disease_name=data['disease_id']):
+            return HttpResponse(content=json.dumps({'response':'Disease ID Exist!'}),content_type='Application/json')
+        elif Disease.objects.filter(disease_name=data['disease']):
+            disease = Disease.objects.filter(disease_name=data['disease']).update(description=data['description'],disease_id=data['disease_id'])
             return HttpResponse(content=json.dumps({'response':'Description updated!'}),content_type='Application/json')
         else:
-            disease = Disease.objects.create(disease_name=data['disease'],sym_type=data['sym_type'],description=data['description'])
+            disease = Disease.objects.create(disease_name=data['disease'],disease_id=data['disease_id'],sym_type=data['sym_type'],description=data['description'])
             return HttpResponse(content=json.dumps({'response':'Disease added Successfully!'}),content_type='Application/json')
     else:
         try:
@@ -541,7 +543,7 @@ def DiseaseData(request):
             # get_data = defaultdict(list)
             # for k in Disease.objects.filter(sym_type=symptom_type):
                 # get_data[k.sym_type].append({'description':k.description,'name':k.disease_name})
-            get_data = map(lambda x:{'type':x.sym_type,'name':x.disease_name,'description':x.description},Disease.objects.filter(sym_type=symptom_type))
+            get_data = map(lambda x:{'type':x.sym_type,'disease_id':x.disease_id,'name':x.disease_name,'description':x.description},Disease.objects.filter(sym_type=symptom_type))
             return HttpResponse(content=json.dumps({'response':get_data}),content_type='Application/json')
         except:
             disease = Disease.objects.filter(disease_name=request.GET['disease']).delete()
