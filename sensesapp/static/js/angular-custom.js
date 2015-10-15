@@ -351,6 +351,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
                 $scope.MasjidAddValue.address = '';
             }
             else {
+                $scope.masjid_val = masjid_val;
                 $scope.getMasjidListData = _.filter(data.data,function(num) { return num.mohalla_id==masjid_val})
                 $scope.MasjidAddValue.mohalla_id = $scope.getMasjidListData[0].mohalla_id;
                 $scope.MasjidAddValue.masjid_name = $scope.getMasjidListData[0].name;
@@ -539,32 +540,35 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
     }
     $scope.addMasjid = function(masjid,data,status) {
         console.log(data,masjid)
-        if(data.masjid_name == "") {
-            alert("Please Enter Masjid Name!")
+        if(data.mohalla_id == "") {
+            var masjid_val = masjid
         }
         else {
-            if(data.mohalla_id == "") {
-                var masjid_val = masjid
+            var masjid_val = data.mohalla_id
+        }
+        console.log('masjid',masjid,'a',data,'b',masjid_val)
+        $http.post('/add_masjid/',{
+            district: data.district,
+            taluk: data.taluk,
+            masjid_name: data.masjid_name,
+            mohalla_id: masjid_val,
+            musallas: data.musallas,
+            address: data.address,
+            status: status,
+        }).success(function(response) {
+            console.log('val',response)
+            $scope.getMasjidList(data)
+            alert(response.data)
+            $scope.new_masjid=false;
+            if(response.data == 'Deleted Successfully!') {
+                $scope.get_masjid()
+                $scope.getMasjidData()
             }
             else {
-                var masjid_val = data.mohalla_id
+                $scope.get_masjid(masjid_val)
+                $scope.getMasjidData(masjid_val)
             }
-            console.log('masjid',masjid,'a',data,'b',masjid_val)
-            $http.post('/add_masjid/',{
-                district: data.district,
-                taluk: data.taluk,
-                masjid_name: data.masjid_name,
-                mohalla_id: masjid_val,
-                musallas: data.musallas,
-                address: data.address,
-                status: status,
-            }).success(function(data) {
-                console.log('val',data)
-                alert(data.data)
-                $scope.new_masjid=false;
-                $scope.getMasjidData()
-            })
-        }
+        })
     }
     $scope.add_location = function(district,district_code,taluk) {
         console.log('val',district,'taluk',taluk)
@@ -644,6 +648,84 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         muhalla : '',
         muhalla_id : '',
         report_name : '',      
+    }
+
+    $scope.add_new_muhalla = function(data) {
+        console.log('masjid_data',data)
+        masjid_data.set_MasjidData(data);
+        var modalInstance = $modal.open({
+            templateUrl: 'add_new_muhalla_modal',
+            controller: add_new_muhalla_ctrl,
+            backdrop: 'true',
+        });
+    }
+    var add_new_muhalla_ctrl=function($scope,$http,masjid_data,$rootScope,$timeout,$location,$modalInstance) {
+        $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+        };
+        var data = masjid_data.get_MasjidData();
+        $scope.MasjidValue = {
+            muhalla_id : '',
+            masjid_name : '',
+            musallis : '',
+            address : '',
+        }
+        $scope.addMasjid = function(masjid_val,status) {
+            console.log('masjid',data,masjid_val)
+            $http.post('/add_masjid/',{
+                district: data.district,
+                taluk: data.taluk,
+                masjid_name: masjid_val.masjid_name,
+                mohalla_id: masjid_val.muhalla_id,
+                musallas: masjid_val.musallis,
+                address: masjid_val.address,
+                status: 'new',
+            }).success(function(response) {
+                console.log('val',response)
+                alert(response.data)
+                if(response.data == 'Mohalla Created Successfully!') {
+                    if(status == 'continue') {
+                       $scope.MasjidValue.masjid_name = '';
+                       $scope.MasjidValue.muhalla_id = '';
+                       $scope.MasjidValue.musallis = '';
+                       $scope.MasjidValue.address = '';
+                    }
+                    else if(status == 'exit') {
+                        $modalInstance.dismiss('cancel');
+                        window.location.reload();
+                    }
+                }
+            })
+        }
+        $scope.add_member = function(member_name,age,designation,mobile,address,status) {
+            console.log('member_name',member_name,data)
+            if(mobile == undefined) { var mobile_no = ''} else {var mobile_no = mobile}
+            if(address == undefined) { var address_val = ''} else {var address_val = address}    
+            console.log('member_name',mobile_no,address_val)
+            $http.post('/masjid_member/',{
+                member_name: member_name,
+                data: data,
+                age: age,
+                designation: designation,
+                mobile: mobile_no,
+                address: address_val,
+                status: 'new',
+            }).success(function(response) {
+                alert(response.data)
+                if(status == 'continue') {
+                   $scope.member_name = '';
+                   $scope.age = '';
+                   $scope.designation = '';
+                   $scope.mobile = '';
+                   $scope.address = '';
+                }
+                else if(status == 'exit') {
+                    $modalInstance.dismiss('cancel');
+                    window.location.reload();
+                }
+                console.log('response',response)
+            })
+        }
     }
 
     $scope.add_members = function(data) {

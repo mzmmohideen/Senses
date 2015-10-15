@@ -455,7 +455,8 @@
     <script type="text/ng-template" id="masjid.html">
         <div class="row" ng-init="getMasjidData();getLocation()">
             <div class="col-lg-12" style="width: 100%;">
-                <h1 class="page-header">Muhallas</h1>
+                <h1 class="page-header">Muhallas <button ng-disabled="!MasjidAddValue.taluk" type="submit" style="width: 100px;height: 34px;float: right;border-radius: 2px;margin-top: -5px;" ng-click="add_new_muhalla(MasjidAddValue)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New Muhalla</button>
+                </h1>
             </div>
             <div class=" col-lg-12">
             <table style="width: 100%;">
@@ -467,7 +468,7 @@
                 <td style="width: 25%;"><select style="display: inline-block;height: 34px;width: 100%;float: left;margin-right: 10%;border-radius: 2px;" ng-model="MasjidAddValue.district" ng-options="gen for gen in district_list" class="form-control">
                     <option value="">SELECT DISTRICT</option>
                 </select></td>
-                <td><select style="display: inline-block;height: 34px;width: 33%;margin-left: 4%; float: left;border-radius: 2px;" ng-change="getMasjidList(MasjidAddValue)" ng-model="MasjidAddValue.taluk" ng-options="gen for gen in getTaluk[MasjidAddValue.district]" class="form-control">
+                <td><select style="display: inline-block;height: 34px;width: 33%;margin-left: 4%; float: left;border-radius: 2px;" ng-change="getMasjidList(MasjidAddValue);get_masjid()" ng-model="MasjidAddValue.taluk" ng-options="gen for gen in getTaluk[MasjidAddValue.district]" class="form-control">
                     <option value="">SELECT TALUK</option>
                 </select></td>
             </tr>
@@ -490,10 +491,10 @@
                     <td><input ng-show="new_masjid" style="display: inline-block;height: 34px;width: 100%;float: left;" placeholder="Enter Mohalla ID" ng-model="MasjidAddValue.mohalla_id" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
                     <td><span style="position: absolute;float: left;left: 20%;top: 10%;color: red;" ng-show="tot_mohalla_list.indexOf(MasjidAddValue.mohalla_id)>-1 && new_masjid">* Mohalla ID Exist!</span></td>
                     
-                    <td><button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)==-1" type="submit" style="width:95%;background-color: #d9534f;border-color: #d9534f;background-color: #f0ad4e;border-color: #f0ad4e;height: 34px; margin-left: 10%;" ng-click="addMasjid(masjid_val,MasjidAddValue,'new')" class="btn-sm btn btn-primary">Update</button></td>
-                    <td><button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)==-1" type="submit" style="width:90%;margin-left: 7%;background-color: #d9534f;border-color: #d9534f;height: 34px;" ng-click="addMasjid(masjid_val,MasjidAddValue,'delete')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-trash"></i> Delete</button></td>
+                    <td><button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)==-1" type="submit" style="width:95%;background-color: #d9534f;border-color: #d9534f;background-color: #f0ad4e;border-color: #f0ad4e;height: 34px; margin-left: 10%;" ng-click="addMasjid(masjid_val,MasjidAddValue,'new');new_masjid=false;" class="btn-sm btn btn-primary">Update</button></td>
+                    <td><button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)==-1" type="submit" style="width:90%;margin-left: 7%;background-color: #d9534f;border-color: #d9534f;height: 34px;" ng-confirm-click="Are you Sure you want to Delete?" confirmed-click="addMasjid(masjid_val,MasjidAddValue,'delete')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-trash"></i> Delete</button></td>
                     <td><button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)==-1" type="submit" style="width:96%;height: 34px;" ng-click="new_masjid=true;getMasjidData();" class="btn-sm btn btn-primary">Cancel</button></td>
-                    <td><button ng-show="new_masjid" ng-disabled="tot_mohalla_list.indexOf(MasjidAddValue.mohalla_id)!=-1 || MasjidAddValue.mohalla_id==''" type="submit" style="width:100%;height: 34px;" ng-click="addMasjid(masjid_val,MasjidAddValue,'new')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Save New</button></td>
+                    <td><button ng-show="new_masjid" ng-disabled="tot_mohalla_list.indexOf(MasjidAddValue.mohalla_id)!=-1 || MasjidAddValue.mohalla_id==''" type="submit" style="width:100%;height: 34px;" ng-click="addMasjid(masjid_val,MasjidAddValue,'new');new_masjid=false;" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Save New</button></td>
                     <td><button ng-show="new_masjid" type="submit" style="width:100%;height: 34px;" ng-click="new_masjid=false;getMasjidData();" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Cancel</button></td>
                     <td><button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)!=-1" type="submit" style="width:92%;height: 34px;" ng-click="new_masjid=true" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> New</button></td>
                     </tr>
@@ -891,6 +892,44 @@
                     </form>
     </div>
     </script>
+    <script type="text/ng-template" id="add_new_muhalla_modal">
+     <div id="add_watchlist_popup" style="">
+             <div class="modal-header">
+             <span class="ng-modal-close" ng-click="cancel()"><i id="closing" style="font-size:14px;float:right;cursor:pointer;" class="fa fa-times"></i></span>
+            <h3 class="modal-title">Add New Muhalla</h3>
+        </div>
+             <form class="form-horizontal">
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-3">Muhalla ID</label>
+                            <div class="col-xs-9">
+                                <input class="form-control" type="text" ng-model="MasjidValue.muhalla_id" placeholder="Muhalla ID" />
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-3">Masjid Name</label>
+                            <div class="col-xs-9">
+                                <input class="form-control" type="text" ng-model="MasjidValue.masjid_name" placeholder="Masjid Name" />
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-3">Musallis</label>
+                            <div class="col-xs-9">
+                                <input class="form-control" type="text" ng-model="MasjidValue.musallis" placeholder="Musallis" />
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-3">Address</label>
+                            <div class="col-xs-9">
+                                <input class="form-control" type="text" ng-model="MasjidValue.address" placeholder="Address" />
+                            </div>
+                        </div>
+                            <div class="modal-footer">
+                            <button ng-disabled="!MasjidValue.muhalla_id || !MasjidValue.masjid_name" class="btn btn-primary" type="button" ng-click="addMasjid(MasjidValue,'continue');">Save and Continue</button>
+                            <button ng-disabled="!MasjidValue.muhalla_id || !MasjidValue.masjid_name" class="btn btn-warning" type="button" ng-click="addMasjid(MasjidValue,'exit');">Save and Exit</button>
+                            </div>
+                    </form>
+    </div>
+    </script>
     <script type="text/ng-template" id="family.html">
         <div class="row" ng-init="getMasjidData();getLocation();">
             <div class="col-lg-12" style="width: 100%;">
@@ -926,14 +965,14 @@
                 </tr>
                 </table>
                 <div class="form-group" style="padding-bottom: 34px;">
-                    <ui-select ng-show="!new_family" style="display: inline-block;height: 34px;width: 45%;margin-right: 1%;float: left;" on-select="familyid=FamilyValue.familyid;get_family(familyid)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="FamilyValue.familyid">
+                    <ui-select ng-show="!new_family" style="display: inline-block;height: 34px;width: 44%;margin-right: 1%;float: left;" on-select="familyid=FamilyValue.familyid;get_family(familyid)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="FamilyValue.familyid">
                         <ui-select-match placeholder="{{family_val}}">{{family_val}}</ui-select-match>
                         <ui-select-choices refresh="familyid=$select.search;get_family(familyid)" repeat="mod in familyList | filter:$select.search">
                             <div ng-bind-html="mod.family_id | highlight: $select.search"></div>
                         </ui-select-choices>
                     </ui-select>
-                    <button ng-show="!new_family" ng-disabled="family_val=='' || family_val=='Type or Select Family ID from the List'" type="submit" style="width:13.2%;background-color: #f0ad4e;border-color: #f0ad4e;height: 34px;" ng-click="addFamily(family_val,FamilyValue,'update')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-trash"></i>&nbsp; &nbsp;Update Family</button>
-                    <button ng-show="!new_family" ng-disabled="family_val=='' || family_val=='Type or Select Family ID from the List'" type="submit" style="width:13.2%;background-color: #d9534f;border-color: #d9534f;height: 34px;" ng-confirm-click="Are you Sure you want to Delete?" confirmed-click="deleteFamily(family_val)" class="btn-sm btn btn-primary">Delete Family</button>
+                    <button ng-show="!new_family" ng-disabled="family_val=='' || family_val=='Type or Select Family ID from the List'" type="submit" style="width:13.2%;background-color: #f0ad4e;border-color: #f0ad4e;height: 34px;" ng-click="addFamily(family_val,FamilyValue,'update')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-pencil"></i>&nbsp;&nbsp;Update Family</button>
+                    <button ng-show="!new_family" ng-disabled="family_val=='' || family_val=='Type or Select Family ID from the List'" type="submit" style="width:13.2%;background-color: #d9534f;border-color: #d9534f;height: 34px;" ng-confirm-click="Are you Sure you want to Delete?" confirmed-click="deleteFamily(family_val)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-trash"></i>&nbsp; &nbsp;Delete Family</button>
                     <button ng-show="!new_family" ng-disabled="family_val=='' || family_val=='Type or Select Family ID from the List'" type="submit" style="width:13.2%;height: 34px;" ng-click="new_family=true;get_family();" class="btn-sm btn btn-primary">Cancel</button>
                     <!--<button ng-show="!new_family" ng-disabled="familyList.indexOf(family_val)==-1">-->
                     <button ng-show="new_family" ng-disabled="!FamilyValue.masjid" type="submit" style="width:13%;height: 34px;" ng-click="addFamily(family_val,FamilyValue,'new');new_family=false;" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add Family</button>

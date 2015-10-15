@@ -194,10 +194,10 @@ def add_masjid(request):
                 return HttpResponse(content=json.dumps({'data':'Mohalla ID Exist!'}),content_type='Application/json')
             else:
                 masjid = Masjid.objects.create(mohalla_id=data['mohalla_id'],taluk=taluk,name=data['masjid_name'],musallas=data['musallas'],location=data['address'])
-                return HttpResponse(content=json.dumps({'data':'success!'}),content_type='Application/json')
+                return HttpResponse(content=json.dumps({'data':'Mohalla Created Successfully!'}),content_type='Application/json')
         elif data['status'] == 'delete':
             masjid = Masjid.objects.filter(mohalla_id=data['mohalla_id']).delete()
-            return HttpResponse(content=json.dumps({'data':'success!'}),content_type='Application/json')
+            return HttpResponse(content=json.dumps({'data':'Deleted Successfully!'}),content_type='Application/json')
     else:
         get_members = map(lambda x:{'name':x.name,'mohalla_id':x.mohalla_id,'taluk':x.taluk.taluk_name,'district':x.taluk.district.district_name,'musallas':x.musallas,'location':x.location},Masjid.objects.all())
         return HttpResponse(content=json.dumps({'data':get_members}),content_type='Application/json')
@@ -617,4 +617,9 @@ def change_password(request):
                 response = 'Username & Email Not Matching!'               
         return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')
 
-# def fetch_data_api(request):                
+def fetch_data_api(request):
+    if request.method == 'GET':
+        data = []
+        for i in SubScheme.objects.all():
+            print 'val',map(lambda x:{'scheme_name':x.scheme.name,'district':x.member.muhalla.taluk.district.district_name},Member_scheme.objects.filter(scheme=i,status=True,solution='Solved'))
+    return HttpResponse(content=json.dumps({'data':'response'}),content_type='Application/json')
