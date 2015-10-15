@@ -187,9 +187,11 @@ def add_masjid(request):
         data = json.loads(request.body)
         if data['status'] == 'new':            
             taluk = Taluk.objects.get(district=District.objects.get(district_name=data['district']),taluk_name=data['taluk'])
-            if Masjid.objects.filter(mohalla_id=data['mohalla_id']):
-                masjid = Masjid.objects.filter(mohalla_id=data['mohalla_id']).update(taluk=taluk,name=data['masjid_name'],musallas=data['musallas'],location=data['address'])
+            if Masjid.objects.filter(mohalla_id=data['mohalla_id'],taluk=taluk):
+                masjid = Masjid.objects.filter(mohalla_id=data['mohalla_id'],taluk=taluk).update(name=data['masjid_name'],musallas=data['musallas'],location=data['address'])
                 return HttpResponse(content=json.dumps({'data':'updated!'}),content_type='Application/json')
+            elif Masjid.objects.filter(mohalla_id=data['mohalla_id']):
+                return HttpResponse(content=json.dumps({'data':'Mohalla ID Exist!'}),content_type='Application/json')
             else:
                 masjid = Masjid.objects.create(mohalla_id=data['mohalla_id'],taluk=taluk,name=data['masjid_name'],musallas=data['musallas'],location=data['address'])
                 return HttpResponse(content=json.dumps({'data':'success!'}),content_type='Application/json')
@@ -614,3 +616,5 @@ def change_password(request):
             else:
                 response = 'Username & Email Not Matching!'               
         return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')
+
+# def fetch_data_api(request):                

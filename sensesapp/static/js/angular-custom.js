@@ -366,6 +366,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         console.log('mahalla',$scope.mahallaList)
         console.log('dataMasjid',data)
         $scope.ReportValues.muhalla = '';
+        $scope.tot_mohalla_list = _.pluck($scope.mahallaList,"mohalla_id")
         $scope.masjidList = _.pluck(_.filter($scope.mahallaList,function(num) {return num.district == data.district && num.taluk == data.taluk}),"mohalla_id")
         $scope.muhallaList = _.filter($scope.mahallaList,function(num) {return num.district == data.district && num.taluk == data.taluk})
         console.log('val',$scope.masjidList)
