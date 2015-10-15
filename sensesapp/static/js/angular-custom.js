@@ -538,27 +538,32 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
     }
     $scope.addMasjid = function(masjid,data,status) {
         console.log(data,masjid)
-        if(data.mohalla_id == "") {
-            var masjid_val = masjid
+        if(data.masjid_name == "") {
+            alert("Please Enter Masjid Name!")
         }
         else {
-            var masjid_val = data.mohalla_id
+            if(data.mohalla_id == "") {
+                var masjid_val = masjid
+            }
+            else {
+                var masjid_val = data.mohalla_id
+            }
+            console.log('masjid',masjid,'a',data,'b',masjid_val)
+            $http.post('/add_masjid/',{
+                district: data.district,
+                taluk: data.taluk,
+                masjid_name: data.masjid_name,
+                mohalla_id: masjid_val,
+                musallas: data.musallas,
+                address: data.address,
+                status: status,
+            }).success(function(data) {
+                console.log('val',data)
+                alert(data.data)
+                $scope.new_masjid=false;
+                $scope.getMasjidData()
+            })
         }
-        console.log('masjid',masjid,'a',data,'b',masjid_val)
-        $http.post('/add_masjid/',{
-            district: data.district,
-            taluk: data.taluk,
-            masjid_name: data.masjid_name,
-            mohalla_id: masjid_val,
-            musallas: data.musallas,
-            address: data.address,
-            status: status,
-        }).success(function(data) {
-            console.log('val',data)
-            alert(data.data)
-            $scope.new_masjid=false;
-            $scope.getMasjidData()
-        })
     }
     $scope.add_location = function(district,district_code,taluk) {
         console.log('val',district,'taluk',taluk)
@@ -1110,6 +1115,16 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         location : '', 
         occupation : '', 
     }
+    $scope.family_gender = ['MALE','FEMALE']
+    $scope.FamilyMember.gender = $scope.family_gender[0]
+    $scope.family_head_status = ['Yes','No']
+    $scope.FamilyMember.family_head = $scope.family_head_status[0]
+    $scope.family_marital_status = ['Married','Unmarried','Widow','Devorced','Aged Unmarried Woman']
+    $scope.FamilyMember.marital_status = $scope.family_marital_status[0]
+    $scope.fam_voter_status = ['Yes','No']
+    $scope.FamilyMember.voter = $scope.fam_voter_status[0]
+    $scope.fam_mem_location = ['Local','Outstation','Foreign']
+    $scope.FamilyMember.location = $scope.fam_mem_location[0]
     $scope.add_Familymembers = function(data,family,status) {
         console.log('data',data,typeof(family),typeof(family.familyid))
         if(typeof(family.familyid) == 'object') {
