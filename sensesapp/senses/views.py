@@ -612,5 +612,6 @@ def fetch_data_api(request):
     if request.method == 'GET':
         data = []
         for i in SubScheme.objects.all():
+            data.append({'scheme_name':i.name,'scheme_data':map(lambda x:{'scheme_name':x.scheme.name,'district':x.member.muhalla.taluk.district.district_name},Member_scheme.objects.filter(scheme=i,status=True,solution='Solved'))})
             print 'val',map(lambda x:{'scheme_name':x.scheme.name,'district':x.member.muhalla.taluk.district.district_name},Member_scheme.objects.filter(scheme=i,status=True,solution='Solved'))
-    return HttpResponse(content=json.dumps({'data':'response'}),content_type='Application/json')
+    return HttpResponse(content=json.dumps({'data':data}),content_type='Application/json')
