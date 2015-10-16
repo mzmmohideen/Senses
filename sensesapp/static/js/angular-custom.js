@@ -650,6 +650,86 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
         report_name : '',      
     }
 
+    $scope.add_new_family = function(data) {
+        console.log('masjid_data',data)
+        masjid_data.set_MasjidData(data);
+        var modalInstance = $modal.open({
+            templateUrl: 'add_new_family_modal',
+            controller: add_new_family_ctrl,
+            backdrop: 'true',
+        });
+    }
+    var add_new_family_ctrl=function($scope,$http,masjid_data,$rootScope,$timeout,$location,$modalInstance) {
+        $scope.cancel = function() {
+            $modalInstance.dismiss('cancel');
+        };
+        $scope.today = function() {
+            $scope.dt = new Date();
+        };
+        $scope.today();
+        var data = masjid_data.get_MasjidData();
+        console.log('data',data)
+        $scope.FamilyValue = {
+            familyid: '',
+            masjid: data.masjid,
+            ration_card: '',
+            report_date: $scope.dt,
+            address: '',
+            mobile: '',
+            district: data.district,
+            taluk: data.taluk,
+            district_code: '',
+            house: '',
+            toilet: '',
+            language: '',
+            health_insurance: '', 
+            family_needs: '', 
+            financial: '',
+        }
+        $scope.addFamily = function(value,status) {
+            console.log('value',value.report_date)
+            var data = {
+                mobile_no: value.mobile_no,
+                taluk: value.taluk,
+                district: value.district,
+                report_date: value.report_date.toUTCString(),
+                masjid: value.masjid.name,
+                mohalla_id : value.masjid.mohalla_id,
+                toilet: value.toilet,
+                language: value.language,
+                health_insurance: value.health_insurance,
+                familyid: '',
+                ration_card: value.ration_card,
+                address: value.address,
+                family_needs: value.family_needs,
+                house: value.house,
+                financial: value.financial,
+            }
+            $http.post('/familyData/',{
+                value: data,
+                status: 'feed',
+            }).success(function(response) {
+                alert(response.data)
+                if(response.data == 'Family Data Saved Successfully!') {
+                    if(status == 'continue') {
+                       $scope.FamilyValue.ration_card = '';
+                       $scope.FamilyValue.address = '';
+                       $scope.FamilyValue.mobile = '';
+                       $scope.FamilyValue.house = '';
+                       $scope.FamilyValue.toilet = '';
+                       $scope.FamilyValue.language = '';
+                       $scope.FamilyValue.health_insurance = '';
+                       $scope.FamilyValue.family_needs = '';
+                       $scope.FamilyValue.financial = '';
+                    }
+                    else if(status == 'exit') {
+                        $modalInstance.dismiss('cancel');
+                        window.location.reload();
+                    }
+                }
+            })
+        }
+    }
     $scope.add_new_muhalla = function(data) {
         console.log('masjid_data',data)
         masjid_data.set_MasjidData(data);
