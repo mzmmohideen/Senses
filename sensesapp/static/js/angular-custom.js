@@ -1310,18 +1310,18 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
         console.log('data',family_id)
         if(data.dateofbirth) {
             var dob = data.dateofbirth.toUTCString()
-            var user_dob_date = moment(data.dateofbirth);
+            // var user_dob_date = moment(data.dateofbirth);
         }
         else {
             var dob = $scope.dt.toUTCString()
-            var user_dob_date = moment($scope.dt);
+            // var user_dob_date = moment($scope.dt);
         }
-        var tod_date = moment($scope.dt)
-        var age = moment.duration(tod_date.diff(user_dob_date)).asYears();
+        // var tod_date = moment($scope.dt)
+        // var age = moment.duration(tod_date.diff(user_dob_date)).asYears();
         $http.post('/FamilyMemberData/',{
             data: data,
             dob_date: dob,
-            age: age,
+            age: data.age,
             status: status,
             familyid: family_id,
         }).success(function(response) {
@@ -1343,18 +1343,18 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
     $scope.UpdateFamMember = function(member,status) {
         if(member.dateofbirth) {
             var dob = member.dateofbirth.toUTCString()
-            var user_dob_date = moment(member.dateofbirth);
+            // var user_dob_date = moment(member.dateofbirth);
         }
         else {
             var dob = $scope.dt.toUTCString()
-            var user_dob_date = moment($scope.dt);
+            // var user_dob_date = moment($scope.dt);
         }
-        var tod_date = moment($scope.dt)
-        var age = moment.duration(tod_date.diff(user_dob_date)).asYears();
+        // var tod_date = moment($scope.dt)
+        // var age = moment.duration(tod_date.diff(user_dob_date)).asYears();
         $http.post('/UpdateFamilyMember/',{
             data: member,
             dob_date: dob,
-            age: age,
+            age: member.age,
             status: status,
         }).success(function(response){
             alert(response.data)
