@@ -1083,8 +1083,9 @@
                         <th style="width: 5%;text-align: center;">S.No</th>
                         <th style="text-align: center;">Name</th>
                         <th style="text-align: center;">Gender</th>
+                        <th style="text-align: center;">Age</th>
                         <th style="text-align: center;">Date of Birth</th>
-                        <th style="text-align: center;">Family Head?</th>                        
+                        <th style="text-align: center;">Family Head?</th>
                         <th style="text-align: center;">Relationship</th>
                         <th style="text-align: center;">Qualification</th>
                         <th style="text-align: center;">Marital Status</th>
@@ -1100,8 +1101,8 @@
                         <td style="padding-left: 1px; padding-right: 1px;"><input type="text" placeholder="Name" ng-model="FamilyMember.name" style="font-size: 12px; padding-left: 7px;" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
                         <td style="padding-left: 1px; padding-right: 1px;"><select ng-model="FamilyMember.gender" ng-options="gen for gen in family_gender" style="font-size: 11px;height: 29px;padding: 2px 0px 3px;" class="form-control">
                         </select></td>
-                        <td><input type="date" id="date_input" datepicker-popup="{{format}}" ng-model="FamilyMember.dateofbirth" is-open="opened" min-date="minDate" max-date="maxDate" close-on-date-selection='false' datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" class="form-control"/></td>
-                        <!--<td><input type="text" placeholder="Age" ng-model="FamilyMember.age" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>-->
+                        <td><input ng-change="get_age_or_dob(FamilyMember,FamilyValue,'age')" type="text" placeholder="Age" ng-model="FamilyMember.age" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                        <td><input ng-change="get_age_or_dob(FamilyMember,FamilyValue,'dob')" type="date" id="date_input" datepicker-popup="{{format}}" ng-model="FamilyMember.dateofbirth" is-open="opened" min-date="minDate" max-date="maxDate" close-on-date-selection='false' datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" class="form-control"/></td>
                         <td><select ng-model="FamilyMember.family_head" ng-options="val for val in family_head_status" class="form-control">
                         </select></td>
                         <td><input type="text" style="padding-left: 3px; padding-right: 1px;" placeholder="Relationship" ng-model="FamilyMember.relationship" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
@@ -1116,10 +1117,10 @@
                         <td><button ng-disabled="!FamilyValue.familyid" type="submit" ng-click="add_Familymembers(FamilyMember,FamilyValue,'new')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>Add</button></td>
                     </tr>
                     <tr ng-show="FamilyMembersList.length==0">
-                        <td colspan="12" style="text-align:center;" class="ng-binding">No Member Data Found!</td>
+                        <td colspan="13" style="text-align:center;" class="ng-binding">No Member Data Found!</td>
                     </tr>
                     <tr ng-show="!FamilyMembersList">
-                        <td colspan="12" style="text-align:center;" class="ng-binding">Please Select Family First!</td>
+                        <td colspan="13" style="text-align:center;" class="ng-binding">Please Select Family First!</td>
                     </tr>
                     <tr ng-repeat="member in FamilyMembersList" class="ng-scope">
                         <td>{{$index+1}}</td>
@@ -1134,13 +1135,13 @@
                             </select> 
                         </td>
                         <td class="ng-binding">
-                            <span ng-show="!updateFamMem">{{member.dateofbirth}}</span>
-                            <input ng-show="updateFamMem" style="display: inline-block;height: 34px;width: 175px;float: left;" type="date" id="date_input" datepicker-popup="{{format}}" ng-model="member.dateofbirth" is-open="opened" min-date="minDate" max-date="maxDate" close-on-date-selection='false' datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" class="form-control"/>
-                        </td>
-                        <!--<td class="ng-binding">
                             <span ng-show="!updateFamMem">{{member.age}}</span>
-                            <input style="display: inline-block;height: 34px;width: 75px;float: left;" type="text" ng-show="updateFamMem" ng-model="member.age">
-                        </td>-->
+                            <input ng-change="get_age_or_dob(FamilyMember,FamilyValue,'age')" style="display: inline-block;height: 34px;width: 75px;float: left;" type="text" ng-show="updateFamMem" ng-model="member.age">
+                        </td>
+                        <td class="ng-binding">
+                            <span ng-show="!updateFamMem">{{member.dateofbirth}}</span>
+                            <input ng-change="get_age_or_dob(FamilyMember,FamilyValue,'dob')" ng-show="updateFamMem" style="display: inline-block;height: 34px;width: 175px;float: left;" type="date" id="date_input" datepicker-popup="{{format}}" ng-model="member.dateofbirth" is-open="opened" min-date="minDate" max-date="maxDate" close-on-date-selection='false' datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" class="form-control"/>
+                        </td>
                         <td class="ng-binding">
                             <span ng-show="!updateFamMem">{{get_booleanval(member.family_head)}}</span>
                             <select ng-show="updateFamMem" ng-init="member.family_head=get_booleanval(member.family_head)" ng-model="member.family_head" ng-options="val for val in ['Yes','No']" class="form-control">

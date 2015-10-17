@@ -122,7 +122,7 @@ app.directive('ngConfirmClick', [
             }
         };
 }])
-app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,$modal) {
+app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$location,$modal) {
     // $scope.formats = ['dd-MMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
     // $scope.format = $scope.formats[0];
     $scope.today = function() {
@@ -1263,6 +1263,17 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data, $location,
             
             console.log('val',$scope.familyList)
         })
+    }
+    $scope.get_age_or_dob = function(FamilyMember,FamilyValue,status) {
+        if(status == 'age') {
+            var dob = moment(FamilyValue.report_date).subtract(parseInt(FamilyMember.age),"years").format()
+            $scope.FamilyMember.dateofbirth = new Date(dob)
+        }
+        else if(status == 'dob') {
+            var tod_date = moment($scope.dt)
+            var age = moment.duration(tod_date.diff(FamilyMember.dateofbirth)).asYears();
+            $scope.FamilyMember.age = $filter('number')(age,0)
+        }
     }
     $scope.FamilyMember = {
         mem_id : '',
