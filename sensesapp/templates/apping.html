@@ -295,6 +295,32 @@
                         </li>
                         <li>
                             <a href="#/reports">Reports</a>
+                            <!-- <span class="fa arrow"></span></a>
+                            <ul class="nav nav-second-level">
+                                <li>
+                                    <a href="#">Second Level Item</a>
+                                </li>
+                                <li>
+                                    <a href="#">Second Level Item</a>
+                                </li>
+                                <li>
+                                    <a href="#">Third Level <span class="fa arrow"></span></a>
+                                    <ul class="nav nav-third-level">
+                                        <li>
+                                            <a href="#">Third Level Item</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Third Level Item</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Third Level Item</a>
+                                        </li>
+                                        <li>
+                                            <a href="#">Third Level Item</a>
+                                        </li>
+                                    </ul>
+                                </li>
+                            </ul> -->
                         </li>
                     </ul>
                 </div>
@@ -1002,7 +1028,9 @@
     <script type="text/ng-template" id="family.html">
         <div class="row" ng-init="getMasjidData();getLocation();">
             <div class="col-lg-12" style="width: 100%;">
-                <h1 class="page-header">Families <button ng-disabled="!FamilyValue.masjid" type="submit" style="width: 100px;height: 34px;float: right;border-radius: 2px;margin-top: -5px;" ng-click="add_new_family(FamilyValue)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New Family</button></h1>
+                <h1 class="page-header">Families 
+                    <!--<button ng-disabled="!FamilyValue.masjid" type="submit" style="width: 100px;height: 34px;float: right;border-radius: 2px;margin-top: -5px;" ng-click="add_new_family(FamilyValue)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New Family</button>-->
+                </h1>
             </div>
             <div class=" col-lg-12" style="padding-bottom: 34px;">
             <table style="width: 100%;">
@@ -1010,7 +1038,8 @@
                 <td> <label for="male">DISTRICT</label> </td>
                 <td> <label for="male">TALUK</label> </td>
                 <td> <label for="male">MUHALLA</label> </td>
-                <td> <label for="male">Select Family ID</label> </td>
+                <td ng-show="!new_fam_bt"> <label for="male">Family New / Update</label> </td>
+                <td ng-show="new_fam_bt"> <label for="male">Select Family ID</label> </td>
             </tr>
             <tr>
                 <td><select style="display: inline-block;border-radius:2px;height: 34px;width: 97%;float: left;" ng-model="FamilyValue.district" ng-options="gen for gen in district_list" class="form-control">
@@ -1025,12 +1054,18 @@
                         <option value="">SELECT MUHALLA </option>
                     </select>
                 </td>
-                <td><ui-select ng-disabled="!FamilyValue.masjid" style="display: inline-block;height: 34px;width: 100%;margin-left: 5px;float: left;" on-select="familyid=FamilyValue.familyid;get_family(familyid)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="FamilyValue.familyid">
+                <td ng-show="!new_fam_bt">
+                    <button ng-disabled="!FamilyValue.masjid" type="submit" style="margin-left:5px; width:45%;height:34px;float: left;border-radius: 2px;" ng-click="add_new_family(FamilyValue)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New Family</button>
+                    <button ng-disabled="!FamilyValue.masjid" type="submit" style="margin-left:5px; float:left;width:45%;background-color: #f0ad4e;border-color: #f0ad4e;height: 34px;" ng-click="new_fam_bt=true;" class="btn-sm btn btn-primary">Update Family</button>
+                </td>
+                <td ng-show="new_fam_bt" >
+                    <ui-select ng-disabled="!FamilyValue.masjid" style="display: inline-block;height: 34px;width: 75%;float: left;" on-select="familyid=FamilyValue.familyid;get_family(familyid)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="FamilyValue.familyid">
                         <ui-select-match placeholder="{{family_val}}">{{family_val}}</ui-select-match>
                         <ui-select-choices refresh="familyid=$select.search;get_family(familyid)" repeat="mod in familyList | filter:$select.search">
                             <div ng-bind-html="mod.family_id | highlight: $select.search"></div>
                         </ui-select-choices>
                     </ui-select>
+                    <button ng-disabled="!FamilyValue.masjid" type="submit" style="background-color: #d9534f;border-color: #d9534f;width: 20%;height: 34px;float: left;border-radius: 2px;margin-left:5px;" ng-click="new_fam_bt=false;" class="btn-sm btn btn-primary">Cancel</button>
                 </td>
             </tr>
             </table>

@@ -524,6 +524,11 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
                 status: 'edit',
             }).success(function(response) {
                 alert(response.data)
+                // $scope.member.name = '';
+                // $scope.member.member.age = '';
+                // $scope.member.member.designation = '';
+                // $scope.member.member.mobile = '';
+                // $scope.member.member.address = ''; 
             })
     }
     $scope.DeleteMember = function(mohalla_id,member) {
@@ -1326,6 +1331,19 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
             familyid: family_id,
         }).success(function(response) {
             alert(response.data)
+            if(response.data=='success') {
+                $scope.FamilyMember.name = '';
+                $scope.FamilyMember.gender = '';
+                $scope.FamilyMember.age = '';
+                $scope.FamilyMember.dateofbirth = $scope.dt;
+                $scope.FamilyMember.family_head = '';
+                $scope.FamilyMember.relationship = '';
+                $scope.FamilyMember.qualification = '';
+                $scope.FamilyMember.marital_status = '';
+                $scope.FamilyMember.voter = '';
+                $scope.FamilyMember.occupation = '';
+                $scope.FamilyMember.location = '';
+            }
             $scope.getFamilyMembers(family_id)
             console.log('response',response)
         })
