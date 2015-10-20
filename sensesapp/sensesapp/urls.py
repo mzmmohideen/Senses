@@ -10,9 +10,9 @@ admin.autodiscover()
 # admin.autodiscover()
 
 urlpatterns = patterns('',
-	url(r'^$', login_check),
-	url(r'^login/$', login_check),
-	url(r'^signup/$', signup),
+    url(r'^$', login_check),
+    url(r'^login/$', login_check),
+    url(r'^signup/$', signup),
     url(r'^user_signup/$', user_signup),
     url(r'^login_page/$', login_page),
     url(r'^logout_view/',logout_view),
