@@ -703,7 +703,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
                 toilet: value.toilet,
                 language: value.language,
                 health_insurance: value.health_insurance,
-                familyid: '',
+                familyid: value.familyid,
                 ration_card: value.ration_card,
                 address: value.address,
                 family_needs: value.family_needs,
@@ -713,6 +713,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
             $http.post('/familyData/',{
                 value: data,
                 status: 'feed',
+                func: 'new',
             }).success(function(response) {
                 alert(response.data)
                 if(response.data == 'Family Data Saved Successfully!') {
@@ -1216,6 +1217,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
         $http.post('/familyData/',{
             value: data,
             status: 'feed',
+            func: status,
         }).success(function(data) {
             alert(data.data)
             if (data.family) {

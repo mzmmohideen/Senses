@@ -751,6 +751,17 @@
     <script type="text/ng-template" id="reports.html">
         <div class="row" ng-init="getLocation();getMasjidData()">
             <div class="col-lg-12">
+                <li>
+                    <a href="#"><i class="fa fa-bar-chart-o fa-fw"></i> Charts<span class="fa arrow"></span></a>
+                    <ul class="nav nav-second-level">
+                        <li>
+                            <a href="flot.html">Flot Charts</a>
+                        </li>
+                        <li>
+                            <a href="morris.html">Morris.js Charts</a>
+                        </li>
+                    </ul>
+                </li>
                 <h1 style="width: 100%;" class="page-header">Reports <select style="display: inline-block;height: 34px;width: 30%;border-radius: 2px; float: right;" ng-model="ReportValues.report_name" ng-change="report_value_change()" ng-options="gen for gen in senses_reports" class="form-control">
                     <option value="">SELECT REPORT</option>
                 </select>
@@ -911,6 +922,12 @@
         </div>
              <form class="form-horizontal">
                         <div class="form-group" style="margin:5px;">
+                            <label class="control-label col-xs-3">Family Number</label>
+                            <div class="col-xs-9">
+                                <input type="text" placeholder="Family Number" ng-model="FamilyValue.familyid" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group" style="margin:5px;">
                             <label class="control-label col-xs-3">Ration Card</label>
                             <div class="col-xs-9">
                                 <input type="text" placeholder="Ration Card Number" ng-model="FamilyValue.ration_card" class="form-control">
@@ -981,8 +998,8 @@
                             </div>
                         </div>
                         <div class="modal-footer">
-                        <button class="btn btn-primary" type="button" ng-click="addFamily(FamilyValue,'continue');">Save and Continue</button>
-                        <button class="btn btn-warning" type="button" ng-click="addFamily(FamilyValue,'exit');">Save and Exit</button>
+                        <button class="btn btn-primary" ng-disabled="!FamilyValue.familyid" type="button" ng-click="addFamily(FamilyValue,'continue');">Save and Continue</button>
+                        <button class="btn btn-warning" ng-disabled="!FamilyValue.familyid" type="button" ng-click="addFamily(FamilyValue,'exit');">Save and Exit</button>
                         </div>
                     </form>
     </div>

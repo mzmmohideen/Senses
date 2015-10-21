@@ -227,24 +227,41 @@ def familyData(request):
             masjid = Masjid.objects.get(mohalla_id=data['mohalla_id'])
             toilet = True if data['toilet'] == 'Yes' else False
             insurance = True if data['health_insurance'] == 'Yes' else False
-            try:            
-                if data['familyid'] != '':
-                    family = Family.objects.filter(family_id=data['familyid']).update(muhalla=masjid,report_date=data_date,language=data['language'],ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
-                    try:
-                        family_data = Family.objects.get(family_id=data['familyid'])
-                        family_val = {'family_id':family_data.family_id,'date':convert_to_IST(family_data.report_date).strftime('%Y-%m-%d'),'muhalla':family_data.muhalla.name,'language':family_data.language,'taluk':family_data.muhalla.taluk.taluk_name,'district_name':family_data.muhalla.taluk.district.district_name,'ration_card':family_data.ration_card,'address':family_data.address,'mobile':family_data.mobile,'house_type':family_data.house_type,'donor':family_data.donor,'volunteer':family_data.volunteer,'health_insurance':family_data.health_insurance,'family_needs':family_data.family_needs,'toilet':family_data.toilet,'financial_status':family_data.financial_status}
-                    except:
-                        family_val = []                        
-                    response = 'Family Data Updated Successfully!'
+            if json.loads(request.body)['func'] == 'new':
+                familyid = '%s / %s / %s' %(taluk.district.district_code,masjid.mohalla_id,data['familyid'])
+                if Family.objects.filter(family_id=familyid):
+                    return HttpResponse(content=json.dumps({'data':'Family Number Exist!'}),content_type='Application/json')
                 else:
-                    family = Family.objects.create(family_id=data['familyid'],muhalla=masjid,report_date=data_date,language=data['language'],ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
-                    family.family_id = '%s / %s / %s' %(taluk.district.district_code,masjid.mohalla_id,family.id)
-                    family.save()
+                    family = Family.objects.create(family_id=familyid,muhalla=masjid,report_date=data_date,language=data['language'],ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
                     family_val = {'family_id':family.family_id,'date':convert_to_IST(family.report_date).strftime('%Y-%m-%d'),'muhalla':family.muhalla.name,'language':family.language,'taluk':family.muhalla.taluk.taluk_name,'district_name':family.muhalla.taluk.district.district_name,'ration_card':family.ration_card,'address':family.address,'mobile':family.mobile,'house_type':family.house_type,'donor':family.donor,'volunteer':family.volunteer,'health_insurance':family.health_insurance,'family_needs':family.family_needs,'toilet':family.toilet,'financial_status':family.financial_status}
                     response = 'Family Data Saved Successfully!'
-                return HttpResponse(content=json.dumps({'data':response,'family':family_val}),content_type='Application/json')
-            except:
-                print repr(format_exc())
+            elif json.loads(request.body)['func'] == 'update':        
+                family = Family.objects.filter(family_id=data['familyid']).update(muhalla=masjid,report_date=data_date,language=data['language'],ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
+                try:
+                    family_data = Family.objects.get(family_id=data['familyid'])
+                    family_val = {'family_id':family_data.family_id,'date':convert_to_IST(family_data.report_date).strftime('%Y-%m-%d'),'muhalla':family_data.muhalla.name,'language':family_data.language,'taluk':family_data.muhalla.taluk.taluk_name,'district_name':family_data.muhalla.taluk.district.district_name,'ration_card':family_data.ration_card,'address':family_data.address,'mobile':family_data.mobile,'house_type':family_data.house_type,'donor':family_data.donor,'volunteer':family_data.volunteer,'health_insurance':family_data.health_insurance,'family_needs':family_data.family_needs,'toilet':family_data.toilet,'financial_status':family_data.financial_status}
+                except:
+                    family_val = []                        
+                response = 'Family Data Updated Successfully!'
+            return HttpResponse(content=json.dumps({'data':response,'family':family_val}),content_type='Application/json')
+            # try:            
+            #     if data['familyid'] != '':
+            #         family = Family.objects.filter(family_id=data['familyid']).update(muhalla=masjid,report_date=data_date,language=data['language'],ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
+            #         try:
+            #             family_data = Family.objects.get(family_id=data['familyid'])
+            #             family_val = {'family_id':family_data.family_id,'date':convert_to_IST(family_data.report_date).strftime('%Y-%m-%d'),'muhalla':family_data.muhalla.name,'language':family_data.language,'taluk':family_data.muhalla.taluk.taluk_name,'district_name':family_data.muhalla.taluk.district.district_name,'ration_card':family_data.ration_card,'address':family_data.address,'mobile':family_data.mobile,'house_type':family_data.house_type,'donor':family_data.donor,'volunteer':family_data.volunteer,'health_insurance':family_data.health_insurance,'family_needs':family_data.family_needs,'toilet':family_data.toilet,'financial_status':family_data.financial_status}
+            #         except:
+            #             family_val = []                        
+            #         response = 'Family Data Updated Successfully!'
+            #     else:
+            #         family = Family.objects.create(family_id=data['familyid'],muhalla=masjid,report_date=data_date,language=data['language'],ration_card=data['ration_card'],address=data['address'],mobile=data['mobile_no'],house_type=data['house'],toilet=toilet,financial_status=data['financial'],health_insurance=insurance,family_needs=data['family_needs'])
+            #         family.family_id = '%s / %s / %s' %(taluk.district.district_code,masjid.mohalla_id,data['familyid'])
+            #         family.save()
+            #         family_val = {'family_id':family.family_id,'date':convert_to_IST(family.report_date).strftime('%Y-%m-%d'),'muhalla':family.muhalla.name,'language':family.language,'taluk':family.muhalla.taluk.taluk_name,'district_name':family.muhalla.taluk.district.district_name,'ration_card':family.ration_card,'address':family.address,'mobile':family.mobile,'house_type':family.house_type,'donor':family.donor,'volunteer':family.volunteer,'health_insurance':family.health_insurance,'family_needs':family.family_needs,'toilet':family.toilet,'financial_status':family.financial_status}
+            #         response = 'Family Data Saved Successfully!'
+            #     return HttpResponse(content=json.dumps({'data':response,'family':family_val}),content_type='Application/json')
+            # except:
+            #     print repr(format_exc())
         elif json.loads(request.body)['status'] == 'delete':
             data = json.loads(request.body)
             family = Family.objects.filter(family_id=data['familyid']).delete()
