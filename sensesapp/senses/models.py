@@ -49,6 +49,7 @@ class Family(models.Model):
     health_insurance = models.BooleanField(default=False)
     family_needs = models.TextField(null=True)
     house_type = models.CharField(max_length=50, choices=STATUS)
+    house_cat = models.CharField(max_length=30,null=True)
     toilet = models.BooleanField(default=True)
     financial_status = models.CharField(max_length=50, choices=FINANCIAL)
 

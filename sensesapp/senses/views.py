@@ -366,7 +366,11 @@ def FamilyMemberData(request):
                 member = memval[0]
             else:
                 member = Member.objects.create(mem_id=data['mem_id'],family=family,dateofbirth=dob_date,muhalla=family.muhalla,name=data['name'],gender=data['gender'],age=age,Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
-                member.mem_id= '%s / %s' %(familyid,member.id)
+                try:
+                    fam_mem_id = '%s / %s' %(familyid,str(len(Member_scheme.objects.filter(family=family)) + 1))
+                except:
+                    fam_mem_id = '%s / %s' %(familyid,member.id)
+                member.mem_id = fam_mem_id
                 member.save()  
         if Member.objects.filter(family=family):
             if data['family_head'] == 'Yes':
