@@ -118,6 +118,7 @@ class Disease(models.Model):
     description = models.TextField(null=True)
 
 class Surgery(models.Model):
+    surgery_name = models.CharField(max_length=50,null=True)
     member = models.ForeignKey(Member,null=True)
     disease = models.ForeignKey(Disease)
     hospital_name = models.CharField(max_length=50,null=True)
@@ -130,12 +131,14 @@ class Medical(models.Model):
     disease = models.ForeignKey(Disease)
     medicine_needs = models.CharField(max_length=200,null=True)
     cost = models.CharField(max_length=20,null=True)
+    monthly_expend = models.CharField(max_length=30,null=True)
 
 class ChronicDisease(models.Model):
     member = models.ForeignKey(Member,null=True)
     disease_name = models.ForeignKey(Disease)
     doctor_name = models.CharField(max_length=50,null=True)
     cost = models.CharField(max_length=20,null=True)
+    hospital_name = models.CharField(max_length=50,null=True)
     status = models.BooleanField(default=False)
     details = models.CharField(max_length=300,null=True)
 
