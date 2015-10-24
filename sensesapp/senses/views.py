@@ -597,7 +597,8 @@ def change_password(request):
 
 def fetch_data_api(request):
     if request.method == 'GET':
-        data = []
+        schemes_data = []
+        service_data = []
         for i in SubScheme.objects.all():
             scheme_data = map(lambda x:{'scheme_name':x.scheme.name,'district':x.member.muhalla.taluk.district.district_name},Member_scheme.objects.filter(scheme=i,status=True,solution='Not Yet'))
             tot_scheme_data = map(lambda x:{'scheme_name':x.scheme.name,'district':x.member.muhalla.taluk.district.district_name},Member_scheme.objects.filter(scheme=i,status=True))
@@ -613,6 +614,19 @@ def fetch_data_api(request):
             # tot_scheme_list = [tot['scheme_name'] for tot in tot_scheme_data]
             # for l in tot_scheme_list:
             #     tot_scheme_dict[l] = tot_scheme_dict.setdefault(l,0) + 1    
-            data.append({'scheme_name':i.name,'total_count':tot_count_dict,'unsolved_district_count':count_dict,'total_scheme_count':len(tot_scheme_data)})
-            # print 'val',map(lambda x:{'scheme_name':x.scheme.name,'district':x.member.muhalla.taluk.district.district_name},Member_scheme.objects.filter(scheme=i,status=True,solution='Solved'))
-    return HttpResponse(content=json.dumps({'data':data}),content_type='Application/json')
+            schemes_data.append({'scheme_name':i.name,'total_count':tot_count_dict,'unsolved_district_count':count_dict,'total_scheme_count':len(tot_scheme_data)})
+
+        for i in Service.objects.all():
+            serv_data = map(lambda x:{'scheme_name':x.scheme.name,'district':x.member.muhalla.taluk.district.district_name},Member_scheme.objects.filter(scheme=i,status=True,solution='Not Yet'))
+            tot_scheme_data = map(lambda x:{'scheme_name':x.scheme.name,'district':x.member.muhalla.taluk.district.district_name},Member_scheme.objects.filter(scheme=i,status=True))
+            count_dict = {}
+            tot_count_dict = {}
+            tot_scheme_dict = {}
+            item_list = [dic['district'] for dic in serv_data]
+            for j in item_list:
+                count_dict[j] = count_dict.setdefault(j,0) + 1
+            tot_item_list = [tot['district'] for tot in tot_scheme_data]
+            for k in tot_item_list:
+                tot_count_dict[k] = tot_count_dict.setdefault(k,0) + 1    
+            service_data.append({'scheme_name':i.name,'total_count':tot_count_dict,'unsolved_district_count':count_dict,'total_scheme_count':len(tot_scheme_data)})    
+    return HttpResponse(content=json.dumps({'schemes_data':schemes_data}),content_type='Application/json')

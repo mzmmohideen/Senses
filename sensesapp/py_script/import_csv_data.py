@@ -38,10 +38,13 @@ def importcsvdata():
      csv_data = open('%s/csv/Census-Erode-perunthurai-201-to-295.csv'%s,'rb')     
      new_val = defaultdict(list)
      data = list(csv.reader(csv_data))
+     a = [i[0].split('|') for i in data[1:]]
+     maxLenObj = max(map(len,a))
      for i in data[1:]:
           try:
-              print 'working',data[1:].index(i)
               val = i[0].split('|')
+              if len(val) < maxLenObj:
+                val = val + ['']*(maxLenObj-len(val))
               if val[3]:
                     data_date = datetime.strptime("09-08-2014","%d-%m-%Y")
               else:
@@ -372,7 +375,7 @@ def importcsvdata():
                 else:
                     mem_service = Member_service.objects.create(member=member,scheme=Service.objects.get(name='Other Government Schemes'),status=True,solution="Not Yet")
           except:
-            print 'report',repr(format_exc())                    
+            print 'report',repr(format_exc())
 
 if __name__ == "__main__":
      importcsvdata()
