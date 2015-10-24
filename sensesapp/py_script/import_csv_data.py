@@ -23,6 +23,7 @@ def importcsvdatas():
      csv_data = open('%s/csv/Census-Erode-perunthurai-201-to-295.csv'%s,'rb')     
      new_val = defaultdict(list)
      data = list(csv.reader(csv_data))
+     print 'data',data[1][0].split('|')[10]
      for i in data[1:]:
           val = i[0].split('|')
           print 'avai',val[63]
@@ -35,7 +36,7 @@ def importcsvdatas():
 def importcsvdata():
      s = os.path.dirname(__file__)
      print 's',os.path.dirname(__file__),s
-     csv_data = open('%s/csv/Census-Erode-perunthurai-201-to-295.csv'%s,'rb')     
+     csv_data = open('%s/csv/Census Perundurai 25to50.csv'%s,'rb')     
      new_val = defaultdict(list)
      data = list(csv.reader(csv_data))
      a = [i[0].split('|') for i in data[1:]]
@@ -46,24 +47,25 @@ def importcsvdata():
               if len(val) < maxLenObj:
                 val = val + ['']*(maxLenObj-len(val))
               if val[3]:
-                    data_date = datetime.strptime("09-08-2014","%d-%m-%Y")
+                    data_date = datetime.strptime("08-09-2014","%d-%m-%Y")
               else:
                     data_date = datetime.now()
-              try:
-                    taluk = Taluk.objects.get(taluk_name=data['taluk'],district=District.objects.get(district_name=val[1]))
-              except:
-                    if not val[2]:
-                         taluk_name = 'Perundurai'
-                    else:
-                         taluk_name = val[2]
-                    taluk = Taluk.objects.create(taluk_name=taluk_name,district=District.objects.get(district_name=val[1]))
+              district_val = val[1] if val[1] else 'Erode'
+              taluk_name = val[2] if val[2] else 'Perunthurai' 
+              if Taluk.objects.filter(taluk_name=taluk_name,district=District.objects.get(district_name=district_val)):                
+                    taluk = Taluk.objects.get(taluk_name=taluk_name,district=District.objects.get(district_name=district_val))
+              else:
+                    taluk = Taluk.objects.create(taluk_name=taluk_name,district=District.objects.get(district_name=district))
               print 'val',val[6]
               csv_mohalla_id = val[6] if val[6] else '1001'
+              mohalla_name = val[5] if val[5] else 'Perundurai Masjid'
+              mohalla_location = val[9] if val[9] else ''
               if Masjid.objects.filter(mohalla_id=csv_mohalla_id):
+                    muhalla_update = Masjid.objects.filter(mohalla_id=csv_mohalla_id).update(taluk=taluk,name=mohalla_name,musallas='',location=mohalla_location)
                     masjid = Masjid.objects.get(mohalla_id=csv_mohalla_id)
+                    print 'muhalla updated'
               else:
-                    mohalla_name = val[5] if val[5] else 'Perundurai Masjid'
-                    masjid = Masjid.objects.create(mohalla_id=csv_mohalla_id,taluk=taluk,name=mohalla_name,musallas='',location='')
+                    masjid = Masjid.objects.create(mohalla_id=csv_mohalla_id,taluk=taluk,name=mohalla_name,musallas='',location=mohalla_location)
               toilet = True if val[16] == 'Y' else False
               print 'value',val[63]
               if val[63]:
@@ -107,7 +109,9 @@ def importcsvdata():
               else:
                     financial_status = 'E - Very Poor'          
               if Family.objects.filter(family_id=familyid):
+                    family_update = Family.objects.filter(family_id=familyid).update(muhalla=masjid,report_date=data_date,language=language,ration_card=ration_card,address=fam_address,mobile=val[10],house_type=fam_house,toilet=toilet,house_cat=val[15],financial_status=financial_status,health_insurance=insurance,volunteer=volunteer,donor=donor,family_needs=family_needs)
                     family = Family.objects.get(family_id=familyid)
+                    print 'family updated'
               else:
                     family = Family.objects.create(family_id=familyid,muhalla=masjid,report_date=data_date,language=language,ration_card=ration_card,address=fam_address,mobile=val[10],house_type=fam_house,toilet=toilet,house_cat=val[15],financial_status=financial_status,health_insurance=insurance,volunteer=volunteer,donor=donor,family_needs=family_needs)
               

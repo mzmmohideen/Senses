@@ -270,31 +270,32 @@
                             </div> -->
                         <!-- </li> -->
                         <li>
-                            <a href="#/dashboard">Dashboard</a>
+                            <a ng-click="reportbt=false" href="#/dashboard">Dashboard</a>
                         </li>
                         <li>
-                            <a href="#/location">Locations</a>
+                            <a ng-click="reportbt=false" href="#/location">Locations</a>
                         </li>
                         <li>
-                            <a href="#/masjid">Muhallas</a>
+                            <a ng-click="reportbt=false" href="#/masjid">Muhallas</a>
                         </li>
                         <li>
-                            <a href="#/member">Members</a>
+                            <a ng-click="reportbt=false" href="#/member">Members</a>
                         </li>
                         <li>
-                            <a href="#/family">Families</a>
+                            <a ng-click="reportbt=false" href="#/family">Families</a>
                         </li>
                         <li>
-                            <a href="#/schemes">Schemes</a>
+                            <a ng-click="reportbt=false" href="#/schemes">Schemes</a>
                         </li>
                         <li>
-                            <a href="#/services">Services</a>
+                            <a ng-click="reportbt=false" href="#/services">Services</a>
                         </li>
                         <li>
-                            <a href="#/diseases">Diseases</a>
+                            <a ng-click="reportbt=false" href="#/diseases">Diseases</a>
                         </li>
                         <li>
-                            <a href="#/reports">Reports</a>
+                            <a ng-click="reportbt=true" href="#/reports">Reports
+                            <button class="btn-sm btn btn-primary" ng-disabled="!reportbt" style="float:right;margin: -5px;"><i class="fa fa-filter"></i> Filter</button></a>
                             <!-- <span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
@@ -766,7 +767,7 @@
                 <td> <label for="male">MUHALLAH ID</label> </td>
             </tr>
             <tr>
-                <td><select ng-disabled="!ReportValues.report_name" style="border-radius:2px;display: inline-block;height: 34px;border-radius: 2px; width: 97%;float: left;" ng-model="ReportValues.district" ng-options="gen for gen in district_list" class="form-control">
+                <td><select ng-disabled="!ReportValues.report_name" style="border-radius:2px;display: inline-block;height: 34px;border-radius: 2px; width: 97%;float: left;" ng-model="ReportValues.district" ng-options="gen for gen in district_list_report" class="form-control">
                     <option value="">SELECT DISTRICT</option>
                 </select></td>
                 <td><select ng-disabled="!ReportValues.district" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;border-radius: 2px; float: left;" ng-change="getMasjidList(ReportValues)" ng-model="ReportValues.taluk" ng-options="gen for gen in getTaluk[ReportValues.district]" class="form-control">

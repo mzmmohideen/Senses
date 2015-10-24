@@ -644,6 +644,9 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
             // console.log('val',data.district)
             $scope.DisCode = data.district;
             $scope.district_list = _.keys(data.district)
+            console.log('district_list_report',data.data)
+            $scope.district_list_report = _.keys(data.district)
+            $scope.district_list_report.push('all')
             $scope.getTaluk = data.data;
         })
     }
