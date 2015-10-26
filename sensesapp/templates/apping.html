@@ -295,7 +295,7 @@
                         </li>
                         <li>
                             <a ng-click="reportbt=true" href="#/reports">Reports
-                            <button class="btn-sm btn btn-primary" ng-disabled="!reportbt" style="float:right;margin: -5px;"><i class="fa fa-filter"></i> Filter</button></a>
+                            <!-- <button class="btn-sm btn btn-primary" ng-disabled="!reportbt" style="float:right;margin: -5px;"><i class="fa fa-filter"></i> Filter</button></a> -->
                             <!-- <span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
                                 <li>
@@ -324,6 +324,22 @@
                             </ul> -->
                         </li>
                     </ul>
+                </div>
+                <div ng-show="reportbt">                    
+                        <div style="margin-left:15px;margin-top:15px;">
+                            <span style="text-decoration:none">Age</span>  <input  style="width:30%" type="text" placeholder="From"> - <input style="width:30%" type="text" placeholder="To"> 
+                        </div>
+                        <div style="margin-left:15px;margin-top:15px;">
+                            <span style="text-decoration:none">Marital Status</span>  <select style="width:40%;display:inline-block;" ng-model="FamilyMember.marital_status" ng-options="gen for gen in family_marital_status" class="form-control">
+                            </select> 
+                        </div>
+                        <div style="margin-left:15px;margin-top:15px;">
+                            <span style="text-decoration:none">Voter Status</span> &nbsp; <select ng-model="FamilyMember.voter" ng-options="gen for gen in fam_voter_status" style="width:40%;display:inline-block;" class="form-control"></select>
+                        </div>
+                        <div style="margin-left:15px;margin-top:15px;">
+                            <span style="text-decoration:none">Gender</span> <select ng-model="FamilyMember.gender" ng-options="gen for gen in family_gender" style="width:40%;display:inline-block;margin-left:16%" class="form-control"></select>
+                        </div>
+
                 </div>
                 <!-- /.sidebar-collapse -->
             </div>
