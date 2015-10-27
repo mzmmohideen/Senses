@@ -327,17 +327,17 @@
                 </div>
                 <div ng-show="reportbt">                    
                         <div style="margin-left:15px;margin-top:15px;">
-                            <span style="text-decoration:none">Age</span>  <input  style="width:30%" type="text" placeholder="From"> - <input style="width:30%" type="text" placeholder="To"> 
+                            <span style="text-decoration:none">Age</span>  <input ng-change="fetchReportAPI(ReportDatas)" ng-model="ReportDatas.age_from" style="width:30%" type="text" placeholder="From"> - <input ng-change="fetchReportAPI(ReportDatas)" ng-model="ReportDatas.age_to" style="width:30%" type="text" placeholder="To"> 
                         </div>
                         <div style="margin-left:15px;margin-top:15px;">
-                            <span style="text-decoration:none">Marital Status</span>  <select style="width:40%;display:inline-block;" ng-model="FamilyMember.marital_status" ng-options="gen for gen in family_marital_status" class="form-control">
+                            <span style="text-decoration:none">Gender</span> <select ng-change="fetchReportAPI(ReportDatas)" ng-model="ReportDatas.gender" ng-options="gen for gen in family_gender" style="width:40%;display:inline-block;margin-left:16%" class="form-control"></select>
+                        </div>
+                        <div style="margin-left:15px;margin-top:15px;">
+                            <span style="text-decoration:none">Marital Status</span>  <select ng-change="fetchReportAPI(ReportDatas)" style="width:40%;display:inline-block;" ng-model="ReportDatas.marital_status" ng-options="gen for gen in family_marital_status" class="form-control">
                             </select> 
                         </div>
                         <div style="margin-left:15px;margin-top:15px;">
-                            <span style="text-decoration:none">Voter Status</span> &nbsp; <select ng-model="FamilyMember.voter" ng-options="gen for gen in fam_voter_status" style="width:40%;display:inline-block;" class="form-control"></select>
-                        </div>
-                        <div style="margin-left:15px;margin-top:15px;">
-                            <span style="text-decoration:none">Gender</span> <select ng-model="FamilyMember.gender" ng-options="gen for gen in family_gender" style="width:40%;display:inline-block;margin-left:16%" class="form-control"></select>
+                            <span style="text-decoration:none">Voter Status</span> &nbsp; <select ng-change="fetchReportAPI(ReportDatas)" ng-model="ReportDatas.voter_status" ng-options="gen for gen in fam_voter_status" style="width:40%;display:inline-block;" class="form-control"></select>
                         </div>
 
                 </div>

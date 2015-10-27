@@ -438,6 +438,24 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
             console.log('scope',$scope.fetched_moh_user.length)
         })
     }
+    $scope.ReportDatas = {
+        age_from : '',
+        age_to : '',
+        gender : '',
+        marital_status : '',
+        voter_status : '',
+        muhalla_id : '',
+        taluk : '',
+        district : '',
+    }
+    $scope.fetchReportAPI = function(data) {
+        console.log('data',data)
+        $http.post('/fetchReportData/',{
+            data : data,
+        }).success(function(response) {
+            console.log('val',response)
+        })
+    }
     $scope.getFamilyReport = function(fam_data) {
         console.log('value',fam_data.report_name)
         $http.get('/fetchReportData/?muhalla_id='+fam_data.muhalla.mohalla_id,{}).success(function(data){

@@ -271,6 +271,21 @@ def familyData(request):
         return HttpResponse(content=json.dumps({'data':family}),content_type='Application/json')
 
 def fetchReportData(request):
+    if request.method == 'POST':
+        data = json.loads(request.body)['data']
+        print 'data',data
+        get_mem_medical = []
+        get_mem_scheme = []
+        get_mem_service = []
+        for i in Member.objects.filter():
+            for j in Medical.objects.all():
+                get_mem_medical.append({'name':j.member.name,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})
+            for k in Member_scheme.objects.all():
+                get_mem_scheme.append({'name':k.member.name,'qualification':k.member.qualification,'status':k.status,'solution':k.solution,'address':k.member.family.address,'age':k.member.age,'gender':k.member.gender,'financial':k.member.family.financial_status,'familyid':k.member.family.family_id,'mobile':k.member.family.mobile,'needs':k.scheme.name,'needer':'Need Government Scheme Guidance'})
+            for m in Member_service.objects.all():
+                get_mem_service.append({'name':m.member.name,'qualification':m.member.qualification,'status':m.status,'solution':m.solution,'address':m.member.family.address,'age':m.member.age,'gender':m.member.gender,'financial':m.member.family.financial_status,'familyid':m.member.family.family_id,'mobile':m.member.family.mobile,'needs':m.scheme.name,'needer':'Need Other/NGO Guidance'})    
+        get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.all())
+        return HttpResponse(content=json.dumps({'data':data,'get_mem_service':get_mem_service,'get_mem_medical':get_mem_medical,'get_mem_scheme':get_mem_scheme,'get_memData':get_memData}),content_type='Application/json')
     if request.method == 'GET':
         muhalla = Masjid.objects.get(mohalla_id=request.GET['muhalla_id'])
         get_family = map(lambda x:{'familyid':x.family_id,'address':x.address,'mobile':x.mobile,'family_head':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].name if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'family_head_occ':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].occupation if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'age':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].age if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'gender':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].gender if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'fam_member':Member.objects.filter(family=Family.objects.get(family_id=x.family_id)).count(),'financial_status':x.financial_status,'muhalla':x.muhalla.name,'ration_card':x.ration_card,'language':x.language},Family.objects.filter(muhalla=muhalla))
