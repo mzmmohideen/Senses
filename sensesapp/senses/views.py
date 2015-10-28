@@ -277,16 +277,47 @@ def fetchReportData(request):
         get_mem_medical = []
         get_mem_scheme = []
         get_mem_service = []
-        for i in Member.objects.filter():
-            for j in Medical.objects.all():
-                get_mem_medical.append({'name':j.member.name,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})
-            for k in Member_scheme.objects.all():
+        member_data = Member.objects.all()
+        if data['age_from']:
+            member_data = Member.objects.filter(age__gte=data['age_from'])
+        if  data['age_to']:
+            member_data = member_data.filter(age__lte=data['age_to'])
+        if data['gender']:
+            member_data = member_data.filter(gender=data['gender'])
+        if data['marital_status']:
+            member_data = member_data.filter(marital_status=data['marital_status'])
+        if data['district']:
+            if data['district'] == 'all':
+                member_data = member_data
+            else:
+                district_val = District.objects.get(district_name=data['district'])
+                member_data = member_data.filter(district=district_val)
+                if data['taluk']:
+                    if data['taluk'] == 'all':
+                        member_data = member_data
+                    else:
+                        taluk_val = Taluk.objects.get(taluk_name=data['taluk'])
+                        member_data = member_data.filter(taluk=taluk_val)
+                        if data['muhalla_id']:
+                            if data['muhalla_id'] == 'all':
+                                member_data = member_data
+                            else:
+                                muhalla_val = Masjid.objects.get(mohalla_id=data['muhalla_id'])
+                                member_data = member_data.filter(muhalla=muhalla_val)
+            
+        for i in member_data:
+            for j in Medical.objects.filter(member=i):
+                get_mem_medical.append({'name':j.member.name,'qualification':j.member.qualification,'status':True,'solution':'','address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})
+            for k in Member_scheme.objects.filter(member=i):
                 get_mem_scheme.append({'name':k.member.name,'qualification':k.member.qualification,'status':k.status,'solution':k.solution,'address':k.member.family.address,'age':k.member.age,'gender':k.member.gender,'financial':k.member.family.financial_status,'familyid':k.member.family.family_id,'mobile':k.member.family.mobile,'needs':k.scheme.name,'needer':'Need Government Scheme Guidance'})
-            for m in Member_service.objects.all():
+            for m in Member_service.objects.filter(member=i):
                 get_mem_service.append({'name':m.member.name,'qualification':m.member.qualification,'status':m.status,'solution':m.solution,'address':m.member.family.address,'age':m.member.age,'gender':m.member.gender,'financial':m.member.family.financial_status,'familyid':m.member.family.family_id,'mobile':m.member.family.mobile,'needs':m.scheme.name,'needer':'Need Other/NGO Guidance'})    
+        member_details = get_mem_medical + get_mem_scheme + get_mem_service
         get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.all())
-        return HttpResponse(content=json.dumps({'data':data,'get_mem_service':get_mem_service,'get_mem_medical':get_mem_medical,'get_mem_scheme':get_mem_scheme,'get_memData':get_memData}),content_type='Application/json')
-    if request.method == 'GET':
+        return HttpResponse(content=json.dumps({'member_details':member_details,'get_mem_service':get_mem_service,'get_mem_medical':get_mem_medical,'get_mem_scheme':get_mem_scheme,'get_memData':get_memData}),content_type='Application/json')
+        # return HttpResponse(content=json.dumps({'data':data,'member_details':member_details,'get_mem_service':get_mem_service,'get_mem_medical':get_mem_medical,'get_mem_scheme':get_mem_scheme,'get_memData':get_memData}),content_type='Application/json')
+    
+    elif request.method == 'GET':
         muhalla = Masjid.objects.get(mohalla_id=request.GET['muhalla_id'])
         get_family = map(lambda x:{'familyid':x.family_id,'address':x.address,'mobile':x.mobile,'family_head':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].name if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'family_head_occ':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].occupation if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'age':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].age if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'gender':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].gender if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'fam_member':Member.objects.filter(family=Family.objects.get(family_id=x.family_id)).count(),'financial_status':x.financial_status,'muhalla':x.muhalla.name,'ration_card':x.ration_card,'language':x.language},Family.objects.filter(muhalla=muhalla))
         get_mem_medical = []
@@ -368,19 +399,25 @@ def FamilyMemberData(request):
         mem_age = json.loads(request.body)['age']
         try:
             if str(mem_age).split('.')[1][0] >= 5:
-                age = str(int(mem_age) + 1)
-            else:
-                age = str(int(mem_age))
+                age = eval(str(int(mem_age) + 1))
+            elif mem_age == '':
+                age = 0
+            elif type(mem_age) == 'str':
+                age = int(mem_age)    
         except:
-            age = str(mem_age)
+            if mem_age == '':
+                age = 0
+            else:
+                age = eval(str(mem_age))
+                
         if data['name'] == '':
             return HttpResponse(content=json.dumps({'data':'Please Enter Member Name!'}),content_type='Application/json')
         else:                
             if Member.objects.filter(mem_id=data['mem_id']):
-                memval = Member.objects.filter(mem_id=data['mem_id']).update(family=family,dateofbirth=dob_date,muhalla=family.muhalla,name=data['name'],gender=data['gender'],age=age,Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
+                memval = Member.objects.filter(mem_id=data['mem_id']).update(family=family,dateofbirth=dob_date,muhalla=family.muhalla,taluk=family.muhalla.taluk,district=family.muhalla.taluk.district,name=data['name'],gender=data['gender'],age=age,Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
                 member = memval[0]
             else:
-                member = Member.objects.create(mem_id=data['mem_id'],family=family,dateofbirth=dob_date,muhalla=family.muhalla,name=data['name'],gender=data['gender'],age=age,Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
+                member = Member.objects.create(mem_id=data['mem_id'],family=family,dateofbirth=dob_date,muhalla=family.muhalla,taluk=family.muhalla.taluk,district=family.muhalla.taluk.district,name=data['name'],gender=data['gender'],age=age,Relation=data['relationship'],qualification=data['qualification'],marital_status=data['marital_status'],voter_status=voter,curr_location=data['location'],occupation=data['occupation'])
                 try:
                     fam_mem_id = '%s / %s' %(familyid,str(len(Member_scheme.objects.filter(family=family)) + 1))
                 except:

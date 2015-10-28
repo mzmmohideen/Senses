@@ -448,12 +448,24 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
         taluk : '',
         district : '',
     }
-    $scope.fetchReportAPI = function(data) {
+    $scope.fetchReportAPI = function(data,values) {
+        console.log('data',data,values)
+        data.district = values.district;
+        data.taluk = values.taluk;
+        if(values.muhalla == 'all') {
+            data.muhalla_id = 'all';
+        }
+        else {
+            data.muhalla_id = values.muhalla.mohalla_id;
+        }
         console.log('data',data)
         $http.post('/fetchReportData/',{
             data : data,
         }).success(function(response) {
-            console.log('val',response)
+            $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
+            $scope.getReportData = response.member_details;
+            $scope.ReportValues.report_name = 'New filter'
+            console.log('val',$scope.getReportData)
         })
     }
     $scope.getFamilyReport = function(fam_data) {

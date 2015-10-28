@@ -75,11 +75,13 @@ class SubScheme(models.Model):
     
 class Member(models.Model):
     muhalla = models.ForeignKey(Masjid)
+    taluk = models.ForeignKey(Taluk)
+    district = models.ForeignKey(District)
     mem_id = models.CharField(max_length=20,unique=True)
     name = models.CharField(max_length=30)
     gender = models.CharField(max_length=10,choices=GENDER)
     dateofbirth = models.DateTimeField(default=timezone.now)
-    age = models.CharField(max_length=10)
+    age = models.IntegerField(max_length=4, default=0)
     Relation = models.CharField(max_length=20)
     family_head = models.BooleanField(default=False)
     marital_status = models.CharField(max_length=20,choices=MARITAL)
