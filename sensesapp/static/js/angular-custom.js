@@ -62,9 +62,9 @@ app.filter('propsFilter', function() {
 app.config(['$routeProvider',
     function($routeProvider) {
         $routeProvider.
-        when('/dashboard', {
-            templateUrl: 'dashboard.html',
-        }).
+        // when('/dashboard', {
+        //     templateUrl: 'dashboard.html',
+        // }).
         when('/location', {
             templateUrl: 'location.html',
         }).
@@ -90,7 +90,7 @@ app.config(['$routeProvider',
             templateUrl: 'reports.html',
         }).
         otherwise({
-            redirectTo: '/dashboard'
+            redirectTo: '/reports'
         });
     }
 ]);
@@ -763,7 +763,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
                     }
                     else if(status == 'exit') {
                         $modalInstance.dismiss('cancel');
-                        window.location.reload();
+                        // window.location.reload();
                     }
                 }
             })
