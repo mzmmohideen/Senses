@@ -15,6 +15,7 @@
     <!-- Custom styles for this template -->
     <link href="{{STATIC_URL}}font-awesome/css/font-awesome.css" rel="stylesheet">
     <link href="{{STATIC_URL}}css/select.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}js/angular/angular-csp.css" rel="stylesheet">
     <link href="{{STATIC_URL}}bootstrap/dashboard/css/sb-admin-2.css" rel="stylesheet">
     <link href="{{STATIC_URL}}bootstrap/dashboard/css/timeline.css" rel="stylesheet">
     <link href="{{STATIC_URL}}metisMenu/metisMenu.css" rel="stylesheet">
@@ -33,7 +34,7 @@
 </head>
 {% verbatim %}
 
-<body ng-app="senses">
+<body ng-cloak class="ng-cloak" ng-app="senses">
     <div id="wrapper" ng-controller="dashboardCtrl">
         <!-- Navigation -->
         <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
@@ -294,7 +295,7 @@
                             <a ng-click="reportbt=false" href="#/diseases">Diseases</a>
                         </li>
                         <li>
-                            <a ng-click="reportbt=true" href="#/reports">Reports
+                            <a ng-click="reportbt=true" href="#/reports">Reports</a>
                             <!-- <button class="btn-sm btn btn-primary" ng-disabled="!reportbt" style="float:right;margin: -5px;"><i class="fa fa-filter"></i> Filter</button></a> -->
                             <!-- <span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
@@ -1550,7 +1551,7 @@
                             </div>
                             <div class="col-xs-9 text-right">
                                 <div class="huge">124</div>
-                                <div>Todatl Mahallas!</div>
+                                <div>Total Mahallas!</div>
                             </div>
                         </div>
                     </div>

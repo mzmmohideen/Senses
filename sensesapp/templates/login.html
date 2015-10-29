@@ -3,8 +3,9 @@
 <head>
 	<title>Welcome! Please Login!</title>
 	<link rel="stylesheet" type="text/css" href="{{STATIC_URL}}css/login.css">
+	<link href="{{STATIC_URL}}js/angular/angular-csp.css" rel="stylesheet">
 </head>
-<body ng-controller="loginCtrl">
+<body ng-cloak class="ng-cloak" ng-controller="loginCtrl">
 	<!-- <img style="position: absolute;top: 0px;width:100%;height:150px;left: 0px;" src="{{STATIC_URL}}images/logo.png"> -->
 	{% csrf_token %}	
 	{% verbatim %}

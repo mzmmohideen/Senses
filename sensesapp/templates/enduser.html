@@ -13,6 +13,7 @@
     <link href="{{STATIC_URL}}bootstrap/dashboard/css/sb-admin-2.css" rel="stylesheet">
     <link href="{{STATIC_URL}}bootstrap/dashboard/css/timeline.css" rel="stylesheet">
     <link href="{{STATIC_URL}}metisMenu/metisMenu.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}js/angular/angular-csp.css" rel="stylesheet">
     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/select2/3.4.5/select2.css">
     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/selectize.js/0.8.5/css/selectize.default.css">
     <style type="text/css">
@@ -28,7 +29,7 @@
 </head>
 {% verbatim %}
 
-<body ng-app="end_user">
+<body ng-cloak class="ng-cloak" ng-app="end_user">
     <div id="wrapper" ng-controller="EndUserCtrl">
             <div style="border: 1px solid #ccc;background-color: #fff;margin-top:0px;width:15%;height:100%" class="navbar-default sidebar" role="navigation">
                 <div class="sidebar-nav navbar-collapse">
