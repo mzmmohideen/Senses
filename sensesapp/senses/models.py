@@ -23,7 +23,8 @@ class Taluk(models.Model):
 
 class Masjid(models.Model):
     taluk = models.ForeignKey(Taluk)
-    mohalla_id = models.CharField(max_length=20,unique=True)
+    district = models.ForeignKey(District)
+    mohalla_id = models.CharField(max_length=20,unique=True,null=True)
     name = models.CharField(max_length=30)
     musallas = models.CharField(max_length=20)
     location = models.CharField(max_length=30)
@@ -33,6 +34,8 @@ class Masjid_members(models.Model):
     member_name = models.CharField(max_length=30)
     age = models.CharField(max_length=30)
     mobile = models.CharField(max_length=20)
+    is_availonwhatsapp = models.BooleanField(default=False)
+    is_coordinator = models.BooleanField(default=False)
     address = models.CharField(max_length=50)
     designation = models.CharField(max_length=20)
 

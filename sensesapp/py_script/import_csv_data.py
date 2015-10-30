@@ -20,13 +20,15 @@ from django.db.models import Q
 def importcsvdatas():
      s = os.path.dirname(__file__)
      print 's',os.path.dirname(__file__),s
-     csv_data = open('%s/csv/Census-Erode-perunthurai-201-to-295.csv'%s,'rb')     
+     csv_data = open('%s/csv/perundurai/Census-Erode-perunthurai-201-to-295.csv'%s,'rb')     
      new_val = defaultdict(list)
      data = list(csv.reader(csv_data))
      print 'data',data[1][0].split('|')[10]
      for i in data[1:]:
           val = i[0].split('|')
-          print 'avai',val[63]
+          print 'avai',val[3]
+          family_head = True if val[18] == '1' else False
+          print 'family_head',family_head,val[18]
           exit()
           if val[16]:
                 print 'toilet',val[16]
@@ -66,7 +68,14 @@ def importcsvdata():
                     print 'muhalla updated'
               else:
                     masjid = Masjid.objects.create(mohalla_id=csv_mohalla_id,taluk=taluk,name=mohalla_name,musallas='',location=mohalla_location)
-              toilet = True if val[16] == 'Y' else False
+              # toilet = True if val[16] == 'Y' else False
+              if val[16]:
+                if val[16] == 'Y':
+                  toilet = True
+                else:
+                  toilet = False
+              else:
+                toilet = True                 
               print 'value',val[63]
               if val[63]:
                     insurance = True if val[63] == 'Yes' else False
@@ -172,11 +181,12 @@ def importcsvdata():
               else:
                  madarasa_details = ''
                  makhtab = False
+              family_head = True if val[18] == '1' else False   
               if Member.objects.filter(mem_id=member_id):
-                    memval = Member.objects.filter(mem_id=member_id).update(family=family,dateofbirth=dob_date,muhalla=family.muhalla,name=val[19],gender=gender,age=mem_age,Relation=relation,qualification=qualification,marital_status=marital_status,voter_status=voterstatus,curr_location=location,occupation=occupation,Makthab=makhtab,madarasa_details=madarasa_details)
+                    memval = Member.objects.filter(mem_id=member_id).update(family=family,family_head=family_head,dateofbirth=dob_date,muhalla=family.muhalla,name=val[19],gender=gender,age=mem_age,Relation=relation,qualification=qualification,marital_status=marital_status,voter_status=voterstatus,curr_location=location,occupation=occupation,Makthab=makhtab,madarasa_details=madarasa_details)
                     member = Member.objects.get(mem_id=member_id)
               else:
-                    member = Member.objects.create(mem_id=member_id,family=family,dateofbirth=dob_date,muhalla=family.muhalla,name=val[19],gender=gender,age=mem_age,Relation=relation,qualification=qualification,marital_status=marital_status,voter_status=voterstatus,curr_location=location,occupation=occupation,Makthab=makhtab,madarasa_details=madarasa_details)
+                    member = Member.objects.create(mem_id=member_id,family=family,family_head=family_head,dateofbirth=dob_date,muhalla=family.muhalla,name=val[19],gender=gender,age=mem_age,Relation=relation,qualification=qualification,marital_status=marital_status,voter_status=voterstatus,curr_location=location,occupation=occupation,Makthab=makhtab,madarasa_details=madarasa_details)
               
               old_age = True if val[33] == 'Y' else False
               if old_age:
@@ -382,4 +392,4 @@ def importcsvdata():
             print 'report',repr(format_exc())
 
 if __name__ == "__main__":
-     importcsvdata()
+     importcsvdatas()

@@ -336,6 +336,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
         district: '',
         taluk: '',
         address: '',
+        mohalla_id: '',
     }
     $scope.mahallaList = [];
     $scope.getMasjidData = function(masjid_val) {
@@ -576,7 +577,12 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
     $scope.addMasjid = function(masjid,data,status) {
         console.log(data,masjid)
         if(data.mohalla_id == "") {
-            var masjid_val = masjid
+            // if(masjid == "Select mahalla ID from the List") {
+            var masjid_val = ''
+            // }
+            // else {
+                // var masjid_val = masjid
+            // }
         }
         else {
             var masjid_val = data.mohalla_id
@@ -861,15 +867,19 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
             $modalInstance.dismiss('cancel');
         };
         var data = masjid_data.get_MasjidData();
-        $scope.add_member = function(member_name,age,designation,mobile,address,status) {
+        $scope.add_member = function(member_name,coordinator,age,designation,mobile,email,whatsapp,address,status) {
             console.log('member_name',member_name,data)
             if(mobile == undefined) { var mobile_no = ''} else {var mobile_no = mobile}
-            if(address == undefined) { var address_val = ''} else {var address_val = address}    
+            if(address == undefined) { var address_val = ''} else {var address_val = address}
+            if(email == undefined) { var email_val = ''} else {var email_val = email}    
             console.log('member_name',mobile_no,address_val)
             $http.post('/masjid_member/',{
                 member_name: member_name,
                 data: data,
                 age: age,
+                email: email_val,
+                coordinator: coordinator,
+                whatsapp: whatsapp,
                 designation: designation,
                 mobile: mobile_no,
                 address: address_val,
@@ -1156,6 +1166,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
             $scope.FamilyValue.mobile_no = '';
             $scope.FamilyValue.address = '';
             $scope.FamilyValue.house = '';
+            $scope.FamilyValue.house_type = '';
             $scope.FamilyValue.toilet = '';
             $scope.FamilyValue.financial = '';
             $scope.FamilyValue.language = '';
@@ -1179,6 +1190,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
             console.log('data',$scope.FamilyValue.report_date)
             $scope.FamilyValue.address = family.address;
             $scope.FamilyValue.house = family.house_type;
+            $scope.FamilyValue.house_type = family.house_cat;
             if(family.toilet == true) { $scope.FamilyValue.toilet = 'Yes'; } else if(family.toilet == false) { $scope.FamilyValue.toilet = 'No'; }
             $scope.FamilyValue.financial = family.financial_status;
             // $scope.FamilyValue.district = family.district_name
@@ -1204,6 +1216,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
         taluk: '',
         district_code: '',
         house: '',
+        house_type: '',
         toilet: '',
         language: '',
         // donor: '', 
@@ -1213,7 +1226,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
         financial: '',
     }
     $scope.addFamily = function(family,value,status) {
-        console.log('family',family,'value',value.report_date)
+        console.log('family',family,'value',value)
         if(status == 'new') {
             var familyid = '';
             var masjid = value.masjid.name;
@@ -1239,6 +1252,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
             address: value.address,
             family_needs: value.family_needs,
             house: value.house,
+            house_type: value.house_type,
             financial: value.financial,
         }
         // if(data.masjid_name == "") {
