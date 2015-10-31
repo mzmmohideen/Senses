@@ -197,7 +197,7 @@
                         </select></td>
                         <td><input type="text" placeholder="Relationship" ng-model="FamilyMember.relationship" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
                         <td><input type="text" placeholder="Qualification" ng-model="FamilyMember.qualification" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
-                        <td><select ng-model="FamilyMember.marital_status" ng-options="gen for gen in ['Married','Unmarried','Widow','Devorced','Aged Unmarried Woman']" class="form-control">
+                        <td><select ng-model="FamilyMember.marital_status" ng-options="gen for gen in ['Married','Single','Widow','Devorced','Aged Unmarried Woman']" class="form-control">
                             <option value="">MARITAL STATUS</option>
                         </select>
                         <td><select ng-model="FamilyMember.voter" ng-options="gen for gen in ['Yes','No']" class="form-control">
@@ -247,7 +247,7 @@
                         </td>
                         <td class="ng-binding">
                             <span ng-show="!updateFamMem">{{member.marital_status}}</span>
-                            <select ng-show="updateFamMem" ng-model="member.marital_status" ng-options="gen for gen in ['Married','Unmarried','Widow','Devorced','Aged Unmarried Woman']" class="form-control">
+                            <select ng-show="updateFamMem" ng-model="member.marital_status" ng-options="gen for gen in ['Married','Single','Widow','Devorced','Aged Unmarried Woman']" class="form-control">
                                 <option value="">MARITAL STATUS</option>
                             </select>
                         </td>

@@ -285,7 +285,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
             $scope.conditionsData = ['=','!=']
         }
         if(field == 'Marital Status') {
-            $scope.getValue = ['Married','Unmarried','Widow','Devorced','Aged Unmarried Woman']
+            $scope.getValue = ['Married','Single','Widow','Devorced','Aged Unmarried Woman']
         }
         else if(field == 'Gender') {
             $scope.getValue = ['Male','Female']
@@ -916,6 +916,13 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
             $modalInstance.dismiss('cancel');
         };
         $scope.Mem_ID = masjid_data.get_MasjidData();
+        $scope.get_user_detail = function(member_id) {
+            $http.get('/family_member/?member_id='+member_id,{}).success(function(data){
+            console.log(data,'member_id')
+            $scope.popup_mem_name = data.name;
+            })
+        }
+        $scope.get_user_detail($scope.Mem_ID)
         $scope.MemberUpdate = {
             volunteer : '', 
             donor : '',
@@ -1347,7 +1354,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
     $scope.FamilyMember.gender = $scope.family_gender[0]
     $scope.family_head_status = ['Yes','No']
     $scope.FamilyMember.family_head = $scope.family_head_status[0]
-    $scope.family_marital_status = ['Married','Unmarried','Widow','Devorced','Aged Unmarried Woman']
+    $scope.family_marital_status = ['Married','Single','Widow','Devorced','Aged Unmarried Woman']
     $scope.FamilyMember.marital_status = $scope.family_marital_status[0]
     $scope.fam_voter_status = ['Yes','No']
     $scope.FamilyMember.voter = $scope.fam_voter_status[0]

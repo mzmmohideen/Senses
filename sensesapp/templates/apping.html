@@ -282,10 +282,7 @@
                             <a ng-click="reportbt=false" href="#/masjid">Muhallas</a>
                         </li>
                         <li>
-                            <a ng-click="reportbt=false" href="#/member">Members</a>
-                        </li>
-                        <li>
-                            <a ng-click="reportbt=false" href="#/family">Families</a>
+                            <a ng-click="reportbt=false" href="#/member">Muhalla Users</a>
                         </li>
                         <li>
                             <a ng-click="reportbt=false" href="#/schemes">Schemes</a>
@@ -295,6 +292,9 @@
                         </li>
                         <li>
                             <a ng-click="reportbt=false" href="#/diseases">Diseases</a>
+                        </li>
+                        <li>
+                            <a ng-click="reportbt=false" href="#/family">Families</a>
                         </li>
                         <li>
                             <a ng-click="reportbt=true" href="#/reports">Reports</a>
@@ -443,25 +443,25 @@
                 </tr>
                 </table>
             </div>
-            <div class="form-group" style="margin-top:20%">   
-            <table style="width: 97%;margin-left: 1.3%;">
-            <tr>
-            <td style="font-size:18px; "><label style="background-color: #F8F8F8;" for="male">TO CREATE MEMBER:</label></td>
-            </tr>
-            <tr>
-                <td> <label for="male">USER NAME</label> </td>
-                <td> <label for="male">EMAIL</label> </td>
-                <td> <label for="male">PASSWORD</label> </td>
+            <!--<div class="form-group" style="margin-top:20%">   
+                <table style="width: 97%;margin-left: 1.3%;">
+                <tr>
+                <td style="font-size:18px; "><label style="background-color: #F8F8F8;" for="male">TO CREATE MEMBER:</label></td>
                 </tr>
-            <tr>         
-                <td><input style="display: inline-block;height: 34px;width: 97%;border-radius: 2px;float: left;" type="text" placeholder="Username" ng-model="moh_user.username" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
-                <td><input style="display: inline-block;height: 34px;width: 97%;border-radius: 2px;float: left;" type="text" placeholder="Email" ng-model="moh_user.email" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
-                <td><input style="display: inline-block;height: 34px;width: 97%;border-radius: 2px;float: left;" class="form-control" type="password" ng-model="moh_user.password" placeholder="Password" /></td>
-                <td><button  ng-disabled="!moh_user.username || !moh_user.email || !moh_user.password || !moh_user.muhalla.mohalla_id" type="submit" style="width:100%;height: 34px;float:right;" ng-click="moh_user_create('',moh_user,'new')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> &nbsp;Create</button></td>
-            </tr>
-            </table>
-            </div>    
-            <table class="table table-striped table-bordered table-hover ng-scope" style="margin-top: 5%; margin-left: 1.5%; width: 97.5%;">
+                <tr>
+                    <td> <label for="male">USER NAME</label> </td>
+                    <td> <label for="male">EMAIL</label> </td>
+                    <td> <label for="male">PASSWORD</label> </td>
+                    </tr>
+                <tr>         
+                    <td><input style="display: inline-block;height: 34px;width: 97%;border-radius: 2px;float: left;" type="text" placeholder="Username" ng-model="moh_user.username" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                    <td><input style="display: inline-block;height: 34px;width: 97%;border-radius: 2px;float: left;" type="text" placeholder="Email" ng-model="moh_user.email" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                    <td><input style="display: inline-block;height: 34px;width: 97%;border-radius: 2px;float: left;" class="form-control" type="password" ng-model="moh_user.password" placeholder="Password" /></td>
+                    <td><button  ng-disabled="!moh_user.username || !moh_user.email || !moh_user.password || !moh_user.muhalla.mohalla_id" type="submit" style="width:100%;height: 34px;float:right;" ng-click="moh_user_create('',moh_user,'new')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> &nbsp;Create</button></td>
+                </tr>
+                </table>
+            </div>-->
+            <table class="table table-striped table-bordered table-hover ng-scope" style="margin-top: 25%; margin-left: 1.5%; width: 97.5%;">
                 <thead>
                     <tr class="ng-scope">
                         <th style="text-align:center; width:5%">S.No</th>
@@ -607,9 +607,9 @@
             <div class="form-group" style="padding-bottom: 34px; width: 97%; margin-left: 1%;">
             <table style="width: 100%;">
              <tr>
-                <td style="width: 24%;"><label for="male">Scheme:</label></td>
-                <td style="width: 26%;"><label for="male">Sub Scheme:</label></td>
-                <td style="width: 15%;"><label for="male">Scheme ID:</label></td>
+                <td style="width: 24%;"><label for="male">Scheme: *</label></td>
+                <td style="width: 26%;"><label for="male">Sub Scheme: *</label></td>
+                <td style="width: 15%;"><label for="male">Scheme ID: *</label></td>
                 <td><label for="male">Description:</label></td>
              </tr>
              </table>
@@ -678,8 +678,8 @@
             <div class="form-group" style="padding-bottom: 34px;">
             <table style="width: 100%;">
              <tr>
-                <td> <label for="male">Services</label> </td>
-                <td> <label for="male">Service ID</label> </td>
+                <td> <label for="male">Services *</label> </td>
+                <td> <label for="male">Service ID *</label> </td>
                 <td> <label for="male">Description</label> </td>
             </tr>
             <tr>
@@ -728,9 +728,9 @@
             <div class="form-group" style="padding-bottom: 34px;">
             <table style="width: 98%;float: left; margin-left: 1%;margin-bottom: 2%;">
             <tr>
-                <td> <label for="male">Select Type</label> </td>
-                <td> <label for="male">Add Disease</label> </td>
-                <td> <label for="male">Disease ID</label> </td>
+                <td> <label for="male">Select Type * </label> </td>
+                <td> <label for="male">Add Disease *</label> </td>
+                <td> <label for="male">Disease ID *</label> </td>
                 <td> <label for="male">description</label> </td>
             </tr>
             <tr>
@@ -905,7 +905,7 @@
              <span class="ng-modal-close" ng-click="cancel()"><i id="closing" style="font-size:14px;float:right;cursor:pointer;" class="fa fa-times"></i></span>
             <h3 class="modal-title">Add New Member</h3>
         </div>
-             <form class="form-horizontal">
+             <form class="form-horizontal" ng-init="coordinator='No';whatsapp='No';">
                         <div class="form-group" style="margin:5px;">
                             <label class="control-label col-xs-3">Member Name *</label>
                             <div class="col-xs-9">
@@ -1132,7 +1132,7 @@
                             <div ng-bind-html="mod.family_id | highlight: $select.search"></div>
                         </ui-select-choices>
                     </ui-select>
-                    <button ng-disabled="!FamilyValue.masjid" type="submit" style="background-color: #d9534f;border-color: #d9534f;width: 30%;height: 34px;float: left;border-radius: 2px;margin-left:5px;" ng-click="new_fam_bt=false;" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New Family</button>
+                    <button ng-disabled="!FamilyValue.masjid" type="submit" style="background-color: #d9534f;border-color: #d9534f;width: 30%;height: 34px;float: left;border-radius: 2px;margin-left:5px;" ng-click="new_fam_bt=false;get_family();" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New Family</button>
                 </td>
             </tr>
             </table>
@@ -1263,7 +1263,7 @@
                         </td>
                         <td class="ng-binding">
                             <span ng-show="!updateFamMem">{{member.marital_status}}</span>
-                            <select ng-show="updateFamMem" ng-model="member.marital_status" ng-options="gen for gen in ['Married','Unmarried','Widow','Devorced','Aged Unmarried Woman']" class="form-control">
+                            <select ng-show="updateFamMem" ng-model="member.marital_status" ng-options="gen for gen in ['Married','Single','Widow','Devorced','Aged Unmarried Woman']" class="form-control">
                                 <option value="">MARITAL STATUS</option>
                             </select>
                         </td>
@@ -1297,7 +1297,7 @@
     <script type="text/ng-template" id="add_Familymembers_modal">
      <div ng-show="!next" id="add_watchlist_popup" style="">
             <div class="popup-header">
-                <span style="margin-left:35%">Update Member Details {{Mem_ID}}</span>
+                <span style="margin-left:35%">Update Member Details - {{popup_mem_name}}</span>
                 <span class="ng-modal-close" ng-click="cancel()"><i id="closing" style="font-size:14px;float:right;cursor:pointer;" class="fa fa-times"></i></span>
             </div>
              <form class="form-horizontal">
@@ -1383,7 +1383,7 @@
     </div>
      <div ng-show="next" id="add_watchlist_popup" style="">
             <div class="popup-header">
-                <span style="margin-left:35%">Update Member Details </span>
+                <span style="margin-left:35%">Update Member Details - {{popup_mem_name}} </span>
                 <span class="ng-modal-close" ng-click="cancel()"><i id="closing" style="font-size:14px;float:right;cursor:pointer;" class="fa fa-times"></i></span>
             </div>
             <accordion ng-init="getScheme();getService();get_memberScheme()">
@@ -1411,7 +1411,7 @@
                           <div style="background-color:#F5F5F5 !important;">
                             <accordion-heading>
                                 <h4 class="panel-title">
-                                            <a data-toggle="collapse" style="text-decoration:none;" data-parent="#accordion"  aria-expanded="true" aria-controls="collapseOne">Services</a>
+                                            <a data-toggle="collapse" style="text-decoration:none;" data-parent="#accordion"  aria-expanded="true" aria-controls="collapseOne">Guidance / Counseling related Services</a>
                                         </h4>
                             </accordion-heading>
                           </div>
@@ -1430,7 +1430,7 @@
                           <div style="background-color:#F5F5F5 !important;">
                             <accordion-heading>
                                 <h4 class="panel-title">
-                                            Disease
+                                            Health Related Services
                                         </h4>
                             </accordion-heading>
                           </div>

@@ -198,24 +198,41 @@ def get_mahallauser_data(request):
     muhalla = {'uname':request.user.username,'mohalla_id':mohallaData.masjid.mohalla_id,'musallas':mohallaData.masjid.musallas,'address':mohallaData.masjid.location,'mohalla':mohallaData.masjid.name,'taluk':mohallaData.masjid.taluk.taluk_name,'district':mohallaData.masjid.taluk.district.district_name}
     return HttpResponse(content=json.dumps({'muhalla':muhalla}),content_type='Application/json')
 
+def family_member(request):
+    if request.method == 'GET':
+        member_id = request.GET['member_id']
+        try:
+            fetch_mem_data = Member.objects.get(mem_id=member_id)
+            return HttpResponse(content=json.dumps({'familyid':fetch_mem_data.family.family_id,'makthab':fetch_mem_data.Makthab,'makthab_status':fetch_mem_data.madarasa_details,'address':fetch_mem_data.family.address,'financial_status':fetch_mem_data.family.financial_status,'mobile':fetch_mem_data.family.mobile,'name':fetch_mem_data.name,'mem_id':fetch_mem_data.mem_id,'gender':fetch_mem_data.gender,'age':fetch_mem_data.age,'marital_status':fetch_mem_data.marital_status,'voter':fetch_mem_data.voter_status}),content_type='Application/json')
+        except:
+            return HttpResponse(content=json.dumps({'familyid':'','makthab':'','makthab_status':'','address':'','financial_status':'','mobile':'','name':'','mem_id':'','gender':'','age':'','marital_status':'','voter':''}),content_type='Application/json')
+
 def masjid_member(request):
     if request.method == 'POST':
         data = json.loads(request.body)
+        print 'data',data
         if data['status'] == 'new':
             masjid_val = Masjid.objects.get(mohalla_id=data['data']['mohalla_id'])
             coordinator = True if data['coordinator'] == 'Yes' else False
             if coordinator:
-                moh_user = masjid_val.mohalla_id.replace(' ','').replace('/','_')
+                moh_user = str(masjid_val.mohalla_id.replace(' ','').replace('/','_'))
                 if not User.objects.filter(username=moh_user):
-                    create_moh_user = User.objects.create(username=moh_user)
-                    create_moh_user.set_password = '%s%s'%(moh_user,'123')
-                    create_moh_user.save() 
+                    if SensesMembers.objects.filter(member_type='Mohalla User',masjid=masjid_val):
+                        response =  'Mohalla User Exist!'
+                    elif User.objects.filter(email=data['email']):
+                        response = 'Email ID Exist!'
+                    else:
+                        create_moh_user = User.objects.create(username=moh_user,email=data['email'])
+                        create_moh_user.set_password = '%s%s'%(moh_user,'123')
+                        create_moh_user.save()
+                        user_add = SensesMembers.objects.create(user=create_moh_user,member_type='Mohalla User',masjid=masjid_val)
+                        response = 'Mohalla User Created Successfully!'
             whatsapp = True if data['whatsapp'] == 'Yes' else False
             if Masjid_members.objects.filter(masjid=masjid_val,member_name=data['member_name'],designation=data['designation']):
-                masjid = Masjid_members.objects.filter(masjid=masjid_val,member_name=data['member_name'],designation=data['designation']).update(age=data['age'],mobile=data['mobile'],email=data['email'],coordinator=coordinator,whatsapp=whatsapp,address=data['address'])
+                masjid = Masjid_members.objects.filter(masjid=masjid_val,member_name=data['member_name'],designation=data['designation']).update(age=data['age'],mobile=data['mobile'],email=data['email'],is_coordinator=coordinator,is_availonwhatsapp=whatsapp,address=data['address'])
                 response = 'updated'
             else:
-                masjid = Masjid_members.objects.create(masjid=masjid_val,member_name=data['member_name'],designation=data['designation'],age=data['age'],mobile=data['mobile'],email=data['email'],coordinator=coordinator,whatsapp=whatsapp,address=data['address'])
+                masjid = Masjid_members.objects.create(masjid=masjid_val,member_name=data['member_name'],designation=data['designation'],age=data['age'],mobile=data['mobile'],email=data['email'],is_coordinator=coordinator,is_availonwhatsapp=whatsapp,address=data['address'])
                 response = 'success'
             return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')    
         elif data['status'] == 'edit':
@@ -228,7 +245,7 @@ def masjid_member(request):
         data = request.GET
         if Masjid.objects.filter(mohalla_id=data['masjid_id']):
             masjid = Masjid.objects.get(mohalla_id=data['masjid_id'])
-            get_members = map(lambda x:{'name':x.member_name,'age':x.age,'email':x.email,'coordinator':x.coordinator,'whatsapp':x.whatsapp,'mobile':x.mobile,'address':x.address,'designation':x.designation},Masjid_members.objects.filter(masjid=masjid))
+            get_members = map(lambda x:{'name':x.member_name,'age':x.age,'email':x.email,'coordinator':x.is_coordinator,'whatsapp':x.is_availonwhatsapp,'mobile':x.mobile,'address':x.address,'designation':x.designation},Masjid_members.objects.filter(masjid=masjid))
         return HttpResponse(content=json.dumps({'data':get_members}),content_type='Application/json')    
 
 def convert_to_IST(timestamp, convert=None):
@@ -612,18 +629,19 @@ def new_member(request):
         data = json.loads(request.body)
         get_mohalla = Masjid.objects.get(mohalla_id=data['mohalla_id'])
         if data['status'] == 'new':
-            print 'status',data['status']     
             if User.objects.filter(username=data['username']):
                 response = 'Username Exist!'
             elif User.objects.filter(email=data['email']):
                 response = 'Email ID Exist!'    
             else:
-                user = User.objects.create(username=data['username'],email=data['email'])
-                user.set_password(data['password'])
-                user.save()
                 if SensesMembers.objects.filter(user=user,member_type=data['member_type'],masjid=get_mohalla):
                     response =  'Given Data Exist!'
+                elif SensesMembers.objects.filter(member_type='Mohalla User',masjid=get_mohalla):
+                    response =  'Mohalla User Exist!'
                 else:
+                    user = User.objects.create(username=data['username'],email=data['email'])
+                    user.set_password(data['password'])
+                    user.save()
                     user_add = SensesMembers.objects.create(user=user,member_type=data['member_type'],masjid=get_mohalla)
                     response = 'Member Created Successfully!'
         elif data['status'] == 'edit':
