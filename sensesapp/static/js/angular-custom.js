@@ -1019,9 +1019,17 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
                 console.log('response',response)
             })
         }
+        $scope.get_total_cost = function(value) {
+            console.log('value',value)
+            if (value.operation_cost != '') { var a = parseInt(value.operation_cost)} else { var a = 0}
+            if (value.cash_hand != '') { var b = parseInt(value.cash_hand)} else { var b = 0}
+            $scope.SurgeryValue.cash_needed = a-b
+        }
+        $scope.disease_id_list=[];
         $scope.DiseaseValue = {
             sym_type: '',
             name: '',
+            disease_id: '',
             medicine: '',
             cost: '',
         }
@@ -1031,6 +1039,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
             hospital_name : '',
             cash_hand : '',
             operation_cost : '',
+            cash_needed : '',
             details : '',
         }
         $scope.ChronicValue = {
@@ -1040,6 +1049,11 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
             tot_cost : '',
             details : '',
         }
+        $scope.diseaseSetup = {
+            multiple: true,
+            formatSearching: 'Searching the Disease...',
+            formatNoMatches: 'No Disease found'
+        };          
         $scope.disease_val = 'SELECT or ADD DISEASE';
         $scope.get_disease = function(disease) {
             if(!disease) {
@@ -1074,6 +1088,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
             console.log('sym_type',sym_type)
             $http.get('/DiseaseData/?type='+sym_type,{}).success(function(data) {
                 $scope.disease_list = _.pluck(data.response,"name")
+                $scope.disease_dict = data.response;
                 $scope.getDiseaseData = data.response;
                 console.log($scope.getDiseaseData)
             })
@@ -1096,11 +1111,16 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
             }
             $scope.MemserviceList.push({'service_value':service_value,'service_id':service_id,'Mem_ID':Mem_ID})
         }
-        $scope.update_memberScheme = function (getSubScheme,getServices,DiseaseValue,SurgeryValue,ChronicValue,status) {
-            console.log('mem_id',DiseaseValue,SurgeryValue,ChronicValue,status)
+        $scope.disease_value = function(disease_id_list) {
+            $scope.disease_id_list.push(disease_list.disease_id)
+            console.log('value',disease_id_list)
+        }
+        $scope.update_memberScheme = function (getSubScheme,getServices,DiseaseValue,disease_id_list,SurgeryValue,ChronicValue,status) {
+            console.log('mem_id',disease_id_list,DiseaseValue,SurgeryValue,ChronicValue,status)
             $http.post('/updateMemScheme/',{
                 schemeData: getSubScheme,
                 disease_val: DiseaseValue,
+                disease_id_list: disease_id_list,
                 surgery_val: SurgeryValue,
                 chronic_val: ChronicValue,
                 Servicedata: getServices,
