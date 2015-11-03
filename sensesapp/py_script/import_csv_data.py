@@ -399,10 +399,21 @@ def importcsvdata():
                     surg_cost = val[59] if val[59] else ''
                     surg_cashinhand = val[60] if val[60] else ''
                     if surg_hospital or surg_name or surg_cost or surg_cashinhand:
-                      if Surgery.objects.filter(member=member,disease=dis_val):
-                        add_surgery_needs = Surgery.objects.filter(member=member,disease=dis_val).update(surgery_name=surg_name,hospital_name=surg_hospital,cost=surg_cost,cash_inHand=surg_cashinhand)
+                      try:
+                        if surg_name:
+                          surgery_name = surg_name
+                        elif len(disease_list) > 0:
+                          surgery_name = disease_list[0]
+                        else:
+                          surgery_name = ''
+                        get_dis_val = Disease.objects.get(disease_name=surgery_name)
+                      except:
+                        surgery_name = Disease.objects.all()
+                        get_dis_val = surgery_name[0]                         
+                      if Surgery.objects.filter(member=member,disease=get_dis_val):
+                        add_surgery_needs = Surgery.objects.filter(member=member,disease=get_dis_val).update(surgery_name=surg_name,hospital_name=surg_hospital,cost=surg_cost,cash_inHand=surg_cashinhand,details=surg_name)
                       else:
-                        add_surgery_needs = Surgery.objects.create(member=member,disease=dis_val,surgery_name=surg_name,hospital_name=surg_hospital,cost=surg_cost,cash_inHand=surg_cashinhand)
+                        add_surgery_needs = Surgery.objects.create(member=member,disease=get_dis_val,surgery_name=surg_name,hospital_name=surg_hospital,cost=surg_cost,cash_inHand=surg_cashinhand,details=surg_name)
                     chronic_disease_details = val[61] if val[61] else ''
                     if chronic_disease_details:
                       if ChronicDisease.objects.filter(member=member,disease=dis_val):
