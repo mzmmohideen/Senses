@@ -589,6 +589,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
         }
         console.log('masjid',masjid,'a',data,'b',masjid_val)
         $http.post('/add_masjid/',{
+            data: data,
             district: data.district,
             taluk: data.taluk,
             masjid_name: data.masjid_name,
@@ -1112,8 +1113,12 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
             $scope.MemserviceList.push({'service_value':service_value,'service_id':service_id,'Mem_ID':Mem_ID})
         }
         $scope.disease_value = function(disease_id_list) {
-            $scope.disease_id_list.push(disease_list.disease_id)
-            console.log('value',disease_id_list)
+            console.log('val',$scope.disease_id_list)
+            // for (var i in disease_id_list) {
+            //     $scope.disease_id_list.push(disease_id_list[i].disease_id)
+            // }
+            $scope.disease_id_list = disease_id_list
+            console.log('value',disease_id_list,$scope.disease_id_list)
         }
         $scope.update_memberScheme = function (getSubScheme,getServices,DiseaseValue,disease_id_list,SurgeryValue,ChronicValue,status) {
             console.log('mem_id',disease_id_list,DiseaseValue,SurgeryValue,ChronicValue,status)
@@ -1149,6 +1154,8 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
                     console.log('value',data.medical.length,data.medical)
                     $scope.DiseaseValue.sym_type = data.medical[0].sym_type;
                     // $scope.disease_val = data.medical[0].disease;
+                    $scope.disease_id_list = data.medical;
+                    console.log($scope.disease_id_list,'final')
                     $scope.get_disease(data.medical[0].disease)
                     $scope.DiseaseValue.medicine = data.medical[0].medicine_needs;
                     $scope.DiseaseValue.cost = data.medical[0].cost;

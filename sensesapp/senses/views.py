@@ -166,12 +166,14 @@ def add_masjid(request):
     if request.method == 'POST':        
         data = json.loads(request.body)
         if data['status'] == 'new':
+            print 'data',data['district']
             district_val = District.objects.get(district_name=data['district'])
+            print 'district',district_val
             taluk = Taluk.objects.get(district=district_val,taluk_name=data['taluk'])
             print 'data',data['mohalla_id']
             if data['mohalla_id']:                
                 if Masjid.objects.filter(mohalla_id=data['mohalla_id'],taluk=taluk):
-                    masjid = Masjid.objects.filter(mohalla_id=data['mohalla_id'],taluk=taluk).update(name=data['masjid_name'],musallas=data['musallas'],location=data['address'])
+                    masjid = Masjid.objects.filter(mohalla_id=data['mohalla_id'],taluk=taluk).update(name=data['masjid_name'],district=district_val,musallas=data['musallas'],location=data['address'])
                     return HttpResponse(content=json.dumps({'data':'updated!'}),content_type='Application/json')
                 # elif Masjid.objects.filter(mohalla_id=data['masjid_name'],taluk=taluk):
                 #     return HttpResponse(content=json.dumps({'data':'Mohalla Name Exist!'}),content_type='Application/json')
@@ -181,10 +183,10 @@ def add_masjid(request):
                 muhalla_dis_val = '%04d'%(muhalla_dis+1) if muhalla_dis<9999 else (muhalla_dis+1)
                 mohalla_id = '%s / %s'%(district_val.district_code,muhalla_dis_val)
                 if Masjid.objects.filter(mohalla_id=mohalla_id):
-                    masjid = Masjid.objects.filter(mohalla_id=mohalla_id,taluk=taluk).update(name=data['masjid_name'],musallas=data['musallas'],location=data['address'])
+                    masjid = Masjid.objects.filter(mohalla_id=mohalla_id,taluk=taluk).update(name=data['masjid_name'],musallas=data['musallas'],location=data['address'],district=district_val)
                     return HttpResponse(content=json.dumps({'data':'updated!'}),content_type='Application/json')
                 else:
-                    masjid = Masjid.objects.create(mohalla_id=mohalla_id,taluk=taluk,name=data['masjid_name'],musallas=data['musallas'],location=data['address'])
+                    masjid = Masjid.objects.create(mohalla_id=mohalla_id,taluk=taluk,district=district_val,name=data['masjid_name'],musallas=data['musallas'],location=data['address'])
                     return HttpResponse(content=json.dumps({'data':'Mohalla Created Successfully!'}),content_type='Application/json')
         elif data['status'] == 'delete':
             masjid = Masjid.objects.filter(mohalla_id=data['mohalla_id']).delete()
@@ -547,6 +549,7 @@ def updateMemScheme(request):
         schemeData = json.loads(request.body)['schemeData']
         Servicedata = json.loads(request.body)['Servicedata']
         disease_val = json.loads(request.body)['disease_val']
+        disease_id_list = json.loads(request.body)['disease_id_list']
         surgery_val = json.loads(request.body)['surgery_val']
         chronic_val = json.loads(request.body)['chronic_val']
         member_id = json.loads(request.body)['mem_id']
@@ -573,9 +576,10 @@ def updateMemScheme(request):
                 member = Member_service.objects.filter(member=member_obj,scheme=service).update(status=status,solution=solution)
             else:
                 member = Member_service.objects.create(member=member_obj,scheme=service,status=status,solution=solution)           
-        if disease_val['name'] != '':
-            disease = Disease.objects.get(disease_name=disease_val['name']) if Disease.objects.filter(disease_name=disease_val['name']) else Disease.objects.create(sym_type=disease_val['sym_type'],disease_name=disease_val['name'])
-            medical_needs = Medical.objects.filter(member=member_obj).update(medicine_needs=disease_val['medicine'],cost=disease_val['cost']) if Medical.objects.filter(member=member_obj,disease=disease) else Medical.objects.create(member=member_obj,disease=disease,medicine_needs=disease_val['medicine'],cost=disease_val['cost'])
+        if len(disease_id_list) > 0:
+            for dis in disease_id_list:
+                disease = Disease.objects.get(disease_id=dis['disease_id']) if Disease.objects.filter(disease_id=dis['disease_id']) else Disease.objects.create(sym_type='DISEASE',disease_name=dis['name'])
+                medical_needs = Medical.objects.filter(member=member_obj,disease=disease).update(cost=disease_val['cost']) if Medical.objects.filter(member=member_obj,disease=disease) else Medical.objects.create(member=member_obj,disease=disease,cost=disease_val['cost'])
         if surgery_val['surgery_val'] == 'Yes':
             disease = Disease.objects.get(disease_name=surgery_val['name']) if Disease.objects.filter(disease_name=surgery_val['name']) else Disease.objects.create(sym_type=surgery_val['sym_type'],disease_name=surgery_val['name'])
             surgery_help = Surgery.objects.filter(member=member_obj).update(hospital_name=surgery_val['hospital_name'],cost=surgery_val['operation_cost'],cash_inHand=surgery_val['cash_hand'],details=surgery_val['details']) if Surgery.objects.filter(member=member_obj,disease=disease) else Surgery.objects.create(member=member_obj,disease=disease,hospital_name=surgery_val['hospital_name'],cost=surgery_val['operation_cost'],cash_inHand=surgery_val['cash_hand'],details=surgery_val['details'])
@@ -595,7 +599,7 @@ def updateMemScheme(request):
         else:
             surgery_detail = []
         if Medical.objects.filter(member=member_obj):
-            medical_details = map(lambda x:{'sym_type':x.disease.sym_type,'disease':x.disease.disease_name,'medicine_needs':x.medicine_needs,'cost':x.cost},Medical.objects.filter(member=member_obj))
+            medical_details = map(lambda x:{'sym_type':x.disease.sym_type,'disease_id':x.disease.disease_id,'name':x.disease.disease_name,'medicine_needs':x.medicine_needs,'cost':x.cost},Medical.objects.filter(member=member_obj))
         else:
             medical_details = []
         return HttpResponse(content=json.dumps({'medical':medical_details,'surgery':surgery_detail,'chronic':chronic_detail}),content_type='Application/json')            

@@ -3,6 +3,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sensesapp.settings")
 from senses.models import *
 import csv,json
+from os import listdir
 from collections import defaultdict
 from django.core.exceptions import ObjectDoesNotExist
 from datetime import datetime, time, timedelta
@@ -23,7 +24,7 @@ def importcsvdatas():
      csv_data = open('%s/csv/census-ashokapuram-1-67-by-althaf.csv'%s,'rb')     
      new_val = defaultdict(list)
      data = list(csv.reader(csv_data))
-     print 'data',data[1][0].split('|')[10]
+     print 'data',data[1][0].split('|')[1]
      for i in data[1:]:
           val = i[0].split('|')
           print 'avai',val[3],datetime.strptime("10/02/2015","%d/%m/%Y")
@@ -43,11 +44,11 @@ def importcsvdata():
      s = os.path.dirname(__file__)
      print 's',os.path.dirname(__file__),s
      filenames = find_csv_filenames('%s/csv/'%s)
-     for name in filenames:
+     for name in ['census-ashokapuram-1-185-by-althaf.csv']:
        # scraped_csv = open('%s/productscrapper/%s'%(s,name))
        # csv_data = open('%s/csv/%s'%(s,name),'rb')
-       csv_data = open('%s/csv/%s'%(s,name))     
-       new_val = defaultdict(list)
+       csv_data = open('%s/csv/%s'%(s,name))
+       print 'filename',name
        data = list(csv.reader(csv_data))
        a = [i[0].split('|') for i in data[1:]]
        maxLenObj = max(map(len,a))
@@ -67,12 +68,14 @@ def importcsvdata():
                   district_val = val[1]
                 else:
                   print 'no district name'
-                  exit()
+                  district_val = data[1][0].split('|')[1]
                 if val[2]:
                   taluk_name = val[2]
                 else:
                   print 'no taluk name'
-                  exit() 
+                  taluk_name = data[1][0].split('|')[2]
+                if district_val == 'Ramnad':
+                  district_val = 'Ramanathapuram'                  
                 district_value = District.objects.get(district_name=district_val)  
                 if Taluk.objects.filter(taluk_name=taluk_name,district=district_value):                
                       taluk = Taluk.objects.get(taluk_name=taluk_name,district=district_value)
@@ -86,12 +89,13 @@ def importcsvdata():
                   csv_mohalla_id = val[6]
                 mohalla_location = val[9] if val[9] else ''  
                 mohalla_name = val[5] if val[5] else mohalla_location
-                if Masjid.objects.filter(mohalla_id=csv_mohalla_id):
-                      muhalla_update = Masjid.objects.filter(mohalla_id=csv_mohalla_id).update(taluk=taluk,name=mohalla_name,musallas='',location=mohalla_location)
-                      masjid = Masjid.objects.get(mohalla_id=csv_mohalla_id)
+                if Masjid.objects.filter(taluk=taluk,name=mohalla_name):
+                      # muhalla_update = Masjid.objects.filter(taluk=taluk,name=mohalla_name).update(mohalla_id=csv_mohalla_id,taluk=taluk,district=district_value,musallas='',location=mohalla_location)
+                      muhalla_update = Masjid.objects.filter(taluk=taluk,name=mohalla_name).update(taluk=taluk,district=district_value,musallas='',location=mohalla_location)
+                      masjid = Masjid.objects.get(taluk=taluk,name=mohalla_name)
                       print 'muhalla updated'
                 else:
-                      masjid = Masjid.objects.create(mohalla_id=csv_mohalla_id,taluk=taluk,name=mohalla_name,musallas='',location=mohalla_location)
+                      masjid = Masjid.objects.create(mohalla_id=csv_mohalla_id,taluk=taluk,district=district_value,name=mohalla_name,musallas='',location=mohalla_location)
                 # toilet = True if val[16] == 'Y' else False
                 if val[16]:
                   if val[16] == 'Y':
@@ -210,11 +214,11 @@ def importcsvdata():
                    madarasa_details = ''
                    makhtab = False
                 family_head = True if val[18] == '1' else False   
-                if Member.objects.filter(mem_id=member_id):
-                      memval = Member.objects.filter(mem_id=member_id).update(family=family,family_head=family_head,dateofbirth=dob_date,muhalla=family.muhalla,name=val[19],gender=gender,age=mem_age,Relation=relation,qualification=qualification,marital_status=marital_status,voter_status=voterstatus,curr_location=location,occupation=occupation,Makthab=makhtab,madarasa_details=madarasa_details)
-                      member = Member.objects.get(mem_id=member_id)
+                if Member.objects.filter(mem_id=member_id,family=family):
+                      memval = Member.objects.filter(mem_id=member_id,family=family).update(family_head=family_head,dateofbirth=dob_date,muhalla=family.muhalla,taluk=taluk,district=district_value,name=val[19],gender=gender,age=mem_age,Relation=relation,qualification=qualification,marital_status=marital_status,voter_status=voterstatus,curr_location=location,occupation=occupation,Makthab=makhtab,madarasa_details=madarasa_details)
+                      member = Member.objects.get(mem_id=member_id,family=family)
                 else:
-                      member = Member.objects.create(mem_id=member_id,family=family,family_head=family_head,dateofbirth=dob_date,muhalla=family.muhalla,name=val[19],gender=gender,age=mem_age,Relation=relation,qualification=qualification,marital_status=marital_status,voter_status=voterstatus,curr_location=location,occupation=occupation,Makthab=makhtab,madarasa_details=madarasa_details)
+                      member = Member.objects.create(mem_id=member_id,family=family,family_head=family_head,dateofbirth=dob_date,muhalla=family.muhalla,taluk=taluk,district=district_value,name=val[19],gender=gender,age=mem_age,Relation=relation,qualification=qualification,marital_status=marital_status,voter_status=voterstatus,curr_location=location,occupation=occupation,Makthab=makhtab,madarasa_details=madarasa_details)
                 
                 old_age = True if val[33] == 'Y' else False
                 if old_age:
@@ -394,16 +398,17 @@ def importcsvdata():
                     surg_name = val[58] if val[58] else ''
                     surg_cost = val[59] if val[59] else ''
                     surg_cashinhand = val[60] if val[60] else ''
-                    if Surgery.objects.filter(member=member,disease=dis_val):
-                      add_surgery_needs = Surgery.objects.filter(member=member,disease=dis_val).update(surgery_name=surg_name,hospital_name=surg_hospital,cost=surg_cost,cash_inHand=surg_cashinhand)
-                    else:
-                      add_surgery_needs = Surgery.objects.create(member=member,disease=dis_val,surgery_name=surg_name,hospital_name=surg_hospital,cost=surg_cost,cash_inHand=surg_cashinhand)
+                    if surg_hospital or surg_name or surg_cost or surg_cashinhand:
+                      if Surgery.objects.filter(member=member,disease=dis_val):
+                        add_surgery_needs = Surgery.objects.filter(member=member,disease=dis_val).update(surgery_name=surg_name,hospital_name=surg_hospital,cost=surg_cost,cash_inHand=surg_cashinhand)
+                      else:
+                        add_surgery_needs = Surgery.objects.create(member=member,disease=dis_val,surgery_name=surg_name,hospital_name=surg_hospital,cost=surg_cost,cash_inHand=surg_cashinhand)
                     chronic_disease_details = val[61] if val[61] else ''
                     if chronic_disease_details:
                       if ChronicDisease.objects.filter(member=member,disease=dis_val):
-                        add_surgery_needs = ChronicDisease.objects.filter(member=member,disease=dis_val).update(details=chronic_disease_details,status=True)
+                        add_chronic_needs = ChronicDisease.objects.filter(member=member,disease=dis_val).update(details=chronic_disease_details,status=True)
                       else:
-                        add_surgery_needs = ChronicDisease.objects.create(member=member,disease=dis_val,details=chronic_disease_details,status=True)
+                        add_chronic_needs = ChronicDisease.objects.create(member=member,disease=dis_val,details=chronic_disease_details,status=True)
                 else:
                   pass
                 loan_needers = True if val[65] == 'Y' else False
@@ -437,4 +442,4 @@ def importcsvdata():
               print 'report',repr(format_exc())
 
 if __name__ == "__main__":
-     importcsvdatas()
+     importcsvdata()
