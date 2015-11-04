@@ -401,6 +401,42 @@ def fetchReportData(request):
                         for j in Medical.objects.filter(member=i):
                             get_mem_medical.append({'name':j.member.name,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})                    
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_medical':get_mem_medical}),content_type='Application/json')            
+        elif data['report_type'] == 'Government Schemes and Guidance Needers Details' or data['report_type'] == 'Educational Help and Guidance Needers List':
+            get_mem_scheme = []
+            scheme_list = json.loads(request.body)['schemeid_list']
+            try:
+                if data['muhalla_id']:
+                    muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
+            except:
+                muhalla = Masjid.objects.all()[0]
+            family_value = Family.objects.filter(muhalla=muhalla)
+            try:
+                if data['financial']:
+                    family_value = family_value.filter(financial_status=data['financial'])
+            except:
+                family_value = family_value
+            for fam in family_value:
+                member_data_scheme = Member.objects.filter(family=fam)
+                if data['age_from']:
+                    member_data_scheme = member_data_scheme.filter(age__gte=data['age_from'])
+                if  data['age_to']:
+                    member_data_scheme = member_data_scheme.filter(age__lte=data['age_to'])
+                if data['gender']:
+                    member_data_scheme = member_data_scheme.filter(gender=data['gender'])
+                if data['marital_status']:
+                    member_data_scheme = member_data_scheme.filter(marital_status=data['marital_status'])    
+                if scheme_list:
+                    for schlist in scheme_list:
+                        print 'scheme',schlist
+                        get_scheme = SubScheme.objects.get(subscheme_id=schlist['scheme_id'])
+                        for i in member_data_scheme:
+                            for j in Member_scheme.objects.filter(member=i,scheme=get_scheme):
+                                get_mem_scheme.append({'name':j.member.name,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'Need Government Scheme Guidance'})
+                else:
+                    for i in member_data_scheme:
+                        for j in Member_scheme.objects.filter(member=i):
+                            get_mem_scheme.append({'name':j.member.name,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'Need Government Scheme Guidance'})                    
+            return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_scheme':get_mem_scheme}),content_type='Application/json')                
         # return HttpResponse(content=json.dumps({'data':data,'member_details':member_details,'get_mem_service':get_mem_service,'get_mem_medical':get_mem_medical,'get_mem_scheme':get_mem_scheme,'get_memData':get_memData}),content_type='Application/json')
     
     elif request.method == 'GET':

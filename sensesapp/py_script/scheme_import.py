@@ -17,7 +17,7 @@ disease_list = [{'disease_id':'HL01','disease_name':'General Medical Check Up'},
 #scheme_list
 def import_scheme_list():
     for i in scheme_list_govt:
-        schemetype = "Govt/ Other NGO'S Related Schemes"
+        schemetype = "Govt/ Other NGOs Related Schemes"
         if Scheme.objects.filter(scheme_type=schemetype):
             scheme = Scheme.objects.get(scheme_type=schemetype)
         else:
