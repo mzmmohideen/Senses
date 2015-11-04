@@ -3,10 +3,16 @@ underscore.factory('_', function() {
     'use strict';
     return window._; // assumes underscore has already been loaded on the page
 });
-var app = angular.module('senses', ['ngSanitize', 'ngCookies', 'ui.bootstrap', 'ngRoute', 'ui.select', 'underscore']);
+var app = angular.module('senses', ['ngSanitize', 'ngCookies', 'ui.bootstrap', 'ngRoute', 'ui.select', 'underscore','loading.services']);
 app.run(function($http, $cookies) {
     console.log($cookies.csrftoken,'csrrf')
     $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
+});
+app.config(function (appBusyProvider) {
+    'use strict';
+    appBusyProvider.setMsg('Registering ...');
+    appBusyProvider.setTimeout(50);
+    appBusyProvider.setClazz('appBusy');
 });
 app.directive('ngEnter', function() {
     return function(scope, element, attrs) {
@@ -122,7 +128,7 @@ app.directive('ngConfirmClick', [
             }
         };
 }])
-app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$location,$modal) {
+app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid_data,$filter,$location,$modal) {
     // $scope.formats = ['dd-MMM-yyyy', 'yyyy/MM/dd', 'dd.MM.yyyy', 'shortDate'];
     // $scope.format = $scope.formats[0];
     $scope.today = function() {
@@ -240,6 +246,7 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
         console.log('sym_type',sym_type)
         $http.get('/DiseaseData/?type='+sym_type,{}).success(function(data) {
             $scope.disease_list = _.pluck(data.response,"name")
+            $scope.disease_dict = data.response;
             $scope.getDiseaseData = data.response;
             console.log($scope.getDiseaseData)
         })
@@ -445,9 +452,17 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
         gender : '',
         marital_status : '',
         voter_status : '',
+        financial : '',
         muhalla_id : '',
         taluk : '',
         district : '',
+        report_type : '',
+    }
+    $scope.diseaseid_list = []
+    $scope.filter_disease_value = function(diseaseid_list) {
+        console.log('val',$scope.diseaseid_list)
+        $scope.diseaseid_list = diseaseid_list
+        console.log('value',diseaseid_list,$scope.diseaseid_list)
     }
     $scope.fetchReportAPI = function(data,values) {
         console.log('data',data,values)
@@ -459,76 +474,121 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
         else {
             data.muhalla_id = values.muhalla.mohalla_id;
         }
+        if(values.report_name == '') {
+            data.report_type = '';
+        }
+        else {
+            data.report_type = values.report_name;
+        }
         console.log('data',data)
+        appBusy.set("Loading....");
         $http.post('/fetchReportData/',{
             data : data,
+            diseaseid_list : $scope.diseaseid_list,
         }).success(function(response) {
-            $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
-            $scope.getReportData = response.member_details;
-            $scope.ReportValues.report_name = 'New filter'
-            console.log('val',$scope.getReportData)
+            appBusy.set('Done...');              
+            $timeout( function() {              
+                appBusy.set(false);
+            }, 1000);
+            if(response.report_type == 'Total Family Details' || response.report_type == 'Families Eligible for Jakaath') {
+                $scope.ReportHeader = ['S.No','Name & Address','Age & Gender','Family ID & Mobile NO','Financial Status & Jakaath']
+                $scope.getReportData = response.get_family;
+            }
+            if(response.report_type == 'Medical Needs and Guidance Needers Details') {
+                $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
+                $scope.getReportData = response.get_mem_medical;
+                console.log('val',$scope.getReportData)
+            }
+            else {
+                $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
+                $scope.getReportData = response.member_details;
+                $scope.ReportValues.report_name = 'New filter'
+                console.log('val',$scope.getReportData)
+            }
         })
     }
     $scope.getFamilyReport = function(fam_data) {
-        console.log('value',fam_data.report_name)
-        $http.get('/fetchReportData/?muhalla_id='+fam_data.muhalla.mohalla_id,{}).success(function(data){
-        // $http.get('/fetchReportData/?muhalla_id='+data.muhalla.mohalla_id+'&report_name='+data.report_name,{}).success(function(data){
-            // 'Government Schemes and Guidance Needers Details(Non Voters)','Basic Help Needers List','Help for Poor Peoples and Guidance Needers List','Training/Employment Help and Guidance Needers List','Childrens Need to join Makthab Madarasa','Persons Need to join Jumrah Madarasa','Women chldrens Need to join Niswan Madarasa']
-            if(fam_data.report_name == 'Mohalla Report') {
-                $scope.ReportHeader = ['S.No','Details','Counts']
-                $scope.getReportData = data.reports;
-            }
-            else if(fam_data.report_name == 'Total Family Details') {
-                $scope.ReportHeader = ['S.No','Name & Address','Age & Gender','Family ID & Mobile NO','Financial Status & Jakaath']
-                $scope.getReportData = data.get_family;
-            }
-            else if(fam_data.report_name == 'Families Eligible for Jakaath' || fam_data.report_name == 'Government Voter ID Needers') {
-                $scope.ReportHeader = ['S.No','Needers Name','Age & Gender','Financial Status & Family ID','Mobile NO','Address']
-                if(fam_data.report_name == 'Families Eligible for Jakaath') {
-                    $scope.getReportData = _.filter(data.get_family,function(val){ return val.financial_status.split(' ')[0] == 'D' || val.financial_status.split(' ')[0] == 'E'});
+        console.log('value',fam_data)
+        if(fam_data.report_name == 'Total Family Details') {
+            $scope.tot_fam_dt = true;
+            $scope.medical_needers = false;
+            $scope.tot_fam_jakath = false;
+        }
+        else if(fam_data.report_name == 'Families Eligible for Jakaath') {
+            $scope.tot_fam_jakath = true;
+            $scope.tot_fam_dt = false;
+            $scope.medical_needers = false;
+        }
+        else if(fam_data.report_name == 'Medical Needs and Guidance Needers Details') {
+            $scope.medical_needers = true;
+            $scope.tot_fam_jakath = false;
+            $scope.tot_fam_dt = false;
+        }
+        if(fam_data.muhalla != '') {
+            appBusy.set("Loading....");
+            $http.get('/fetchReportData/?muhalla_id='+fam_data.muhalla.mohalla_id,{}).success(function(data){
+                 appBusy.set('Done...');              
+                  $timeout( function() {              
+                    appBusy.set(false);
+                  }, 1000);
+            // $http.get('/fetchReportData/?muhalla_id='+data.muhalla.mohalla_id+'&report_name='+data.report_name,{}).success(function(data){
+                // 'Government Schemes and Guidance Needers Details(Non Voters)','Basic Help Needers List','Help for Poor Peoples and Guidance Needers List','Training/Employment Help and Guidance Needers List','Childrens Need to join Makthab Madarasa','Persons Need to join Jumrah Madarasa','Women chldrens Need to join Niswan Madarasa']
+                if(fam_data.report_name == 'Mohalla Report') {
+                    $scope.ReportHeader = ['S.No','Details','Counts']
+                    $scope.getReportData = data.reports;
                 }
-                else if(fam_data.report_name == 'Basic Help Needers List') {
-                    $scope.getReportData = _.filter(data.get_family,function(val){ return val.financial_status.split(' ')[0] == 'E'});
+                else if(fam_data.report_name == 'Total Family Details') {
+                    $scope.ReportHeader = ['S.No','Name & Address','Age & Gender','Family ID & Mobile NO','Financial Status & Jakaath']
+                    $scope.getReportData = data.get_family;
                 }
-                else if(fam_data.report_name == 'Government Voter ID Needers') {
-                    console.log('voter',data.get_memdata)
-                    $scope.getReportData = _.filter(data.get_memdata,function(val){ return val.voter == false && parseInt(val.age) >= 18});
-                }                
-            }
-            else if(fam_data.report_name == 'Educational Help and Guidance Needers List' || fam_data.report_name == 'Help for Discontinued and Guidance Needers List') {
-                $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
-                if(fam_data.report_name == 'Educational Help and Guidance Needers List') {
-                    $scope.getReportData = _.filter(data.get_mem_scheme,function(val){ return val.needs == 'Help for Higher Education/ Guidance Needed' && val.status == true});
+                else if(fam_data.report_name == 'Families Eligible for Jakaath' || fam_data.report_name == 'Government Voter ID Needers') {
+                    $scope.ReportHeader = ['S.No','Needers Name','Age & Gender','Financial Status & Family ID','Mobile NO','Address']
+                    if(fam_data.report_name == 'Families Eligible for Jakaath') {
+                        $scope.getReportData = _.filter(data.get_family,function(val){ return val.financial_status.split(' ')[0] == 'D' || val.financial_status.split(' ')[0] == 'E'});
+                    }
+                    else if(fam_data.report_name == 'Basic Help Needers List') {
+                        $scope.getReportData = _.filter(data.get_family,function(val){ return val.financial_status.split(' ')[0] == 'E'});
+                    }
+                    else if(fam_data.report_name == 'Government Voter ID Needers') {
+                        console.log('voter',data.get_memdata)
+                        $scope.getReportData = _.filter(data.get_memdata,function(val){ return val.voter == false && parseInt(val.age) >= 18});
+                    }                
                 }
-                else if(fam_data.report_name == 'Help for Discontinued and Guidance Needers List') {
-                    $scope.getReportData = _.filter(data.get_mem_scheme,function(val){ return val.status == true && val.needs == 'Help for Education Discontinued/Guidance Needed'});
-                }                
-            }
-            else if(fam_data.report_name == 'Medical Needs and Guidance Needers Details' || fam_data.report_name == 'Government Schemes and Guidance Needers Details') {
-                $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
-                if(fam_data.report_name == 'Medical Needs and Guidance Needers Details') {
-                    $scope.getReportData = data.get_mem_medical;
+                else if(fam_data.report_name == 'Educational Help and Guidance Needers List' || fam_data.report_name == 'Help for Discontinued and Guidance Needers List') {
+                    $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
+                    if(fam_data.report_name == 'Educational Help and Guidance Needers List') {
+                        $scope.getReportData = _.filter(data.get_mem_scheme,function(val){ return val.needs == 'Help for Higher Education/ Guidance Needed' && val.status == true});
+                    }
+                    else if(fam_data.report_name == 'Help for Discontinued and Guidance Needers List') {
+                        $scope.getReportData = _.filter(data.get_mem_scheme,function(val){ return val.status == true && val.needs == 'Help for Education Discontinued/Guidance Needed'});
+                    }                
                 }
-                else if(fam_data.report_name == 'Government Schemes and Guidance Needers Details') {
-                    $scope.getReportData = data.get_mem_scheme;
+                else if(fam_data.report_name == 'Medical Needs and Guidance Needers Details' || fam_data.report_name == 'Government Schemes and Guidance Needers Details') {
+                    $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
+                    if(fam_data.report_name == 'Medical Needs and Guidance Needers Details') {
+                        $scope.getReportData = data.get_mem_medical;
+                    }
+                    else if(fam_data.report_name == 'Government Schemes and Guidance Needers Details') {
+                        $scope.getReportData = data.get_mem_scheme;
+                    }
                 }
-            }
-            else if(fam_data.report_name == 'Persons Need to join Jumrah Madarasa' || fam_data.report_name == 'Childrens Need to join Makthab Madarasa'  || fam_data.report_name == 'Women chldrens Need to join Niswan Madarasa') {
-                $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
-                if(fam_data.report_name == 'Persons Need to join Jumrah Madarasa') {
-                    $scope.getReportData = _.filter(data.get_memData,function(val) {return val.makthab == true && val.makthab_status == 'Jumrah Madarasa for Boys'});
+                else if(fam_data.report_name == 'Persons Need to join Jumrah Madarasa' || fam_data.report_name == 'Childrens Need to join Makthab Madarasa'  || fam_data.report_name == 'Women chldrens Need to join Niswan Madarasa') {
+                    $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
+                    if(fam_data.report_name == 'Persons Need to join Jumrah Madarasa') {
+                        $scope.getReportData = _.filter(data.get_memData,function(val) {return val.makthab == true && val.makthab_status == 'Jumrah Madarasa for Boys'});
+                    }
+                    else if(fam_data.report_name == 'Childrens Need to join Makthab Madarasa') {
+                        $scope.getReportData = _.filter(data.get_memData,function(val) {return val.makthab == true && val.makthab_status == 'Boys For Makthab 4-15'});
+                    }
+                    else if(fam_data.report_name == 'Women chldrens Need to join Niswan Madarasa') {
+                        $scope.getReportData = _.filter(data.get_memData,function(val) {return val.makthab == true && val.makthab_status == 'Girls For Makthab 4-15'});
+                    }
                 }
-                else if(fam_data.report_name == 'Childrens Need to join Makthab Madarasa') {
-                    $scope.getReportData = _.filter(data.get_memData,function(val) {return val.makthab == true && val.makthab_status == 'Boys For Makthab 4-15'});
-                }
-                else if(fam_data.report_name == 'Women chldrens Need to join Niswan Madarasa') {
-                    $scope.getReportData = _.filter(data.get_memData,function(val) {return val.makthab == true && val.makthab_status == 'Girls For Makthab 4-15'});
-                }
-            }
-            console.log('data',$scope.getReportData)
-            // $scope.getReportData = data.reports;
-            console.log('reportdata',$scope.getReportData)
-        })
+                console.log('data',$scope.getReportData)
+                // $scope.getReportData = data.reports;
+                console.log('reportdata',$scope.getReportData)
+            })
+        }
     }
     $scope.get_jakaath_status = function(financial) {
         if(financial == 'A' || financial == 'B' || financial == 'C') { return 'NO' }
@@ -1699,13 +1759,51 @@ app.controller('dashboardCtrl', function($scope,_, $http,masjid_data,$filter,$lo
 })
 
 
-// request.onupgradeneeded = function() {
-//    var db = request.result;
-//    var store = db.createObjectStore("student", {keyPath: "studentid", autoIncrement : true});
-//    var idIndex = store.createIndex("studentid", "studentid", {unique: true});
-//    var nameIndex = store.createIndex("name", "name");
-//    var courseIndex = store.createIndex("course", "course");
-//    var yearIndex = store.createIndex("year", "year");
-//    var attendanceIndex = store.createIndex("attendance", "attendance");
-//    var dateIndex = store.createIndex("date", "date");
-//  };
+var appServices = angular.module('loading.services', []).provider("appBusy", function() {
+
+    this.msg = "Loading ...";
+    this.timeout = 1000;
+    this.clazz = "appBusy";
+
+    var body = angular.element(window.document.body);
+    var domEl = null;
+
+    this.show = function(msg) {
+        msg = msg || this.msg;
+        if (!domEl) {
+            domEl = angular.element('<div></div>').addClass(this.clazz);
+            domEl.text(msg);
+            setTimeout(function() {
+                if (domEl)
+                    body.append(domEl);
+            }, this.timeout);
+        } else {
+            domEl.text(msg);
+        }
+    }
+    this.hide = function() {
+        if (domEl) {
+            domEl.remove();
+            domEl = null;
+        }
+    }
+    this.$get = function() {
+        var self = this;
+        return {
+            set: function(msg) {
+                if (typeof msg == 'boolean') {
+                    msg === true ? self.show() : self.hide();
+                } else self.show(msg);
+            }
+        }
+    }
+    this.setMsg = function(val) {
+        this.msg = val;
+    }
+    this.setTimeout = function(val) {
+        this.timeout = val;
+    }
+    this.setClazz = function(val) {
+        this.clazz = val;
+    }
+});
