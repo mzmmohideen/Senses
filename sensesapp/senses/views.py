@@ -401,7 +401,28 @@ def fetchReportData(request):
                         for j in Medical.objects.filter(member=i):
                             get_mem_medical.append({'name':j.member.name,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})                    
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_medical':get_mem_medical}),content_type='Application/json')            
-        elif data['report_type'] == 'Government Schemes and Guidance Needers Details' or data['report_type'] == 'Educational Help and Guidance Needers List':
+        elif data['report_type'] == 'Government Voter ID Needers':
+            get_mem_voter = []
+            try:
+                if data['muhalla_id']:
+                    muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
+            except:
+                muhalla = Masjid.objects.all()[0]
+            family_value = Family.objects.filter(muhalla=muhalla)
+            for fam in family_value:
+                get_mem_voter_dt = Member.objects.filter(family=fam,voter_status=False)
+                if data['age_from']:
+                    get_mem_voter_dt = get_mem_voter_dt.filter(age__gte=data['age_from'])
+                if  data['age_to']:
+                    get_mem_voter_dt = get_mem_voter_dt.filter(age__lte=data['age_to'])
+                if data['gender']:
+                    get_mem_voter_dt = get_mem_voter_dt.filter(gender=data['gender'])
+                if data['marital_status']:
+                    get_mem_voter_dt = get_mem_voter_dt.filter(marital_status=data['marital_status'])
+                for i in get_mem_voter_dt:
+                    get_mem_voter.append({'family_head':i.name,'qualification':i.qualification,'address':i.family.address,'age':i.age,'gender':i.gender,'financial_status':i.family.financial_status,'familyid':i.family.family_id,'mobile':i.family.mobile})
+            return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_voter':get_mem_voter}),content_type='Application/json')                
+        elif data['report_type'] == 'Government Schemes and Guidance Needers Details' or data['report_type'] == 'Educational Help and Guidance Needers List' or data['report_type'] == 'Help for Discontinued and Guidance Needers List' :
             get_mem_scheme = []
             scheme_list = json.loads(request.body)['schemeid_list']
             try:
@@ -797,6 +818,7 @@ def fetch_data_api(request):
             # tot_scheme_list = [tot['scheme_name'] for tot in tot_scheme_data]
             # for l in tot_scheme_list:
             #     tot_scheme_dict[l] = tot_scheme_dict.setdefault(l,0) + 1    
+            # schemes_data[i.name].append({'total_count':tot_count_dict,'unsolved_district_count':count_dict,'total_scheme_count':len(tot_scheme_data)})
             schemes_data.append({'scheme_name':i.name,'total_count':tot_count_dict,'unsolved_district_count':count_dict,'total_scheme_count':len(tot_scheme_data)})
 
         for i in Service.objects.all():
@@ -812,4 +834,11 @@ def fetch_data_api(request):
             for k in tot_item_list:
                 tot_count_dict[k] = tot_count_dict.setdefault(k,0) + 1    
             service_data.append({'scheme_name':i.name,'total_count':tot_count_dict,'unsolved_district_count':count_dict,'total_scheme_count':len(tot_scheme_data)})    
-    return HttpResponse(content=json.dumps({'schemes_data':schemes_data}),content_type='Application/json')
+        data = json.dumps({'schemes_data':schemes_data,'service_data':service_data})
+        try:
+            if request.GET['callback']:
+                callback_val = request.GET['callback']
+                data = '%s(%s);' % (callback_val,data)
+        except:
+            print 'report',repr(format_exc())                               
+    return HttpResponse(data,content_type='Application/json')

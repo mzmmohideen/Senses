@@ -508,6 +508,10 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
                 $scope.getReportData = response.get_mem_scheme;
             }
+            else if(response.report_type == 'Government Voter ID Needers') {
+                $scope.ReportHeader = ['S.No','Needers Name','Age & Gender','Financial Status & Family ID','Mobile NO','Address']
+                $scope.getReportData = response.get_mem_voter;
+            }
             else {
                 $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
                 $scope.getReportData = response.member_details;
@@ -515,10 +519,25 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             }
         })
     }
+    $scope.get_dis_val = function(){
+        $http.get('/fetch_data_api/',{}).success(function(data){
+            $scope.val_dis = data
+        })
+    }
+    $scope.get_dis_val()
     $scope.getFamilyReport = function(fam_data) {
         console.log('value',fam_data)
         if(fam_data.report_name == 'Total Family Details') {
+            $scope.voter_status_dt = false;
             $scope.tot_fam_dt = true;
+            $scope.govt_needers = false;
+            $scope.edu_needers = false;
+            $scope.medical_needers = false;
+            $scope.tot_fam_jakath = false;
+        }
+        else if(fam_data.report_name == 'Government Voter ID Needers') {
+            $scope.voter_status_dt = true;
+            $scope.tot_fam_dt = false;
             $scope.govt_needers = false;
             $scope.edu_needers = false;
             $scope.medical_needers = false;
@@ -526,6 +545,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         }
         else if(fam_data.report_name == 'Families Eligible for Jakaath') {
             $scope.tot_fam_jakath = true;
+            $scope.voter_status_dt = false;
             $scope.govt_needers = false;
             $scope.edu_needers = false;
             $scope.tot_fam_dt = false;
@@ -533,21 +553,23 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         }
         else if(fam_data.report_name == 'Medical Needs and Guidance Needers Details') {
             $scope.medical_needers = true;
+            $scope.voter_status_dt = false;
             $scope.govt_needers = false;
             $scope.edu_needers = false;
             $scope.tot_fam_jakath = false;
             $scope.tot_fam_dt = false;
         }
-        else if(fam_data.report_name == 'Government Schemes and Guidance Needers Details' || fam_data.report_name == 'Educational Help and Guidance Needers List') {
+        else if(fam_data.report_name == 'Government Schemes and Guidance Needers Details' || fam_data.report_name == 'Help for Discontinued and Guidance Needers List' || fam_data.report_name == 'Educational Help and Guidance Needers List') {
             if(fam_data.report_name == 'Government Schemes and Guidance Needers Details') {
                 $scope.edu_needers = false;
                 $scope.govt_needers = true;
             }
-            else if(fam_data.report_name == 'Educational Help and Guidance Needers List') {
+            else if(fam_data.report_name == 'Educational Help and Guidance Needers List' || fam_data.report_name == 'Help for Discontinued and Guidance Needers List') {
                 $scope.edu_needers = true;
                 $scope.govt_needers = false;
             }
             $scope.medical_needers = false;
+            $scope.voter_status_dt = false;
             $scope.tot_fam_jakath = false;
             $scope.tot_fam_dt = false;
         }
