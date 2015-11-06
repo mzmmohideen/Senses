@@ -21,7 +21,7 @@ from django.db.models import Q
 def importcsvdatas():
      s = os.path.dirname(__file__)
      print 's',os.path.dirname(__file__),s
-     csv_data = open('%s/csv/census-thangachimadam-1-100.csv'%s,'rb')     
+     csv_data = open('%s/csv/census-thangachimadam-301-389.csv'%s,'rb')     
      new_val = defaultdict(list)
      data = list(csv.reader(csv_data))
      print 'data',data[1][0].split('|')[1]
@@ -44,7 +44,7 @@ def importcsvdata():
      s = os.path.dirname(__file__)
      print 's',os.path.dirname(__file__),s
      filenames = find_csv_filenames('%s/csv/'%s)
-     for name in ['census-thangachimadam-1-100.csv']:
+     for name in filenames:
        # scraped_csv = open('%s/productscrapper/%s'%(s,name))
        # csv_data = open('%s/csv/%s'%(s,name),'rb')
        csv_data = open('%s/csv/%s'%(s,name))
@@ -97,6 +97,8 @@ def importcsvdata():
                       muhalla_update = Masjid.objects.filter(taluk=taluk,name=mohalla_name).update(taluk=taluk,district=district_value,musallas='',location=mohalla_location)
                       masjid = Masjid.objects.get(taluk=taluk,name=mohalla_name)
                       print 'muhalla updated'
+                elif Masjid.objects.filter(mohalla_id=csv_mohalla_id):
+                      pass      
                 else:
                       masjid = Masjid.objects.create(mohalla_id=csv_mohalla_id,taluk=taluk,district=district_value,name=mohalla_name,musallas='',location=mohalla_location)
                 # toilet = True if val[16] == 'Y' else False
@@ -107,7 +109,6 @@ def importcsvdata():
                     toilet = False
                 else:
                   toilet = True                 
-                print 'value',val[63]
                 if val[63]:
                       insurance = True if val[63] == 'Yes' else False
                 else:

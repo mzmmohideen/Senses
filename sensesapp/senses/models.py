@@ -25,7 +25,7 @@ class Masjid(models.Model):
     taluk = models.ForeignKey(Taluk)
     district = models.ForeignKey(District)
     mohalla_id = models.CharField(max_length=20,unique=True,null=True)
-    name = models.CharField(max_length=30,unique=True)
+    name = models.CharField(max_length=70,unique=True)
     musallas = models.CharField(max_length=20)
     location = models.CharField(max_length=30)
 

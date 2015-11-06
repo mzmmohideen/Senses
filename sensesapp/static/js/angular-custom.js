@@ -469,6 +469,11 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         $scope.schemeid_list = schemeid_list
         console.log('value',schemeid_list,$scope.schemeid_list)
     }
+    $scope.serviceid_list = []
+    $scope.filter_service_value = function(serviceid_list) {
+        $scope.serviceid_list = serviceid_list
+        console.log('value',serviceid_list,$scope.serviceid_list)
+    }    
     $scope.fetchReportAPI = function(data,values) {
         console.log('data',data,values)
         data.district = values.district;
@@ -491,20 +496,33 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             data : data,
             diseaseid_list : $scope.diseaseid_list,
             schemeid_list : $scope.schemeid_list,
+            serviceid_list : $scope.serviceid_list,
         }).success(function(response) {
             appBusy.set('Done...');              
             $timeout( function() {              
                 appBusy.set(false);
             }, 1000);
-            if(response.report_type == 'Total Family Details' || response.report_type == 'Families Eligible for Jakaath') {
+            if(response.report_type == 'Total Family Details') {
                 $scope.ReportHeader = ['S.No','Name & Address','Age & Gender','Family ID & Mobile NO','Financial Status & Jakaath']
+                $scope.getReportData = response.get_family;
+            }
+            else if(response.report_type == 'Basic Help Needers List') {
+                $scope.ReportHeader = ['S.No','Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
+                $scope.getReportData = response.get_family;
+            }
+            else if(response.report_type == 'Families Eligible for Jakaath') {
+                $scope.ReportHeader = ['S.No','Needers Name','Age & Gender','Financial Status & Family ID','Mobile NO','Address']
                 $scope.getReportData = response.get_family;
             }
             else if(response.report_type == 'Medical Needs and Guidance Needers Details') {
                 $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
                 $scope.getReportData = response.get_mem_medical;
             }
-            else if(response.report_type == 'Government Schemes and Guidance Needers Details' || response.report_type == 'Educational Help and Guidance Needers List') {
+            else if(response.report_type == 'Help for Poor Peoples and Guidance Needers List') {
+                $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
+                $scope.getReportData = response.get_mem_service;
+            }
+            else if(response.report_type == 'Government Schemes and Guidance Needers Details' || response.report_type == 'Training/Employment Help and Guidance Needers List' || response.report_type == 'Educational Help and Guidance Needers List') {
                 $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
                 $scope.getReportData = response.get_mem_scheme;
             }
@@ -533,44 +551,70 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.govt_needers = false;
             $scope.edu_needers = false;
             $scope.medical_needers = false;
+            $scope.service_needers = false;
             $scope.tot_fam_jakath = false;
+            $scope.basic_needs = false;
         }
         else if(fam_data.report_name == 'Government Voter ID Needers') {
             $scope.voter_status_dt = true;
             $scope.tot_fam_dt = false;
+            $scope.service_needers = false;
             $scope.govt_needers = false;
             $scope.edu_needers = false;
             $scope.medical_needers = false;
+            $scope.basic_needs = false;
             $scope.tot_fam_jakath = false;
         }
-        else if(fam_data.report_name == 'Families Eligible for Jakaath') {
-            $scope.tot_fam_jakath = true;
+        else if(fam_data.report_name == 'Families Eligible for Jakaath' || fam_data.report_name == 'Basic Help Needers List') {
+            if(fam_data.report_name == 'Basic Help Needers List') {
+                $scope.basic_needs = true;
+                $scope.tot_fam_jakath = false;
+            }
+            else if(fam_data.report_name == 'Families Eligible for Jakaath') {
+                $scope.basic_needs = false;
+                $scope.tot_fam_jakath = true;
+            }
             $scope.voter_status_dt = false;
             $scope.govt_needers = false;
             $scope.edu_needers = false;
             $scope.tot_fam_dt = false;
+            $scope.service_needers = false;
             $scope.medical_needers = false;
+        }
+        else if(fam_data.report_name == 'Help for Poor Peoples and Guidance Needers List') {
+            $scope.service_needers = true;
+            $scope.medical_needers = false;
+            $scope.voter_status_dt = false;
+            $scope.govt_needers = false;
+            $scope.edu_needers = false;
+            $scope.tot_fam_jakath = false;
+            $scope.tot_fam_dt = false;
+            $scope.basic_needs = false;
         }
         else if(fam_data.report_name == 'Medical Needs and Guidance Needers Details') {
             $scope.medical_needers = true;
             $scope.voter_status_dt = false;
             $scope.govt_needers = false;
+            $scope.service_needers = false;
             $scope.edu_needers = false;
             $scope.tot_fam_jakath = false;
             $scope.tot_fam_dt = false;
+            $scope.basic_needs = false;
         }
-        else if(fam_data.report_name == 'Government Schemes and Guidance Needers Details' || fam_data.report_name == 'Help for Discontinued and Guidance Needers List' || fam_data.report_name == 'Educational Help and Guidance Needers List') {
+        else if(fam_data.report_name == 'Government Schemes and Guidance Needers Details' || fam_data.report_name == 'Training/Employment Help and Guidance Needers List' || fam_data.report_name == 'Help for Discontinued and Guidance Needers List' || fam_data.report_name == 'Educational Help and Guidance Needers List') {
             if(fam_data.report_name == 'Government Schemes and Guidance Needers Details') {
                 $scope.edu_needers = false;
                 $scope.govt_needers = true;
             }
-            else if(fam_data.report_name == 'Educational Help and Guidance Needers List' || fam_data.report_name == 'Help for Discontinued and Guidance Needers List') {
+            else if(fam_data.report_name == 'Educational Help and Guidance Needers List' || fam_data.report_name == 'Training/Employment Help and Guidance Needers List' || fam_data.report_name == 'Help for Discontinued and Guidance Needers List') {
                 $scope.edu_needers = true;
                 $scope.govt_needers = false;
             }
             $scope.medical_needers = false;
             $scope.voter_status_dt = false;
             $scope.tot_fam_jakath = false;
+            $scope.service_needers = false;
+            $scope.basic_needs = false;
             $scope.tot_fam_dt = false;
         }
         if(fam_data.muhalla != '') {
@@ -596,6 +640,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                         $scope.getReportData = _.filter(data.get_family,function(val){ return val.financial_status.split(' ')[0] == 'D' || val.financial_status.split(' ')[0] == 'E'});
                     }
                     else if(fam_data.report_name == 'Basic Help Needers List') {
+                        $scope.ReportHeader = ['S.No','Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
                         $scope.getReportData = _.filter(data.get_family,function(val){ return val.financial_status.split(' ')[0] == 'E'});
                     }
                     else if(fam_data.report_name == 'Government Voter ID Needers') {
@@ -603,7 +648,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                         $scope.getReportData = _.filter(data.get_memdata,function(val){ return val.voter == false && parseInt(val.age) >= 18});
                     }                
                 }
-                else if(fam_data.report_name == 'Educational Help and Guidance Needers List' || fam_data.report_name == 'Help for Discontinued and Guidance Needers List') {
+                else if(fam_data.report_name == 'Educational Help and Guidance Needers List' || fam_data.report_name == 'Training/Employment Help and Guidance Needers List' || fam_data.report_name == 'Help for Discontinued and Guidance Needers List') {
                     $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
                     if(fam_data.report_name == 'Educational Help and Guidance Needers List') {
                         $scope.getReportData = _.filter(data.get_mem_scheme,function(val){ return val.status == true});

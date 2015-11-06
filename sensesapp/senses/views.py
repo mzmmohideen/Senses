@@ -355,17 +355,24 @@ def fetchReportData(request):
             member_details = get_mem_medical + get_mem_scheme + get_mem_service
             get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.all())
             return HttpResponse(content=json.dumps({'member_details':member_details,'get_mem_service':get_mem_service,'get_mem_medical':get_mem_medical,'get_mem_scheme':get_mem_scheme,'get_memData':get_memData}),content_type='Application/json')
-        elif data['report_type'] == 'Total Family Details' or data['report_type'] == 'Families Eligible for Jakaath':
+        elif data['report_type'] == 'Total Family Details' or data['report_type'] == 'Basic Help Needers List' or data['report_type'] == 'Families Eligible for Jakaath':
             try:
                 if data['muhalla_id']:
                     muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
+                else:
+                    muhalla = Masjid.objects.all()[0]
             except:
                 muhalla = Masjid.objects.all()[0]
-            try:
-                if data['financial']:
-                    family_value = Family.objects.filter(muhalla=muhalla,financial_status=data['financial'])
-            except:
-                family_value = Family.objects.filter(muhalla=muhalla)               
+            if data['report_type'] == 'Basic Help Needers List':
+                family_value = Family.objects.filter(muhalla=muhalla,financial_status='E - Very Poor')
+            else:
+                try:
+                    if data['financial']:
+                        family_value = Family.objects.filter(muhalla=muhalla,financial_status=data['financial'])
+                    else:
+                        family_value = Family.objects.filter(muhalla=muhalla)                    
+                except:
+                    family_value = Family.objects.filter(muhalla=muhalla)               
             get_family = map(lambda x:{'familyid':x.family_id,'address':x.address,'mobile':x.mobile,'family_head':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].name if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'family_head_occ':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].occupation if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'age':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].age if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'gender':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].gender if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'fam_member':Member.objects.filter(family=Family.objects.get(family_id=x.family_id)).count(),'financial_status':x.financial_status,'muhalla':x.muhalla.name,'ration_card':x.ration_card,'language':x.language},family_value)
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_family':get_family}),content_type='Application/json')
         elif data['report_type'] == 'Medical Needs and Guidance Needers Details':
@@ -422,7 +429,45 @@ def fetchReportData(request):
                 for i in get_mem_voter_dt:
                     get_mem_voter.append({'family_head':i.name,'qualification':i.qualification,'address':i.family.address,'age':i.age,'gender':i.gender,'financial_status':i.family.financial_status,'familyid':i.family.family_id,'mobile':i.family.mobile})
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_voter':get_mem_voter}),content_type='Application/json')                
-        elif data['report_type'] == 'Government Schemes and Guidance Needers Details' or data['report_type'] == 'Educational Help and Guidance Needers List' or data['report_type'] == 'Help for Discontinued and Guidance Needers List' :
+        elif data['report_type'] == 'Help for Poor Peoples and Guidance Needers List':
+            get_mem_service = []
+            service_list = json.loads(request.body)['serviceid_list']
+            try:
+                if data['muhalla_id']:
+                    muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
+            except:
+                muhalla = Masjid.objects.all()[0]
+            family_value = Family.objects.filter(muhalla=muhalla)
+            try:
+                if data['financial']:
+                    family_value = family_value.filter(financial_status=data['financial'])
+                else:
+                    family_value = family_value                    
+            except:
+                family_value = family_value
+            for fam in family_value:
+                member_data_service = Member.objects.filter(family=fam)
+                if data['age_from']:
+                    member_data_service = member_data_service.filter(age__gte=data['age_from'])
+                if  data['age_to']:
+                    member_data_service = member_data_service.filter(age__lte=data['age_to'])
+                if data['gender']:
+                    member_data_service = member_data_service.filter(gender=data['gender'])
+                if data['marital_status']:
+                    member_data_service = member_data_service.filter(marital_status=data['marital_status'])    
+                if service_list:
+                    for schlist in service_list:
+                        print 'scheme',schlist
+                        get_service = Service.objects.get(service_id=schlist['service_id'])
+                        for i in member_data_service:
+                            for j in Member_service.objects.filter(member=i,scheme=get_service):
+                                get_mem_service.append({'name':j.member.name,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'via UNWO'})
+                else:
+                    for i in member_data_service:
+                            for j in Member_service.objects.filter(member=i):
+                                get_mem_service.append({'name':j.member.name,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'via UNWO'})
+            return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_service':get_mem_service}),content_type='Application/json')                
+        elif data['report_type'] == 'Government Schemes and Guidance Needers Details' or data['report_type'] == 'Educational Help and Guidance Needers List' or data['report_type'] == 'Help for Discontinued and Guidance Needers List' or data['report_type'] == 'Training/Employment Help and Guidance Needers List':
             get_mem_scheme = []
             scheme_list = json.loads(request.body)['schemeid_list']
             try:
@@ -434,6 +479,8 @@ def fetchReportData(request):
             try:
                 if data['financial']:
                     family_value = family_value.filter(financial_status=data['financial'])
+                else:
+                    family_value = family_value    
             except:
                 family_value = family_value
             for fam in family_value:
