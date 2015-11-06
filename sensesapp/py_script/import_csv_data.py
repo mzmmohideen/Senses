@@ -21,7 +21,7 @@ from django.db.models import Q
 def importcsvdatas():
      s = os.path.dirname(__file__)
      print 's',os.path.dirname(__file__),s
-     csv_data = open('%s/csv/census-ashokapuram-1-67-by-althaf.csv'%s,'rb')     
+     csv_data = open('%s/csv/census-thangachimadam-1-100.csv'%s,'rb')     
      new_val = defaultdict(list)
      data = list(csv.reader(csv_data))
      print 'data',data[1][0].split('|')[1]
@@ -44,7 +44,7 @@ def importcsvdata():
      s = os.path.dirname(__file__)
      print 's',os.path.dirname(__file__),s
      filenames = find_csv_filenames('%s/csv/'%s)
-     for name in ['census-ashokapuram-1-185-by-althaf.csv']:
+     for name in ['census-thangachimadam-1-100.csv']:
        # scraped_csv = open('%s/productscrapper/%s'%(s,name))
        # csv_data = open('%s/csv/%s'%(s,name),'rb')
        csv_data = open('%s/csv/%s'%(s,name))
@@ -65,12 +65,14 @@ def importcsvdata():
                 except:
                   data_date = datetime.now()                      
                 if val[1]:
-                  district_val = val[1]
+                  # district_val = val[1]
+                  district_val = data[1][0].split('|')[1]
                 else:
                   print 'no district name'
                   district_val = data[1][0].split('|')[1]
                 if val[2]:
                   taluk_name = val[2]
+                  taluk_name = data[1][0].split('|')[2]
                 else:
                   print 'no taluk name'
                   taluk_name = data[1][0].split('|')[2]
@@ -87,8 +89,9 @@ def importcsvdata():
                   csv_mohalla_id = '%s / %s'%(district_value.district_code,muhalla_dis_val)
                 else:
                   csv_mohalla_id = val[6]
-                mohalla_location = val[9] if val[9] else ''  
-                mohalla_name = val[5] if val[5] else mohalla_location
+                mohalla_location = val[9] if val[9] else ''
+                mohalla_name = data[1][0].split('|')[5]  
+                # mohalla_name = val[5] if val[5] else mohalla_location
                 if Masjid.objects.filter(taluk=taluk,name=mohalla_name):
                       # muhalla_update = Masjid.objects.filter(taluk=taluk,name=mohalla_name).update(mohalla_id=csv_mohalla_id,taluk=taluk,district=district_value,musallas='',location=mohalla_location)
                       muhalla_update = Masjid.objects.filter(taluk=taluk,name=mohalla_name).update(taluk=taluk,district=district_value,musallas='',location=mohalla_location)
