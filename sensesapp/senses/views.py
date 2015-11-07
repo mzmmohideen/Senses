@@ -359,6 +359,10 @@ def fetchReportData(request):
             try:
                 if data['muhalla_id']:
                     muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
+                elif data['taluk']:
+                    muhalla = Masjid.objects.filter(taluk=Taluk.objects.filter(taluk_name=data['taluk'])[0])[0]
+                elif data['district']:
+                    muhalla = Masjid.objects.filter(district=District.objects.get(district_name=data['district']))[0]                        
                 else:
                     muhalla = Masjid.objects.all()[0]
             except:
@@ -381,6 +385,10 @@ def fetchReportData(request):
             try:
                 if data['muhalla_id']:
                     muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
+                elif data['taluk']:
+                    muhalla = Masjid.objects.filter(taluk=Taluk.objects.filter(taluk_name=data['taluk'])[0])[0]
+                elif data['district']:
+                    muhalla = Masjid.objects.filter(district=District.objects.get(district_name=data['district']))[0]                        
             except:
                 muhalla = Masjid.objects.all()[0]
             family_value = Family.objects.filter(muhalla=muhalla)
@@ -413,6 +421,10 @@ def fetchReportData(request):
             try:
                 if data['muhalla_id']:
                     muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
+                elif data['taluk']:
+                    muhalla = Masjid.objects.filter(taluk=Taluk.objects.filter(taluk_name=data['taluk'])[0])[0]
+                elif data['district']:
+                    muhalla = Masjid.objects.filter(district=District.objects.get(district_name=data['district']))[0]                        
             except:
                 muhalla = Masjid.objects.all()[0]
             family_value = Family.objects.filter(muhalla=muhalla)
@@ -435,6 +447,10 @@ def fetchReportData(request):
             try:
                 if data['muhalla_id']:
                     muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
+                elif data['taluk']:
+                    muhalla = Masjid.objects.filter(taluk=Taluk.objects.filter(taluk_name=data['taluk'])[0])[0]
+                elif data['district']:
+                    muhalla = Masjid.objects.filter(district=District.objects.get(district_name=data['district']))[0]                        
             except:
                 muhalla = Masjid.objects.all()[0]
             family_value = Family.objects.filter(muhalla=muhalla)
@@ -473,6 +489,10 @@ def fetchReportData(request):
             try:
                 if data['muhalla_id']:
                     muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
+                elif data['taluk']:
+                    muhalla = Masjid.objects.filter(taluk=Taluk.objects.filter(taluk_name=data['taluk'])[0])[0]
+                elif data['district']:
+                    muhalla = Masjid.objects.filter(district=District.objects.get(district_name=data['district']))[0]                        
             except:
                 muhalla = Masjid.objects.all()[0]
             family_value = Family.objects.filter(muhalla=muhalla)
@@ -505,6 +525,59 @@ def fetchReportData(request):
                         for j in Member_scheme.objects.filter(member=i):
                             get_mem_scheme.append({'name':j.member.name,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'Need Government Scheme Guidance'})                    
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_scheme':get_mem_scheme}),content_type='Application/json')                
+        elif data['report_type'] == 'Women chldrens Need to join Niswan Madarasa' or data['report_type']  == 'Persons Need to join Jumrah Madarasa' or data['report_type']  == 'Childrens Need to join Makthab Madarasa':
+            try:
+                if data['muhalla_id']:
+                    muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
+                elif data['taluk']:
+                    muhalla = Masjid.objects.filter(taluk=Taluk.objects.filter(taluk_name=data['taluk'])[0])[0]
+                elif data['district']:
+                    muhalla = Masjid.objects.filter(district=District.objects.get(district_name=data['district']))[0]                        
+            except:
+                muhalla = Masjid.objects.all()[0]
+            if data['report_type'] == 'Women chldrens Need to join Niswan Madarasa':
+                get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla,Makthab=True,madarasa_details='Girls For Makthab 4-15'))
+            elif data['report_type'] == 'Childrens Need to join Makthab Madarasa':
+                get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla,Makthab=True,madarasa_details='Boys For Makthab 4-15'))
+            elif data['report_type'] == 'Persons Need to join Jumrah Madarasa':
+                get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla,Makthab=True,madarasa_details='Jumrah Madarasa for Boys'))    
+            return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_memData':get_memData}),content_type='Application/json')
+        elif data['report_type'] == 'Mohalla Report':
+            print 'mohalla report_type'
+            try:
+                if data['muhalla_id']:
+                    muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
+                elif data['taluk']:
+                    muhalla = Masjid.objects.filter(taluk=Taluk.objects.filter(taluk_name=data['taluk'])[0])[0]
+                elif data['district']:
+                    muhalla = Masjid.objects.filter(district=District.objects.get(district_name=data['district']))[0]                    
+            except:
+                muhalla = Masjid.objects.all()[0]            
+            get_family = map(lambda x:{'familyid':x.family_id,'address':x.address,'mobile':x.mobile,'family_head':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].name if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'family_head_occ':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].occupation if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'age':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].age if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'gender':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].gender if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'fam_member':Member.objects.filter(family=Family.objects.get(family_id=x.family_id)).count(),'financial_status':x.financial_status,'muhalla':x.muhalla.name,'ration_card':x.ration_card,'language':x.language},Family.objects.filter(muhalla=muhalla))
+            get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla))
+            married = sum(1 if(x['marital_status']=='Married' or x['marital_status']=='Widow' or x['marital_status']=='Devorced') else 0 for x in get_memData)
+            tot_men = sum(1 if(x['gender']=='MALE') else 0 for x in get_memData)
+            tot_women = sum(1 if(x['gender']=='FEMALE') else 0 for x in get_memData)
+            voter = sum(1 if(x['voter']==True) else 0 for x in get_memData)
+            men_age_60 = sum(1 if(x['gender']=='MALE' and eval(str(str(x['age'])))>=60) else 0 for x in get_memData)
+            women_age_60 = sum(1 if(x['gender']=='FEMALE' and eval(str(x['age']))>=60) else 0 for x in get_memData)
+            men_age_22to59 = sum(1 if(x['gender']=='MALE' and 22<=eval(str(x['age']))<=59) else 0 for x in get_memData)
+            women_age_22to59 = sum(1 if(x['gender']=='FEMALE' and 22<=eval(str(x['age']))<=59) else 0 for x in get_memData)
+            men_age_11to21 = sum(1 if(x['gender']=='MALE' and 11<=eval(str(x['age']))<=21) else 0 for x in get_memData)
+            women_age_11to21 = sum(1 if(x['gender']=='FEMALE' and 11<=eval(str(x['age']))<=21) else 0 for x in get_memData)
+            child_upto11 = sum(1 if(eval(str(x['age']))<=10) else 0 for x in get_memData)
+            cat_A = sum(1 if(x['financial_status']=='A - Well Settled') else 0 for x in get_family)
+            cat_B = sum(1 if(x['financial_status']=='B - Full Filled') else 0 for x in get_family)
+            cat_C = sum(1 if(x['financial_status']=='C - Middle Class') else 0 for x in get_family)
+            cat_D = sum(1 if(x['financial_status']=='D - Poor') else 0 for x in get_family)
+            cat_E = sum(1 if(x['financial_status']=='E - Very Poor') else 0 for x in get_family)
+            lang_tamil = sum(1 if(x['language']=='Tamil') else 0 for x in get_family)
+            lang_urdu = sum(1 if(x['language']=='Urdu') else 0 for x in get_family)
+            lang_others = sum(1 if(x['language']=='Others') else 0 for x in get_family)
+            widowed = sum(1 if(x['marital_status']=='Widow' and x['gender']=='FEMALE') else 0 for x in get_memData)
+            divorced = sum(1 if(x['marital_status']=='Devorced' and x['gender']=='FEMALE') else 0 for x in get_memData)
+            rep_data = {'Taluk':muhalla.taluk.taluk_name,'Taluk Count':1,'Total Family ':len(get_family),'Total Population':len(get_memData),'Total Male':tot_men,'Total Female':tot_women,'Married':married,'Male age 60+':men_age_60,'Female age 60+':women_age_60,'Male age between 22-59':men_age_22to59,'Female age between 22-59':women_age_22to59,'Male age between 11-21':men_age_11to21,'Female age between 11-21':women_age_11to21,'Child upto 11 age ':child_upto11,'A - Well Settled':cat_A,'B - Full Filled':cat_B,'C - Middle Class':cat_C,'D - Poor':cat_D,'E - Very Poor':cat_E,'Widow':widowed,'Divorced':divorced,'Mother Tongue':{'Tamil':lang_tamil,'Urdu':lang_urdu,'Others':lang_others}}
+            return HttpResponse(content=json.dumps({'report_type':data['report_type'],'reports':rep_data}),content_type='Application/json')
         # return HttpResponse(content=json.dumps({'data':data,'member_details':member_details,'get_mem_service':get_mem_service,'get_mem_medical':get_mem_medical,'get_mem_scheme':get_mem_scheme,'get_memData':get_memData}),content_type='Application/json')
     
     elif request.method == 'GET':
@@ -866,11 +939,13 @@ def fetch_data_api(request):
             # for l in tot_scheme_list:
             #     tot_scheme_dict[l] = tot_scheme_dict.setdefault(l,0) + 1    
             # schemes_data[i.name].append({'total_count':tot_count_dict,'unsolved_district_count':count_dict,'total_scheme_count':len(tot_scheme_data)})
+            count_dict['The_Nilgiris'] = count_dict.pop('The Nilgiris')
+            tot_count_dict['The_Nilgiris'] = tot_count_dict.pop('The Nilgiris')
             schemes_data.append({'scheme_name':i.name,'total_count':tot_count_dict,'unsolved_district_count':count_dict,'total_scheme_count':len(tot_scheme_data)})
 
         for i in Service.objects.all():
-            serv_data = map(lambda x:{'scheme_name':x.scheme.name,'district':x.member.muhalla.taluk.district.district_name},Member_scheme.objects.filter(scheme=i,status=True,solution='Not Yet'))
-            tot_scheme_data = map(lambda x:{'scheme_name':x.scheme.name,'district':x.member.muhalla.taluk.district.district_name},Member_scheme.objects.filter(scheme=i,status=True))
+            serv_data = map(lambda x:{'scheme_name':x.scheme.name,'district':x.member.muhalla.taluk.district.district_name},Member_service.objects.filter(scheme=i,status=True,solution='Not Yet'))
+            tot_scheme_data = map(lambda x:{'scheme_name':x.scheme.name,'district':x.member.muhalla.taluk.district.district_name},Member_service.objects.filter(scheme=i,status=True))
             count_dict = {'Ariyalur':0,'Chennai':0,'Coimbatore':0,'Cuddalore':0,'Dharmapuri':0,'Dindigul':0,'Erode':0,'Kanchipuram':0,'Kanyakumari':0,'Karur':0,'Krishnagiri':0,'Madurai':0,'Nagapattinam':0,'Namakkal':0,'The Nilgiris':0,'Perambalur':0,'Pudukkottai':0,'Ramanathapuram':0,'Salem':0,'Sivaganga':0,'Thanjavur':0,'Theni':0,'Thoothukudi':0,'Tiruchirappalli':0,'Tirunelveli':0,'Tiruppur':0,'Tiruvallur':0,'Tiruvannamalai':0,'Tiruvarur':0,'Vellore':0,'Viluppuram':0,'Virudhunagar':0}
             tot_count_dict = {'Ariyalur':0,'Chennai':0,'Coimbatore':0,'Cuddalore':0,'Dharmapuri':0,'Dindigul':0,'Erode':0,'Kanchipuram':0,'Kanyakumari':0,'Karur':0,'Krishnagiri':0,'Madurai':0,'Nagapattinam':0,'Namakkal':0,'The Nilgiris':0,'Perambalur':0,'Pudukkottai':0,'Ramanathapuram':0,'Salem':0,'Sivaganga':0,'Thanjavur':0,'Theni':0,'Thoothukudi':0,'Tiruchirappalli':0,'Tirunelveli':0,'Tiruppur':0,'Tiruvallur':0,'Tiruvannamalai':0,'Tiruvarur':0,'Vellore':0,'Viluppuram':0,'Virudhunagar':0}
             tot_scheme_dict = {}
@@ -879,7 +954,9 @@ def fetch_data_api(request):
                 count_dict[j] = count_dict.setdefault(j,0) + 1
             tot_item_list = [tot['district'] for tot in tot_scheme_data]
             for k in tot_item_list:
-                tot_count_dict[k] = tot_count_dict.setdefault(k,0) + 1    
+                tot_count_dict[k] = tot_count_dict.setdefault(k,0) + 1
+            count_dict['The_Nilgiris'] = count_dict.pop('The Nilgiris')
+            tot_count_dict['The_Nilgiris'] = tot_count_dict.pop('The Nilgiris')    
             service_data.append({'scheme_name':i.name,'total_count':tot_count_dict,'unsolved_district_count':count_dict,'total_scheme_count':len(tot_scheme_data)})    
         data = json.dumps({'schemes_data':schemes_data,'service_data':service_data})
         try:
