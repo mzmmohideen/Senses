@@ -938,6 +938,7 @@ def matrix_taluk_api(request):
                 data = map(lambda x:{'scheme_name':x.scheme.name,'taluk':x.member.muhalla.taluk.taluk_name,'district':x.member.muhalla.taluk.district.district_name},Member_service.objects.filter(scheme=service,status=True,solution='Not Yet'))
                 get_district = filter(None,map(lambda y:{'scheme_name':y['scheme_name'],'taluk':y['taluk'],'district':y['district']} if y['district']==district else None,data))
                 item_list = [dic['taluk'] for dic in get_district]
+                scheme = request.GET['service_name']
                 for j in item_list:
                     count_dict[j] = count_dict.setdefault(j,0) + 1
             elif request.GET['scheme_name'] != 'none':
@@ -945,6 +946,7 @@ def matrix_taluk_api(request):
                 data = map(lambda x:{'scheme_name':x.scheme.name,'taluk':x.member.muhalla.taluk.taluk_name,'district':x.member.muhalla.taluk.district.district_name},Member_scheme.objects.filter(scheme=scheme,status=True,solution='Not Yet')) 
                 get_district = filter(None,map(lambda y:{'scheme_name':y['scheme_name'],'taluk':y['taluk'],'district':y['district']} if y['district']==district else None,data))
                 item_list = [dic['taluk'] for dic in get_district]
+                scheme = request.GET['scheme_name']
                 for j in item_list:
                     count_dict[j] = count_dict.setdefault(j,0) + 1
             else:
@@ -952,7 +954,7 @@ def matrix_taluk_api(request):
         except:
             print 'repr',repr(format_exc())
             data = []                
-        return HttpResponse(content=json.dumps({'data':count_dict,'district':district}),content_type='Application/json')    
+        return HttpResponse(content=json.dumps({'data':count_dict,'district':district,'campaign':scheme}),content_type='Application/json')    
 
 def fetch_data_api(request):
     if request.method == 'GET':
