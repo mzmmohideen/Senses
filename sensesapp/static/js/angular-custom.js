@@ -68,9 +68,9 @@ app.filter('propsFilter', function() {
 app.config(['$routeProvider',
     function($routeProvider) {
         $routeProvider.
-        // when('/dashboard', {
-        //     templateUrl: 'dashboard.html',
-        // }).
+        when('/dashboard', {
+            templateUrl: 'dashboard.html',
+        }).
         when('/location', {
             templateUrl: 'location.html',
         }).

@@ -919,6 +919,41 @@ def change_password(request):
                 response = 'Username & Email Not Matching!'               
         return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')
 
+def dashboard_api(request):
+    if request.method == 'GET':
+        muhalla = len(Masjid.objects.all())
+        fam_member = len(Member.objects.all())
+        tot_family = len(Family.objects.all())
+        volunteer_interest = len(Member.objects.filter(volunteer=True))
+        donor_interest = len(Member.objects.filter(donor=True))
+        return HttpResponse(content=json.dumps({'data':'data'}),content_type='Application/json')
+
+def matrix_taluk_api(request):
+    if request.method == 'GET':
+        district = request.GET['district']
+        count_dict = {}
+        try:            
+            if request.GET['service_name'] != 'none':
+                service = Service.objects.get(name=request.GET['service_name'])
+                data = map(lambda x:{'scheme_name':x.scheme.name,'taluk':x.member.muhalla.taluk.taluk_name,'district':x.member.muhalla.taluk.district.district_name},Member_service.objects.filter(scheme=service,status=True,solution='Not Yet'))
+                get_district = filter(None,map(lambda y:{'scheme_name':y['scheme_name'],'taluk':y['taluk'],'district':y['district']} if y['district']==district else None,data))
+                item_list = [dic['taluk'] for dic in get_district]
+                for j in item_list:
+                    count_dict[j] = count_dict.setdefault(j,0) + 1
+            elif request.GET['scheme_name'] != 'none':
+                scheme = SubScheme.objects.get(name=request.GET['scheme_name'])           
+                data = map(lambda x:{'scheme_name':x.scheme.name,'taluk':x.member.muhalla.taluk.taluk_name,'district':x.member.muhalla.taluk.district.district_name},Member_scheme.objects.filter(scheme=scheme,status=True,solution='Not Yet')) 
+                get_district = filter(None,map(lambda y:{'scheme_name':y['scheme_name'],'taluk':y['taluk'],'district':y['district']} if y['district']==district else None,data))
+                item_list = [dic['taluk'] for dic in get_district]
+                for j in item_list:
+                    count_dict[j] = count_dict.setdefault(j,0) + 1
+            else:
+                data = []
+        except:
+            print 'repr',repr(format_exc())
+            data = []                
+        return HttpResponse(content=json.dumps({'data':count_dict,'district':district}),content_type='Application/json')    
+
 def fetch_data_api(request):
     if request.method == 'GET':
         schemes_data = []

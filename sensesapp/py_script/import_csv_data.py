@@ -44,7 +44,7 @@ def importcsvdata():
      s = os.path.dirname(__file__)
      print 's',os.path.dirname(__file__),s
      filenames = find_csv_filenames('%s/csv/'%s)
-     for name in filenames:
+     for name in ['486-523.csv']:
        # scraped_csv = open('%s/productscrapper/%s'%(s,name))
        # csv_data = open('%s/csv/%s'%(s,name),'rb')
        csv_data = open('%s/csv/%s'%(s,name))
@@ -63,7 +63,8 @@ def importcsvdata():
                   else:
                         data_date = datetime.now()
                 except:
-                  data_date = datetime.now()                      
+                  data_date = datetime.now()
+                print 'val',val  
                 if val[1]:
                   # district_val = val[1]
                   district_val = data[1][0].split('|')[1]
@@ -152,13 +153,14 @@ def importcsvdata():
                 if val[15]:
                   house_cat = '' if val[15] == '-' else val[15]
                 else:
-                  house_cat = ''                   
+                  house_cat = ''
+                mobile_no = val[10] if len(val[10]) else val[10][:10]  
                 if Family.objects.filter(family_id=familyid):
-                      family_update = Family.objects.filter(family_id=familyid).update(muhalla=masjid,report_date=data_date,language=language,ration_card=ration_card,address=fam_address,mobile=val[10],house_type=fam_house,toilet=toilet,house_cat=house_cat,financial_status=financial_status,health_insurance=insurance,volunteer=volunteer,donor=donor,family_needs=family_needs)
+                      family_update = Family.objects.filter(family_id=familyid).update(muhalla=masjid,report_date=data_date,language=language,ration_card=ration_card,address=fam_address,mobile=mobile_no,house_type=fam_house,toilet=toilet,house_cat=house_cat,financial_status=financial_status,health_insurance=insurance,volunteer=volunteer,donor=donor,family_needs=family_needs)
                       family = Family.objects.get(family_id=familyid)
                       print 'family updated'
                 else:
-                      family = Family.objects.create(family_id=familyid,muhalla=masjid,report_date=data_date,language=language,ration_card=ration_card,address=fam_address,mobile=val[10],house_type=fam_house,toilet=toilet,house_cat=house_cat,financial_status=financial_status,health_insurance=insurance,volunteer=volunteer,donor=donor,family_needs=family_needs)
+                      family = Family.objects.create(family_id=familyid,muhalla=masjid,report_date=data_date,language=language,ration_card=ration_card,address=fam_address,mobile=mobile_no,house_type=fam_house,toilet=toilet,house_cat=house_cat,financial_status=financial_status,health_insurance=insurance,volunteer=volunteer,donor=donor,family_needs=family_needs)
                 
                 # member add
                 member_id = '%s / %s' %(family.family_id,val[18])
@@ -413,11 +415,11 @@ def importcsvdata():
                         get_dis_val = Disease.objects.get(disease_name=surgery_name)
                       except:
                         surgery_name = Disease.objects.all()
-                        get_dis_val = surgery_name[0]                         
+                        get_dis_val = surgery_name[0]  
                       if Surgery.objects.filter(member=member,disease=get_dis_val):
-                        add_surgery_needs = Surgery.objects.filter(member=member,disease=get_dis_val).update(surgery_name=surg_name,hospital_name=surg_hospital,cost=surg_cost,cash_inHand=surg_cashinhand,details=surg_name)
+                        add_surgery_needs = Surgery.objects.filter(member=member,disease=get_dis_val).update(surgery_name=surg_name,hospital_name=surg_hospital,cost=surg_cost,cash_inHand=surg_cashinhand)
                       else:
-                        add_surgery_needs = Surgery.objects.create(member=member,disease=get_dis_val,surgery_name=surg_name,hospital_name=surg_hospital,cost=surg_cost,cash_inHand=surg_cashinhand,details=surg_name)
+                        add_surgery_needs = Surgery.objects.create(member=member,disease=get_dis_val,surgery_name=surg_name,hospital_name=surg_hospital,cost=surg_cost,cash_inHand=surg_cashinhand)
                     chronic_disease_details = val[61] if val[61] else ''
                     if chronic_disease_details:
                       if ChronicDisease.objects.filter(member=member,disease=dis_val):
@@ -454,7 +456,8 @@ def importcsvdata():
                   else:
                       mem_service = Member_service.objects.create(member=member,scheme=Service.objects.get(name='Other Government Schemes'),status=True,solution="Not Yet")
             except:
-              print 'report',repr(format_exc())
+              print 'report',data[1:]
+              exit()
 
 if __name__ == "__main__":
      importcsvdata()
