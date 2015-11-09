@@ -220,15 +220,15 @@ def masjid_member(request):
                 moh_user = str(masjid_val.mohalla_id.replace(' ','').replace('/','_'))
                 if not User.objects.filter(username=moh_user):
                     if SensesMembers.objects.filter(member_type='Mohalla User',masjid=masjid_val):
-                        response =  'Mohalla User Exist!'
+                        return HttpResponse(content=json.dumps({'data':'Mohalla User Exist!'}),content_type='Application/json')    
                     elif User.objects.filter(email=data['email']):
-                        response = 'Email ID Exist!'
+                        return HttpResponse(content=json.dumps({'data':'Email ID Exist!'}),content_type='Application/json')    
                     else:
                         create_moh_user = User.objects.create(username=moh_user,email=data['email'])
                         create_moh_user.set_password = '%s%s'%(moh_user,'123')
                         create_moh_user.save()
                         user_add = SensesMembers.objects.create(user=create_moh_user,member_type='Mohalla User',masjid=masjid_val)
-                        response = 'Mohalla User Created Successfully!'
+                        # response = 'Mohalla User Created Successfully!'
             whatsapp = True if data['whatsapp'] == 'Yes' else False
             if Masjid_members.objects.filter(masjid=masjid_val,member_name=data['member_name'],designation=data['designation']):
                 masjid = Masjid_members.objects.filter(masjid=masjid_val,member_name=data['member_name'],designation=data['designation']).update(age=data['age'],mobile=data['mobile'],email=data['email'],is_coordinator=coordinator,is_availonwhatsapp=whatsapp,address=data['address'])
@@ -894,8 +894,18 @@ def new_member(request):
         return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')
     else:
         muhalla = Masjid.objects.get(mohalla_id=request.GET['muhalla_id'])
-        sense_member = map(lambda x:{'username':x.user.username,'email':x.user.email,'Member_type':x.member_type},SensesMembers.objects.filter(masjid=muhalla))
-        return HttpResponse(content=json.dumps({'data':sense_member}),content_type='Application/json')
+        print 'muhalla',muhalla.id,request.GET['muhalla_id']
+        if SensesMembers.objects.filter(masjid=muhalla):
+            try:
+                sen_mem = SensesMembers.objects.get(masjid=muhalla)
+            except:
+                sen_mem = SensesMembers.objects.filter(masjid=muhalla)[0]            
+            # sense_member = map(lambda x:{'username':x.user.username,'email':x.user.email,'Member_type':x.member_type},SensesMembers.objects.filter(masjid=muhalla))
+            return HttpResponse(content=json.dumps({'username':sen_mem.user.username,'email':sen_mem.user.email,'Member_type':sen_mem.member_type}),content_type='Application/json')
+            # return HttpResponse(content=json.dumps({'data':sense_member}),content_type='Application/json')
+        else:
+            return HttpResponse(content=json.dumps({'data':'No Data Found!'}),content_type='Application/json')
+            
 
 def change_password(request):
     if request.method == 'POST':
@@ -926,7 +936,7 @@ def dashboard_api(request):
         tot_family = len(Family.objects.all())
         volunteer_interest = len(Member.objects.filter(volunteer=True))
         donor_interest = len(Member.objects.filter(donor=True))
-        return HttpResponse(content=json.dumps({'data':'data'}),content_type='Application/json')
+        return HttpResponse(content=json.dumps({'muhalla':muhalla,'fam_member':fam_member,'tot_family':tot_family,'volunteer_interest':volunteer_interest,'donor_interest':donor_interest}),content_type='Application/json')
 
 def matrix_taluk_api(request):
     if request.method == 'GET':

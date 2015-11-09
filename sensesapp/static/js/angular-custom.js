@@ -147,6 +147,12 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             }    
         }
     }
+    $scope.fetch_dashboard_data = function() {
+        $http.get('/dashboard_api/',{}).success(function(response){
+            $scope.dashboard_data = response;
+        })
+    }
+    $scope.fetch_dashboard_data()
     $scope.scheme_val = 'SELECT or ADD SCHEMES';
     $scope.get_scheme = function(scheme) {
         if(!scheme) {
@@ -442,8 +448,15 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         console.log('mohalla_data',mohalla_data)
         $http.get('/new_member/?muhalla_id='+mohalla_data.muhalla.mohalla_id,{}).success(function(data){
             console.log('data',data)
-            $scope.fetched_moh_user = _.filter(data.data,function(val){ return val.Member_type == mohalla_data.member_type});
-            console.log('scope',$scope.fetched_moh_user.length)
+            if(data.data) {
+                $scope.fetched_moh_user = []
+            }
+            else {
+                $scope.fetched_moh_user = data;
+            }
+            // $scope.fetched_moh_user = data.data[0];
+            // $scope.fetched_moh_user = _.filter(data.data,function(val){ return val.Member_type == mohalla_data.member_type});
+            // console.log('scope',$scope.fetched_moh_user.length)
         })
     }
     $scope.ReportDatas = {
@@ -1082,7 +1095,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 }
                 else if(status == 'exit') {
                     $modalInstance.dismiss('cancel');
-                    window.location.reload();
+                    // window.location.reload();
                 }
                 console.log('response',response)
             })
