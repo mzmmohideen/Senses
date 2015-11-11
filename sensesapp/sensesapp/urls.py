@@ -41,6 +41,8 @@ urlpatterns = patterns('',
     url(r'^DiseaseData/',DiseaseData),
     url(r'^updateMemScheme/',updateMemScheme),
     url(r'^FamilyMemberData/',FamilyMemberData),
+    url(r'^report_to_pdf/',report_to_pdf),
+    url(r'^upload_bulk_data/',upload_bulk_data),    
     # Examples:
     # url(r'^$', 'sensesapp.views.home', name='home'),
     # url(r'^sensesapp/', include('sensesapp.foo.urls')),

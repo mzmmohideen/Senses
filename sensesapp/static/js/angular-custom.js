@@ -92,11 +92,14 @@ app.config(['$routeProvider',
         when('/diseases', {
             templateUrl: 'diseases.html',
         }).
+        when('/import', {
+            templateUrl: 'imports.html',
+        }).
         when('/reports', {
             templateUrl: 'reports.html',
         }).
         otherwise({
-            redirectTo: '/reports'
+            redirectTo: '/dashboard'
         });
     }
 ]);
@@ -176,6 +179,20 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.sub_scheme_val = scheme.sub;
         }
         console.log('val',$scope.sub_scheme_val)
+    }
+    $scope.upload_csv = function(csv_file) {
+        var fileUrl = '/upload_bulk_data/';
+        var send = new FormData();
+        console.log('csv_file',csv_file)
+        send.append('csv_file', csv_file);
+        $http.post(fileUrl, send, {
+            transformRequest: angular.identity,
+            headers: {
+                'Content-Type': undefined
+            }
+        }).success(function(data) {
+            alert(data.data)
+        });
     }
     $scope.getScheme = function() {
         $http.get('/SchemeData/',{}).success(function(data) {
@@ -394,6 +411,9 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         $scope.ReportValues.muhalla.mohalla_id = ''
         $scope.ReportHeader = []
         $scope.getReportData = []
+        $http.get('/matrix_taluk_api/?district=Chennai&scheme_name=Old Age Pension&service_name=none',{}).success(function(data){
+            console.log('data',data)
+        })
     }
     $scope.moh_user = {
         member_type : '',
@@ -1059,7 +1079,8 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         var modalInstance = $modal.open({
             templateUrl: 'add_members_modal',
             controller: add_members_ctrl,
-            backdrop: 'true',
+            backdrop: 'static',
+            keyboard: false
         });
     }
     var add_members_ctrl=function($scope,$http,masjid_data,$rootScope,$timeout,$location,$modalInstance) {
@@ -1108,7 +1129,8 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         var modalInstance = $modal.open({
             templateUrl: 'add_Familymembers_modal',
             controller: add_Familymembers_ctrl,
-            backdrop: 'true',
+            backdrop: 'static',
+            keyboard: false
         });
     }
     var add_Familymembers_ctrl=function($scope,$http,masjid_data,$rootScope,$timeout,$location,$modalInstance) {
@@ -1693,123 +1715,23 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         // return pluck_module
     }
 
-    $scope.upload_csv = function(csv_file, to) {
-        console.log(csv_file, to)
-        var csv_file = csv_file;
-        var fileUrl = '/upload_bulk_csv/';
-        var send = new FormData();
-        send.append('csv_file', csv_file);
-        $http.post(fileUrl, send, {
-            data: to,
-            transformRequest: angular.identity,
-            headers: {
-                'Content-Type': undefined
-            }
-        }).success(function(data) {
-            console.log('val', data)
-            alert(data.data)
-        });
-    }
-
-    $scope.sizeUpdated = function(day, session) {
-
-        var periodIndex = day.allocs.indexOf(session);
-        console.log(periodIndex,session,day.allocs)
-
-        var tempStartHour = parseInt(session.session_start) + session.session_length;
-
-        for (var i = periodIndex + 1; i < day.allocs.length; i++) {
-            if(day.allocs[i].name == 'Period 5' || day.allocs[i].subject== 'Lunch Break') {
-                console.log('????',day.allocs)
-                day.allocs[i].session_start = 4;
-                day.allocs[i].session_length = 1;
-                day.allocs[i].subject = 'Lunch Break';
-
-            }
-            else if(day.allocs[i].name || day.allocs[i].subject || day.allocs[i].staff) {
-                console.log('????',day.allocs)
-                day.allocs[i].session_start = parseInt(day.allocs[i].session_start);
-                day.allocs[i].session_length = day.allocs[i].session_length;
-            }
-            else {
-                day.allocs[i].session_start = parseInt(session.session_start);
-                day.allocs[i].session_length = session.session_length;
-            }
-            console.log(tempStartHour);
-            console.log(day.allocs)
-            // tempStartHour = day.allocs[i].session_start + day.allocs[i].session_length;
-        };
-
-
-
-    }
-
-
-
-    $scope.addNewPeriod = function(day, session) {
-        var lastPeriod = day.allocs[day.allocs.length - 1];
-        var session_start = 0;
-        console.log('session',lastPeriod)
-        if (session != undefined) {
-            console.log(session);
-            lastPeriod = session;
-            console.log('lastPeriod',lastPeriod,'lastPeriodsession',parseInt(lastPeriod.session_length))
-            session_start = parseInt(lastPeriod.session_start) + parseInt(lastPeriod.session_length);
-        };
-        // var lastPeriod = day.allocs[day.allocs.length - 1];
-        var periodIndex = day.allocs.indexOf(lastPeriod) + 1;
-
-        console.log(day.allocs,'111',session_start)
-        var tempData = {
-            name: 'Period ' + (day.allocs.length),
-            subject: '',
-            staff: '',
-            session_start: session_start,
-            session_length: 1,
-            selected: false
-        };
-        console.log(day.allocs.length)
-        day.allocs.splice(periodIndex + 1, 0, tempData);
-        console.log('session_start',day.allocs,'lastPeriod',lastPeriod)
-        var tempStartHour = day.allocs[periodIndex].session_start + day.allocs[periodIndex].session_length;
-
-
-        $scope.periodClicked(day,day.allocs[periodIndex + 1])
-
-        for (var i = periodIndex + 1; i < day.allocs.length; i++) {
-            console.log(tempStartHour);
-            day.allocs[i].session_start = tempStartHour;
-            tempStartHour = day.allocs[i].session_start + day.allocs[i].session_length;
-        };
-    }
-
-
-    $scope.dayClicked = function(day) {
-
-        console.log("dayClicked", day);
-
-        $scope.selectedDay = day;
-
-
-        console.log("dayClicked", $scope.selectedDay);
-
-
-    }
-
-
-    $scope.periodClicked = function(day, session) {
-
-        $scope.dayClicked(day);
-        
-
-        console.log("periodClicked", day, session, $scope.selectedDay, $scope.selectedSession);
-
-        $scope.selectedSession = session;
-
-
-
-
-    }
+    // $scope.upload_csv = function(csv_file, to) {
+    //     console.log(csv_file, to)
+    //     var csv_file = csv_file;
+    //     var fileUrl = '/upload_bulk_csv/';
+    //     var send = new FormData();
+    //     send.append('csv_file', csv_file);
+    //     $http.post(fileUrl, send, {
+    //         data: to,
+    //         transformRequest: angular.identity,
+    //         headers: {
+    //             'Content-Type': undefined
+    //         }
+    //     }).success(function(data) {
+    //         console.log('val', data)
+    //         alert(data.data)
+    //     });
+    // }
 
 
     $scope.get_program = function() {

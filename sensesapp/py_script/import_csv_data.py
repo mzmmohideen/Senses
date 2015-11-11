@@ -40,11 +40,13 @@ def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
     return [ filename for filename in filenames if filename.endswith( suffix ) ]
 
-def importcsvdata():
+def importcsvdata(value):
      s = os.path.dirname(__file__)
-     print 's',os.path.dirname(__file__),s
-     filenames = find_csv_filenames('%s/csv/'%s)
-     for name in ['486-523.csv']:
+     if value == 'upload':
+      filenames = find_csv_filenames('%s/csv/'%s)
+     else:
+      filenames = [value]      
+     for name in filenames:
        # scraped_csv = open('%s/productscrapper/%s'%(s,name))
        # csv_data = open('%s/csv/%s'%(s,name),'rb')
        csv_data = open('%s/csv/%s'%(s,name))
@@ -154,17 +156,23 @@ def importcsvdata():
                   house_cat = '' if val[15] == '-' else val[15]
                 else:
                   house_cat = ''
-                mobile_no = val[10] if len(val[10]) else val[10][:10]  
+                # mobile_no = val[10] if len(val[10]) else val[10][:10]
+                mobile_no = val[10] if val[10] else ''
                 if Family.objects.filter(family_id=familyid):
                       family_update = Family.objects.filter(family_id=familyid).update(muhalla=masjid,report_date=data_date,language=language,ration_card=ration_card,address=fam_address,mobile=mobile_no,house_type=fam_house,toilet=toilet,house_cat=house_cat,financial_status=financial_status,health_insurance=insurance,volunteer=volunteer,donor=donor,family_needs=family_needs)
                       family = Family.objects.get(family_id=familyid)
                       print 'family updated'
                 else:
                       family = Family.objects.create(family_id=familyid,muhalla=masjid,report_date=data_date,language=language,ration_card=ration_card,address=fam_address,mobile=mobile_no,house_type=fam_house,toilet=toilet,house_cat=house_cat,financial_status=financial_status,health_insurance=insurance,volunteer=volunteer,donor=donor,family_needs=family_needs)
-                
                 # member add
                 member_id = '%s / %s' %(family.family_id,val[18])
-                dob_date = data_date - relativedelta(years=eval(val[21])) if val[21] else data_date
+                try:
+                  dob_date = data_date - relativedelta(years=eval(val[21])) if val[21] else data_date
+                except:
+                  try:
+                    dob_date = data_date - relativedelta(years=eval(val[21].split(' ')[0]))
+                  except:
+                    dob_date = data_date - relativedelta(years=eval(val[21][:1]))
                 mem_age = str(datetime.now().year-dob_date.year)
                 if val[23]:
                       if val[23] == 'M':
@@ -456,8 +464,8 @@ def importcsvdata():
                   else:
                       mem_service = Member_service.objects.create(member=member,scheme=Service.objects.get(name='Other Government Schemes'),status=True,solution="Not Yet")
             except:
-              print 'report',data[1:]
+              print 'report',repr(format_exc())
               exit()
 
 if __name__ == "__main__":
-     importcsvdata()
+     importcsvdata('upload')

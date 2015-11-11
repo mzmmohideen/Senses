@@ -45,7 +45,7 @@ class Family(models.Model):
     family_id = models.CharField(max_length=30,unique=True)
     ration_card =  models.CharField(max_length=30)
     address = models.CharField(max_length=200)
-    mobile = models.CharField(max_length=20)
+    mobile = models.CharField(max_length=50,null=True)
     donor = models.BooleanField(default=False)
     report_date = models.DateTimeField(default=timezone.now)
     volunteer = models.BooleanField(default=False)

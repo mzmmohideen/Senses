@@ -15,6 +15,7 @@ from traceback import format_exc
 from itertools import groupby
 from operator import itemgetter
 from django.db.models import Q
+from py_script.import_csv_data import importcsvdata
 
 def login_check(request):
     if request.user.is_authenticated():
@@ -938,38 +939,79 @@ def dashboard_api(request):
         donor_interest = len(Member.objects.filter(donor=True))
         return HttpResponse(content=json.dumps({'muhalla':muhalla,'fam_member':fam_member,'tot_family':tot_family,'volunteer_interest':volunteer_interest,'donor_interest':donor_interest}),content_type='Application/json')
 
+def upload_bulk_data(request):
+    get_csv = request.FILES['csv_file']
+    print 'get_csv',get_csv
+    csv_import = importcsvdata(get_csv)
+    print 'csv_import',
+    if csv_import == None:
+        response = 'Data Imported Successfully!'
+    else:
+        response = str(csv_import)        
+    return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')
+
+def report_to_pdf(request):
+    import pdfkit,pdfcrowd
+    body = """
+    <html>
+      Hello World! how are you! i am Fine!
+      </html>
+    """
+    filename = 'mohii.pdf'
+    response = pdfkit.from_string(body, filename)
+    # response['Content-Disposition'] = 'attachment; filename='+filename
+    # response['Content-Type'] = 'Content-type: application/octet-stream'
+    # response['Content-Length'] = bytes
+    print 'response',response
+    # response = HttpResponse(content_type="application/pdf")
+    # response["Cache-Control"] = "max-age=0"
+    # response["Accept-Ranges"] = "none"
+    
+    # response["Content-Disposition"] = "attachment; filename="+filename
+    return response
+    # return HttpResponse(content=json.dumps({'muhalla':'data'}),content_type='Application/pdf')
+
 def matrix_taluk_api(request):
     if request.method == 'GET':
         district = request.GET['district']
         count_dict = {}
-        try:            
-            if request.GET['service_name'] != 'none':
-                service = Service.objects.get(name=request.GET['service_name'])
-                data = map(lambda x:{'scheme_name':x.scheme.name,'taluk':x.member.muhalla.taluk.taluk_name,'district':x.member.muhalla.taluk.district.district_name},Member_service.objects.filter(scheme=service,status=True,solution='Not Yet'))
-                get_district = filter(None,map(lambda y:{'scheme_name':y['scheme_name'],'taluk':y['taluk'],'district':y['district']} if y['district']==district else None,data))
-                item_list = [dic['taluk'] for dic in get_district]
-                scheme = request.GET['service_name']
-                for j in item_list:
-                    count_dict[j] = count_dict.setdefault(j,0) + 1
-            elif request.GET['scheme_name'] != 'none':
-                scheme = SubScheme.objects.get(name=request.GET['scheme_name'])           
-                data = map(lambda x:{'scheme_name':x.scheme.name,'taluk':x.member.muhalla.taluk.taluk_name,'district':x.member.muhalla.taluk.district.district_name},Member_scheme.objects.filter(scheme=scheme,status=True,solution='Not Yet')) 
-                get_district = filter(None,map(lambda y:{'scheme_name':y['scheme_name'],'taluk':y['taluk'],'district':y['district']} if y['district']==district else None,data))
-                item_list = [dic['taluk'] for dic in get_district]
-                scheme = request.GET['scheme_name']
-                for j in item_list:
-                    count_dict[j] = count_dict.setdefault(j,0) + 1
-            else:
-                data = []
+        # try:            
+        if request.GET['service_name'] != 'none':
+            service = Service.objects.get(name=request.GET['service_name'])
+            data = map(lambda x:{'scheme_name':x.scheme.name,'taluk':x.member.muhalla.taluk.taluk_name,'district':x.member.muhalla.taluk.district.district_name},Member_service.objects.filter(scheme=service,status=True,solution='Not Yet'))
+            get_district = filter(None,map(lambda y:{'scheme_name':y['scheme_name'],'taluk':y['taluk'],'district':y['district']} if y['district']==district else None,data))
+            item_list = [dic['taluk'] for dic in get_district]
+            compaign_name = request.GET['service_name']
+            for j in item_list:
+                count_dict[j] = count_dict.setdefault(j,0) + 1
+            data = {'data':count_dict,'district':district,'campaign':compaign_name}      
+        elif request.GET['scheme_name'] != 'none':
+            scheme = SubScheme.objects.get(name=request.GET['scheme_name'])           
+            data = map(lambda x:{'scheme_name':x.scheme.name,'taluk':x.member.muhalla.taluk.taluk_name,'district':x.member.muhalla.taluk.district.district_name},Member_scheme.objects.filter(scheme=scheme,status=True,solution='Not Yet')) 
+            get_district = filter(None,map(lambda y:{'scheme_name':y['scheme_name'],'taluk':y['taluk'],'district':y['district']} if y['district']==district else None,data))
+            item_list = [dic['taluk'] for dic in get_district]
+            compaign_name = request.GET['scheme_name']
+            for j in item_list:
+                count_dict[j] = count_dict.setdefault(j,0) + 1
+            data = json.dumps({'data':count_dict,'district':district,'campaign':compaign_name})  
+        else:
+            data = []
+        try:
+            if request.GET['callback']:
+                callback_val = request.GET['callback']
+                data = '%s(%s);' % (callback_val,data)
         except:
-            print 'repr',repr(format_exc())
-            data = []                
-        return HttpResponse(content=json.dumps({'data':count_dict,'district':district,'campaign':scheme}),content_type='Application/json')    
+            print 'report',repr(format_exc())    
+        # except:
+            # print 'repr',repr(format_exc())
+        print 'data',data    
+        return HttpResponse(content=data,content_type='Application/json')    
 
 def fetch_data_api(request):
     if request.method == 'GET':
         schemes_data = []
         service_data = []
+        disease_data = []
         for i in SubScheme.objects.all():
             scheme_data = map(lambda x:{'scheme_name':x.scheme.name,'district':x.member.muhalla.taluk.district.district_name},Member_scheme.objects.filter(scheme=i,status=True,solution='Not Yet'))
             tot_scheme_data = map(lambda x:{'scheme_name':x.scheme.name,'district':x.member.muhalla.taluk.district.district_name},Member_scheme.objects.filter(scheme=i,status=True))
@@ -995,7 +1037,6 @@ def fetch_data_api(request):
             tot_scheme_data = map(lambda x:{'scheme_name':x.scheme.name,'district':x.member.muhalla.taluk.district.district_name},Member_service.objects.filter(scheme=i,status=True))
             count_dict = {'Ariyalur':0,'Chennai':0,'Coimbatore':0,'Cuddalore':0,'Dharmapuri':0,'Dindigul':0,'Erode':0,'Kanchipuram':0,'Kanyakumari':0,'Karur':0,'Krishnagiri':0,'Madurai':0,'Nagapattinam':0,'Namakkal':0,'The Nilgiris':0,'Perambalur':0,'Pudukkottai':0,'Ramanathapuram':0,'Salem':0,'Sivaganga':0,'Thanjavur':0,'Theni':0,'Thoothukudi':0,'Tiruchirappalli':0,'Tirunelveli':0,'Tiruppur':0,'Tiruvallur':0,'Tiruvannamalai':0,'Tiruvarur':0,'Vellore':0,'Viluppuram':0,'Virudhunagar':0}
             tot_count_dict = {'Ariyalur':0,'Chennai':0,'Coimbatore':0,'Cuddalore':0,'Dharmapuri':0,'Dindigul':0,'Erode':0,'Kanchipuram':0,'Kanyakumari':0,'Karur':0,'Krishnagiri':0,'Madurai':0,'Nagapattinam':0,'Namakkal':0,'The Nilgiris':0,'Perambalur':0,'Pudukkottai':0,'Ramanathapuram':0,'Salem':0,'Sivaganga':0,'Thanjavur':0,'Theni':0,'Thoothukudi':0,'Tiruchirappalli':0,'Tirunelveli':0,'Tiruppur':0,'Tiruvallur':0,'Tiruvannamalai':0,'Tiruvarur':0,'Vellore':0,'Viluppuram':0,'Virudhunagar':0}
-            tot_scheme_dict = {}
             item_list = [dic['district'] for dic in serv_data]
             for j in item_list:
                 count_dict[j] = count_dict.setdefault(j,0) + 1
@@ -1005,7 +1046,15 @@ def fetch_data_api(request):
             count_dict['The_Nilgiris'] = count_dict.pop('The Nilgiris')
             tot_count_dict['The_Nilgiris'] = tot_count_dict.pop('The Nilgiris')    
             service_data.append({'scheme_name':i.name,'total_count':tot_count_dict,'unsolved_district_count':count_dict,'total_scheme_count':len(tot_scheme_data)})    
-        data = json.dumps({'schemes_data':schemes_data,'service_data':service_data})
+        for d in Disease.objects.all():
+            dis_data = map(lambda x:{'disease_name':x.disease.disease_name,'district':x.member.muhalla.taluk.district.district_name},Medical.objects.filter(disease=d))
+            count_dict = {'Ariyalur':0,'Chennai':0,'Coimbatore':0,'Cuddalore':0,'Dharmapuri':0,'Dindigul':0,'Erode':0,'Kanchipuram':0,'Kanyakumari':0,'Karur':0,'Krishnagiri':0,'Madurai':0,'Nagapattinam':0,'Namakkal':0,'The Nilgiris':0,'Perambalur':0,'Pudukkottai':0,'Ramanathapuram':0,'Salem':0,'Sivaganga':0,'Thanjavur':0,'Theni':0,'Thoothukudi':0,'Tiruchirappalli':0,'Tirunelveli':0,'Tiruppur':0,'Tiruvallur':0,'Tiruvannamalai':0,'Tiruvarur':0,'Vellore':0,'Viluppuram':0,'Virudhunagar':0}
+            item_list = [dic['district'] for dic in dis_data]
+            for j in item_list:
+                count_dict[j] = count_dict.setdefault(j,0) + 1
+            disease_data.append({'disease_name':d.disease_name,'disease_count':count_dict,'total_count':len(dis_data)})    
+
+        data = json.dumps({'schemes_data':schemes_data,'service_data':service_data,'disease_data':disease_data})
         try:
             if request.GET['callback']:
                 callback_val = request.GET['callback']
