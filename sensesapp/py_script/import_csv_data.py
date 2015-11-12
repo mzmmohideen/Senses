@@ -430,10 +430,10 @@ def importcsvdata(value):
                         add_surgery_needs = Surgery.objects.create(member=member,disease=get_dis_val,surgery_name=surg_name,hospital_name=surg_hospital,cost=surg_cost,cash_inHand=surg_cashinhand)
                     chronic_disease_details = val[61] if val[61] else ''
                     if chronic_disease_details:
-                      if ChronicDisease.objects.filter(member=member,disease=dis_val):
-                        add_chronic_needs = ChronicDisease.objects.filter(member=member,disease=dis_val).update(details=chronic_disease_details,status=True)
+                      if ChronicDisease.objects.filter(member=member,disease_name=dis_val):
+                        add_chronic_needs = ChronicDisease.objects.filter(member=member,disease_name=dis_val).update(details=chronic_disease_details,status=True)
                       else:
-                        add_chronic_needs = ChronicDisease.objects.create(member=member,disease=dis_val,details=chronic_disease_details,status=True)
+                        add_chronic_needs = ChronicDisease.objects.create(member=member,disease_name=dis_val,details=chronic_disease_details,status=True)
                 else:
                   pass
                 loan_needers = True if val[65] == 'Y' else False
