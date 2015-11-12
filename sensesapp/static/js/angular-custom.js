@@ -181,6 +181,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         console.log('val',$scope.sub_scheme_val)
     }
     $scope.upload_csv = function(csv_file) {
+        appBusy.set("Loading....");
         var fileUrl = '/upload_bulk_data/';
         var send = new FormData();
         console.log('csv_file',csv_file)
@@ -192,6 +193,10 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             }
         }).success(function(data) {
             alert(data.data)
+            appBusy.set('Done...');              
+            $timeout( function() {              
+                appBusy.set(false);
+            }, 1000);
         });
     }
     $scope.getScheme = function() {
@@ -672,6 +677,22 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 }
             })
         }
+    }
+    $scope.export_to_pdf = function(header,data,report) {
+        $http.post('/report_to_pdf/',{
+            header : header,
+            data : data,
+            report : report,
+        }).success(function(response){
+            console.log('success',response)
+            // var file = new Blob([response], { type: 'application/pdf' });
+            // saveAs(file, 'filename.pdf');
+            window.open('/'+response.pdfname)
+            // if(response.data == true) {
+            //     console.log('down',response)
+            //     window.location.href = '/'+response.pdfname
+            // }
+        })
     }
     $scope.get_dis_val = function(){
         $http.get('/fetch_data_api/',{}).success(function(data){

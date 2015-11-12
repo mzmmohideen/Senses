@@ -6,6 +6,9 @@ from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import *
 from django.http import HttpResponseRedirect
 import json,csv
+import os, sys
+import pdfkit,pdfcrowd
+from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
 from collections import defaultdict
@@ -951,25 +954,37 @@ def upload_bulk_data(request):
     return HttpResponse(content=json.dumps({'data':response}),content_type='Application/json')
 
 def report_to_pdf(request):
-    import pdfkit,pdfcrowd
-    body = """
-    <html>
-      Hello World! how are you! i am Fine!
-      </html>
-    """
-    filename = 'mohii.pdf'
-    response = pdfkit.from_string(body, filename)
-    # response['Content-Disposition'] = 'attachment; filename='+filename
-    # response['Content-Type'] = 'Content-type: application/octet-stream'
-    # response['Content-Length'] = bytes
-    print 'response',response
-    # response = HttpResponse(content_type="application/pdf")
-    # response["Cache-Control"] = "max-age=0"
-    # response["Accept-Ranges"] = "none"
-    
-    # response["Content-Disposition"] = "attachment; filename="+filename
-    return response
-    # return HttpResponse(content=json.dumps({'muhalla':'data'}),content_type='Application/pdf')
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        file_path = os.path.dirname(os.path.dirname(__file__))
+        pdf_filename = 'reports_gen.pdf'
+        html_filename = '%s/templates/report_to_pdf.html'%file_path
+        html_content = render_to_string(html_filename,{'header':data['header'],'data':data['data'],'report':data['report'],'total':len(data['data'])})
+        response = pdfkit.from_string(html_content, pdf_filename)
+        # open_pdf = '%s/%s'%(file_path,pdf_filename)
+        # f = open(open_pdf,'r')
+        # response = f.read()
+        # f.close()
+        print 'response',response
+        # return HttpResponse(response,content_type='Application/pdf')
+        return HttpResponse(content=json.dumps({'data':response,'pdfname':pdf_filename}),content_type='Application/json')
+    else:
+        file_path = os.path.dirname(os.path.dirname(__file__))
+        # print 's',request
+        pdf_filename = 'reports_gen.pdf'
+        html_filename = '%s/templates/report_to_pdf.html'%file_path
+        html_content = render_to_string(html_filename,{'name':'name'})
+        print 'html_filename',html_content
+        # exit()    
+        # response = pdfkit.from_file(html_filename,pdf_filename)
+        response = pdfkit.from_string(html_content, pdf_filename)
+        open_pdf = '%s/%s'%(file_path,pdf_filename)
+        f = open(open_pdf,'r')
+        response = f.read()
+        f.close()
+        # response = HttpResponse(content_type="application/pdf")
+        # response["Content-Disposition"] = "attachment; pdf_filename="+pdf_filename
+        return HttpResponse(response,content_type='Application/pdf')
 
 def matrix_taluk_api(request):
     if request.method == 'GET':

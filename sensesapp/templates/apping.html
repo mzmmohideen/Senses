@@ -855,11 +855,12 @@
             <div class=" col-lg-12">
             <table style="width: 100%;margin-bottom: 2%;">
             <tr>
-                <td> <label for="male">DISTRICT</label> </td>
-                <td> <label for="male">TALUK</label> </td>
-                <td> <label for="male">MUHALLAH</label> </td>
-                <td> <label for="male">MUHALLAH ID</label> </td>
-                <td> <label for="male">REPORT TYPES</label> </td>
+                <td><label for="male">DISTRICT</label></td>
+                <td><label for="male">TALUK</label></td>
+                <td><label for="male">MUHALLAH</label></td>
+                <td><label for="male">MUHALLAH ID</label></td>
+                <td><label for="male">REPORT TYPES</label></td>
+                <td><label for="male">PDF</label></td>
             </tr>
             <tr>
                 <td><select style="border-radius:2px;display: inline-block;height: 34px;border-radius: 2px; width: 97%;float: left;" ng-model="ReportValues.district" ng-options="gen for gen in district_list_report" class="form-control">
@@ -868,12 +869,15 @@
                 <td><select ng-disabled="!ReportValues.district" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;border-radius: 2px; float: left;" ng-change="getMasjidList(ReportValues)" ng-model="ReportValues.taluk" ng-options="gen for gen in getTaluk[ReportValues.district]" class="form-control">
                     <option value="">SELECT TALUK</option>
                 </select></td>
-                <td><select ng-disabled="!ReportValues.taluk" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;float: left;border-radius: 2px; "  ng-change="fetchReportAPI(ReportDatas,ReportValues)" ng-model="ReportValues.muhalla" ng-options="gen.name for gen in muhallaList" class="form-control">
+                <td><select ng-disabled="!ReportValues.taluk" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;float: left;border-radius: 2px;" ng-model="ReportValues.muhalla" ng-options="gen.name for gen in muhallaList" class="form-control">
                     <option value="">SELECT MUHALLAH</option>
                 </select></td>
                 <td><input style="display: inline-block;height: 34px;border-radius: 2px; width: 100%;float: left;" class="form-control" type="text" ng-model="ReportValues.muhalla.mohalla_id" valid-number ng-change="clear_error()" placeholder="Muhalla ID" readonly/></td>
-                <td><select style="display: inline-block;height: 34px;width: 100%;border-radius: 2px; float: right;" ng-model="ReportValues.report_name" ng-change="fetchReportAPI(ReportDatas,ReportValues)" ng-options="gen for gen in senses_reports" class="form-control"><option value="">SELECT REPORT</option></select>
+                <td><select style="display: inline-block;height: 34px;width: 98%;border-radius: 2px; float: left;" ng-model="ReportValues.report_name" ng-change="fetchReportAPI(ReportDatas,ReportValues)" ng-options="gen for gen in senses_reports" class="form-control"><option value="">SELECT REPORT</option></select>
                     </td>
+                <td><button target="_blank" ng-disabled="!ReportValues.muhalla || !ReportValues.report_name" type="submit" style="display: inline-block;height: 34px;width: 98%;border-radius: 2px; float: left;" ng-click="export_to_pdf(ReportHeader,getReportData,ReportValues)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Export</button>
+                    </td>    
+
             </tr>
             </table>
             </div>
@@ -1932,62 +1936,7 @@
             </div>
             <!-- /.col-lg-8 -->
             <div class="col-lg-4">
-                <div class="panel panel-default" style="border-radius: 2px;">
-                    <div class="panel-heading">
-                        <i class="fa fa-bell fa-fw"></i> Notifications Panel
-                    </div>
-                    <!-- /.panel-heading -->
-                    <div class="panel-body">
-                        <div class="list-group">
-                            <a href="#" class="list-group-item" style="border-radius:2px;">
-                                <i class="fa fa-comment fa-fw"></i> New Volunteer
-                                <span class="pull-right text-muted small"><em>4 minutes ago</em>
-                                    </span>
-                            </a>
-                            <a href="#" class="list-group-item">
-                                <i class="fa fa-twitter fa-fw"></i> 3 New Families
-                                <span class="pull-right text-muted small"><em>12 minutes ago</em>
-                                    </span>
-                            </a>
-                            <a href="#" class="list-group-item">
-                                <i class="fa fa-envelope fa-fw"></i> new Donor
-                                <span class="pull-right text-muted small"><em>27 minutes ago</em>
-                                    </span>
-                            </a>
-                            <a href="#" class="list-group-item" style="border-radius:2px;">
-                                <i class="fa fa-tasks fa-fw"></i> New Task
-                                <span class="pull-right text-muted small"><em>43 minutes ago</em>
-                                    </span>
-                            </a>
-                            <!--<a href="#" class="list-group-item">
-                                <i class="fa fa-upload fa-fw"></i> Server Rebooted
-                                <span class="pull-right text-muted small"><em>11:32 AM</em>
-                                    </span>
-                            </a>
-                            <a href="#" class="list-group-item">
-                                <i class="fa fa-bolt fa-fw"></i> Server Crashed!
-                                <span class="pull-right text-muted small"><em>11:13 AM</em>
-                                    </span>
-                            </a>
-                            <a href="#" class="list-group-item">
-                                <i class="fa fa-warning fa-fw"></i> Server Not Responding
-                                <span class="pull-right text-muted small"><em>10:57 AM</em>
-                                    </span>
-                            </a>
-                            <a href="#" class="list-group-item">
-                                <i class="fa fa-shopping-cart fa-fw"></i> New Order Placed
-                                <span class="pull-right text-muted small"><em>9:49 AM</em>
-                                    </span>
-                            </a>
-                            <a href="#" class="list-group-item">
-                                <i class="fa fa-money fa-fw"></i> Payment Received
-                                <span class="pull-right text-muted small"><em>Yesterday</em>
-                                    </span>
-                            </a>-->
-                        </div>
-                        <a href="#" class="btn btn-default btn-block" style="border-radius:2px;">View All Datas</a>
-                    </div>
-                </div>
+                
                 <div class="panel panel-default" style="border-radius: 2px;">
                     <div class="panel-heading">
                         <i class="fa fa-bar-chart-o fa-fw"></i> Mahallas Chart
