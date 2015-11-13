@@ -421,7 +421,7 @@ def fetchReportData(request):
                 else:
                     for i in member_data_med:
                         for j in Medical.objects.filter(member=i):
-                            get_mem_medical.append({'name':j.member.name,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})                    
+                            get_mem_medical.append({'name':j.member.name,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})                    
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_medical':get_mem_medical}),content_type='Application/json')            
         elif data['report_type'] == 'Government Voter ID Needers':
             get_mem_voter = []
@@ -446,7 +446,7 @@ def fetchReportData(request):
                 if data['marital_status']:
                     get_mem_voter_dt = get_mem_voter_dt.filter(marital_status=data['marital_status'])
                 for i in get_mem_voter_dt:
-                    get_mem_voter.append({'family_head':i.name,'qualification':i.qualification,'address':i.family.address,'age':i.age,'gender':i.gender,'financial_status':i.family.financial_status,'familyid':i.family.family_id,'mobile':i.family.mobile})
+                    get_mem_voter.append({'family_head':i.name,'qualification':i.qualification,'address':i.family.address,'age':i.age,'gender':i.gender,'financial_status':i.family.financial_status,'financial_pdf':i.family.financial_status.split(' ')[0],'familyid':i.family.family_id,'mobile':i.family.mobile})
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_voter':get_mem_voter}),content_type='Application/json')                
         elif data['report_type'] == 'Help for Poor Peoples and Guidance Needers List':
             get_mem_service = []
@@ -530,7 +530,7 @@ def fetchReportData(request):
                 else:
                     for i in member_data_scheme:
                         for j in Member_scheme.objects.filter(member=i):
-                            get_mem_scheme.append({'name':j.member.name,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'Need Government Scheme Guidance'})                    
+                            get_mem_scheme.append({'name':j.member.name,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'Need Government Scheme Guidance'})
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_scheme':get_mem_scheme}),content_type='Application/json')                
         elif data['report_type'] == 'Women chldrens Need to join Niswan Madarasa' or data['report_type']  == 'Persons Need to join Jumrah Madarasa' or data['report_type']  == 'Childrens Need to join Makthab Madarasa':
             try:
@@ -972,6 +972,18 @@ def report_to_pdf(request):
         elif data['report']['report_name'] == 'Families Eligible for Jakaath':
             pdf_filename = 'fam_eligible_jakath.pdf'
             html_filename = '%s/templates/fam_eligible_jakath.html'%file_path    
+        elif data['report']['report_name'] == 'Medical Needs and Guidance Needers Details':
+            pdf_filename = 'medical_needers.pdf'
+            html_filename = '%s/templates/medical_needers.html'%file_path     
+        elif data['report']['report_name'] == 'Government Schemes and Guidance Needers Details':
+            pdf_filename = 'govt_scheme_needers.pdf'
+            html_filename = '%s/templates/govt_scheme_needers.html'%file_path
+        elif data['report']['report_name'] == 'Government Voter ID Needers':
+            pdf_filename = 'voter_id_needers.pdf'
+            html_filename = '%s/templates/voter_id_needers.html'%file_path
+        elif data['report']['report_name'] == 'Educational Help and Guidance Needers List':
+            pdf_filename = 'edu_guide_needers.pdf'
+            html_filename = '%s/templates/edu_guide_needers.html'%file_path
         else:
             pdf_filename = 'reports_gen.pdf'
             html_filename = '%s/templates/report_to_pdf.html'%file_path
