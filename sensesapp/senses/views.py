@@ -1016,7 +1016,7 @@ def matrix_taluk_api(request):
             data = json.dumps({'data':count_dict,'district':district,'campaign':compaign_name}) 
         elif request.GET['disease_name'] != 'none':
             disease = Disease.objects.get(disease_name=request.GET['disease_name'])           
-            data = map(lambda x:{'disease_name':x.disease.disease_name,'district':x.member.muhalla.taluk.district.district_name},Medical.objects.filter(disease=disease))
+            data = map(lambda x:{'disease_name':x.disease.disease_name,'taluk':x.member.muhalla.taluk.taluk_name,'district':x.member.muhalla.taluk.district.district_name},Medical.objects.filter(disease=disease))
             get_district = filter(None,map(lambda y:{'scheme_name':y['scheme_name'],'taluk':y['taluk'],'district':y['district']} if y['district']==district else None,data))
             item_list = [dic['taluk'] for dic in data]
             compaign_name = request.GET['disease_name']
