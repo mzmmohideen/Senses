@@ -167,7 +167,7 @@ def importcsvdata(value):
                 # member add
                 member_id = '%s / %s' %(family.family_id,val[18])
                 try:
-                  dob_date = data_date - relativedelta(years=eval(val[21])) if val[21] else '0'
+                  dob_date = data_date - relativedelta(years=eval(val[21])) if val[21] else data_date
                 except:
                   try:
                     dob_date = data_date - relativedelta(years=eval(val[21].split(' ')[0]))
@@ -376,8 +376,10 @@ def importcsvdata(value):
                       mem_service = Member_service.objects.filter(member=member,scheme=Service.objects.get(name='Suffering Due To Interest Base Loan')).update(status=True,solution="Not Yet")
                   else:
                       mem_service = Member_service.objects.create(member=member,scheme=Service.objects.get(name='Suffering Due To Interest Base Loan'),status=True,solution="Not Yet")
-
-                disease_id = val[53] if val[53] else ''
+                try:
+                  disease_id = val[53] if val[53] else ''
+                except:
+                  disease_id = 'HL01'                  
                 if disease_id:
                   try:
                     disease_list = []
@@ -395,13 +397,20 @@ def importcsvdata(value):
                   except:
                     disease_list = []
                     if Disease.objects.filter(disease_id=disease_id):
-                        get_disease = Disease.objects.get(disease_id=disease_id)
+                      get_disease = Disease.objects.get(disease_id=disease_id)
                     else:
-                        disease_name = 'Disease %s'%disease_id
-                        try:
-                            get_disease = Disease.objects.get(disease_name=disease_name)
-                        except:
-                            get_disease = Disease.objects.create(sym_type='DISEASE',disease_name=disease_name,disease_id=disease_id)
+                      if len(disease_id) <= 20 :
+                        disease_name = disease_id
+                        disease_id = 'HL%s'%disease_id[:10]
+                      else:
+                        disease_name = disease_id[:50]
+                        disease_id = 'HL%s'%disease_id[:10]
+                      if Disease.objects.filter(disease_id=disease_id):
+                        get_disease = Disease.objects.get(disease_id=disease_id)
+                      elif Disease.objects.filter(disease_name=disease_name):
+                          get_disease = Disease.objects.get(disease_name=disease_name)
+                      else:
+                        get_disease = Disease.objects.create(sym_type='DISEASE',disease_name=disease_name,disease_id=disease_id)
                     disease_list.append(get_disease)        
                   medicine = val[54] if val[54] else ''
                   medicine_cost = val[55] if val[55] else '' 
