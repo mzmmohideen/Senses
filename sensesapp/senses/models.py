@@ -119,8 +119,8 @@ class Member_service(models.Model):
 
 class Disease(models.Model):
     sym_type = models.CharField(max_length=30,choices=SYMPTOMTYPE)
-    disease_name = models.CharField(max_length=50,unique=True)
-    disease_id = models.CharField(max_length=20,unique=True)
+    disease_name = models.CharField(max_length=100,unique=True)
+    disease_id = models.CharField(max_length=25,unique=True)
     description = models.TextField(null=True)
 
 class Surgery(models.Model):

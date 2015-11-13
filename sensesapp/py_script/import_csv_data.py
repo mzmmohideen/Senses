@@ -396,19 +396,15 @@ def importcsvdata(value):
                       disease_list.append(get_disease)    
                   except:
                     disease_list = []
-                    if Disease.objects.filter(disease_id=disease_id):
+                    try:
                       get_disease = Disease.objects.get(disease_id=disease_id)
-                    else:
-                      if len(disease_id) <= 20 :
-                        disease_name = disease_id
-                        disease_id = 'HL%s'%disease_id[:10]
-                      else:
-                        disease_name = disease_id[:50]
-                        disease_id = 'HL%s'%disease_id[:10]
-                      if Disease.objects.filter(disease_id=disease_id):
+                    except:
+                      disease_name = disease_id[:50]
+                      disease_id = 'HL%s'%str(len(disease_id))
+                      if Disease.objects.filter(disease_name=disease_name):
+                        get_disease = Disease.objects.get(disease_name=disease_name)
+                      elif Disease.objects.filter(disease_id=disease_id):
                         get_disease = Disease.objects.get(disease_id=disease_id)
-                      elif Disease.objects.filter(disease_name=disease_name):
-                          get_disease = Disease.objects.get(disease_name=disease_name)
                       else:
                         get_disease = Disease.objects.create(sym_type='DISEASE',disease_name=disease_name,disease_id=disease_id)
                     disease_list.append(get_disease)        

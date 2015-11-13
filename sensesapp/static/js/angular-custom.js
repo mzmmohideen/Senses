@@ -682,11 +682,19 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 }
                 else {
                     var pdf_data = $scope.getReportData;
-                }                    
+                }
+                if (response.report_type == 'Total Family Details' || response.report_type == 'Basic Help Needers List' || response.report_type == 'Families Eligible for Jakaath') {
+                    var finacial_value = response.finacial_value;
+                }
+                else {
+                    var finacial_value = '';
+                }
+                console.log('finacial_value',finacial_value)
                 $http.post('/report_to_pdf/',{
                     header : $scope.ReportHeader,
                     data : pdf_data,
                     report : $scope.ReportValues,
+                    finacial_value : finacial_value,
                 }).success(function(response){
                     console.log('success',response)
                     $scope.get_pdfname = response.pdfname;
