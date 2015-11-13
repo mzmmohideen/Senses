@@ -563,6 +563,7 @@ def fetchReportData(request):
             tot_men = sum(1 if(x['gender']=='MALE') else 0 for x in get_memData)
             tot_women = sum(1 if(x['gender']=='FEMALE') else 0 for x in get_memData)
             voter = sum(1 if(x['voter']==True) else 0 for x in get_memData)
+            non_voter = sum(1 if(x['voter']==False) else 0 for x in get_memData)
             men_age_60 = sum(1 if(x['gender']=='MALE' and eval(str(str(x['age'])))>=60) else 0 for x in get_memData)
             women_age_60 = sum(1 if(x['gender']=='FEMALE' and eval(str(x['age']))>=60) else 0 for x in get_memData)
             men_age_22to59 = sum(1 if(x['gender']=='MALE' and 22<=eval(str(x['age']))<=59) else 0 for x in get_memData)
@@ -581,7 +582,8 @@ def fetchReportData(request):
             widowed = sum(1 if(x['marital_status']=='Widow' and x['gender']=='FEMALE') else 0 for x in get_memData)
             divorced = sum(1 if(x['marital_status']=='Devorced' and x['gender']=='FEMALE') else 0 for x in get_memData)
             rep_data = {'Taluk':muhalla.taluk.taluk_name,'Taluk Count':1,'Total Family ':len(get_family),'Total Population':len(get_memData),'Total Male':tot_men,'Total Female':tot_women,'Married':married,'Male age 60+':men_age_60,'Female age 60+':women_age_60,'Male age between 22-59':men_age_22to59,'Female age between 22-59':women_age_22to59,'Male age between 11-21':men_age_11to21,'Female age between 11-21':women_age_11to21,'Child upto 11 age ':child_upto11,'A - Well Settled':cat_A,'B - Full Filled':cat_B,'C - Middle Class':cat_C,'D - Poor':cat_D,'E - Very Poor':cat_E,'Widow':widowed,'Divorced':divorced,'Mother Tongue':{'Tamil':lang_tamil,'Urdu':lang_urdu,'Others':lang_others}}
-            return HttpResponse(content=json.dumps({'report_type':data['report_type'],'reports':rep_data}),content_type='Application/json')
+            pdf_rep_data = {'Taluk':muhalla.taluk.taluk_name,'Taluk_Count':1,'Total_Family ':len(get_family),'non_voter':non_voter,'voter':voter,'Total_Population':len(get_memData),'Total_Male':tot_men,'Total_Female':tot_women,'Married':married,'Male_age_60':men_age_60,'Female_age_60':women_age_60,'Male_age_between_22to59':men_age_22to59,'Female_age_between_22to59':women_age_22to59,'Male_age_between_11to21':men_age_11to21,'Female_age_between_11to21':women_age_11to21,'Child_upto_11_age':child_upto11,'A_Well_Settled':cat_A,'B_Full_Filled':cat_B,'C_Middle_Class':cat_C,'D_Poor':cat_D,'E_Very_Poor':cat_E,'Widow':widowed,'Divorced':divorced,'Mother_Tongue':{'Tamil':lang_tamil,'Urdu':lang_urdu,'Others':lang_others}}
+            return HttpResponse(content=json.dumps({'report_type':data['report_type'],'non_voter':non_voter,'voter':voter,'reports':rep_data,'pdf_report':pdf_rep_data}),content_type='Application/json')
         # return HttpResponse(content=json.dumps({'data':data,'member_details':member_details,'get_mem_service':get_mem_service,'get_mem_medical':get_mem_medical,'get_mem_scheme':get_mem_scheme,'get_memData':get_memData}),content_type='Application/json')
     
     elif request.method == 'GET':
@@ -957,17 +959,20 @@ def report_to_pdf(request):
     if request.method == 'POST':
         data = json.loads(request.body)
         file_path = os.path.dirname(os.path.dirname(__file__))
-        pdf_filename = 'reports_gen.pdf'
-        html_filename = '%s/templates/report_to_pdf.html'%file_path
+        if data['report']['report_name'] == 'Mohalla Report':
+            pdf_filename = 'mohalla_report.pdf'
+            html_filename = '%s/templates/mohalla_report.html'%file_path
+        else:
+            pdf_filename = 'reports_gen.pdf'
+            html_filename = '%s/templates/report_to_pdf.html'%file_path
         html_content = render_to_string(html_filename,{'header':data['header'],'data':data['data'],'report':data['report'],'total':len(data['data'])})
         response = pdfkit.from_string(html_content, pdf_filename)
         # open_pdf = '%s/%s'%(file_path,pdf_filename)
         # f = open(open_pdf,'r')
         # response = f.read()
         # f.close()
-        print 'response',response
         # return HttpResponse(response,content_type='Application/pdf')
-        return HttpResponse(content=json.dumps({'data':response,'pdfname':pdf_filename}),content_type='Application/json')
+        return HttpResponse(content=json.dumps({'data':data,'pdfname':pdf_filename}),content_type='Application/json')
     else:
         file_path = os.path.dirname(os.path.dirname(__file__))
         # print 's',request
@@ -1008,7 +1013,16 @@ def matrix_taluk_api(request):
             compaign_name = request.GET['scheme_name']
             for j in item_list:
                 count_dict[j] = count_dict.setdefault(j,0) + 1
-            data = json.dumps({'data':count_dict,'district':district,'campaign':compaign_name})  
+            data = json.dumps({'data':count_dict,'district':district,'campaign':compaign_name}) 
+        elif request.GET['disease_name'] != 'none':
+            disease = Disease.objects.get(disease_name=request.GET['disease_name'])           
+            data = map(lambda x:{'disease_name':x.disease.disease_name,'district':x.member.muhalla.taluk.district.district_name},Medical.objects.filter(disease=disease))
+            get_district = filter(None,map(lambda y:{'scheme_name':y['scheme_name'],'taluk':y['taluk'],'district':y['district']} if y['district']==district else None,data))
+            item_list = [dic['taluk'] for dic in dis_data]
+            compaign_name = request.GET['disease_name']
+            for j in item_list:
+                count_dict[j] = count_dict.setdefault(j,0) + 1     
+            data = json.dumps({'data':count_dict,'district':district,'campaign':compaign_name})             
         else:
             data = []
         try:
@@ -1045,7 +1059,7 @@ def fetch_data_api(request):
             # schemes_data[i.name].append({'total_count':tot_count_dict,'unsolved_district_count':count_dict,'total_scheme_count':len(tot_scheme_data)})
             count_dict['The_Nilgiris'] = count_dict.pop('The Nilgiris')
             tot_count_dict['The_Nilgiris'] = tot_count_dict.pop('The Nilgiris')
-            schemes_data.append({'scheme_name':i.name,'total_count':tot_count_dict,'unsolved_district_count':count_dict,'total_scheme_count':len(tot_scheme_data)})
+            schemes_data.append({'scheme_name':i.name,'total_count':tot_count_dict,'unsolved_district_count':count_dict,'total_scheme_count':len(tot_scheme_data),'total_unsolved_scheme_count':len(scheme_data)})
 
         for i in Service.objects.all():
             serv_data = map(lambda x:{'scheme_name':x.scheme.name,'district':x.member.muhalla.taluk.district.district_name},Member_service.objects.filter(scheme=i,status=True,solution='Not Yet'))

@@ -1,0 +1,151 @@
+<html>
+    <head>
+		<style type="text/css">
+			.tg  {border-collapse:collapse;border-spacing:0;border-color:#aabcfe;}
+			.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#669;background-color:#e8edff;}
+			.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#039;background-color:#b9c9fe;}
+			.tg .tg-8xgs{background-color:#ffffff;font-weight:bold;color:#000000;text-align:center;vertical-align:top}
+			.tg .tg-7un6{background-color:#ffffff;color:#000000;text-align:center;vertical-align:top}
+			.tg .tg-83xr{background-color:#ffffff;color:#000000;text-align:center;vertical-align:top}
+			.tg .tg-7x8i{background-color:#cd9934;color:#000000;vertical-align:top}
+			.tg .tg-to58{font-weight:bold;font-size:24px;background-color:#cd9934;color:#000000;text-align:center;vertical-align:top}
+			.tg .tg-92io{background-color:#cd9934;color:#000000;text-align:center;vertical-align:top}
+			.tg .tg-uq5v{background-color:#cd9934;color:#000000;text-align:center;vertical-align:top}
+			.tg .tg-mo1d{background-color:#cd9934;color:#000000;vertical-align:top}
+			.tg .tg-pxng{background-color:#ffffff;color:#000000;vertical-align:top}
+			.tg .tg-kixb{background-color:#ffffff;color:#000000;vertical-align:top}
+		</style>
+	</head>
+	<body>
+		<table class="tg" style="width:100%">
+		  <tr>
+		    <th class="tg-to58" colspan="2" rowspan="3"><br>UNWO<br>Needers Deatails</th>
+		    <th class="tg-92io" colspan="2">DISTRICT</th>
+		    <th class="tg-7x8i">{{report.district}}</th>
+		  </tr>
+		  <tr>
+		    <td class="tg-uq5v" colspan="2">TALUK</td>
+		    <td class="tg-mo1d">{{report.taluk}}</td>
+		  </tr>
+		  <tr>
+		    <td class="tg-92io" colspan="2">MAHALLA</td>
+		    <td class="tg-7x8i">{{report.muhalla.name}}</td>
+		  </tr>
+		  <tr>
+		    <td class="tg-8xgs">DETAILS</td>
+		    <td class="tg-8xgs">COUNT</td>
+		    <td class="tg-8xgs" colspan="2">DETAILS</td>
+		    <td class="tg-8xgs">COUNT</td>
+		  </tr>
+		  <tr>
+		    <td class="tg-pxng">Number of Taluk (s)</td>
+		    <td class="tg-pxng">{{data.Taluk_Count}}</td>
+		    <td class="tg-pxng" colspan="2">Rich Families -                 A</td>
+		    <td class="tg-pxng">{{data.A_Well_Settled}}</td>
+		  </tr>
+		  <tr>
+		    <td class="tg-kixb">Number of Mahalla (s)</td>
+		    <td class="tg-kixb">1</td>
+		    <td class="tg-kixb" colspan="2">Self Sufficient Families -  B</td>
+		    <td class="tg-kixb">{{data.B_Full_Filled}}</td>
+		  </tr>
+		  <tr>
+		    <td class="tg-pxng">Census Books Issued</td>
+		    <td class="tg-pxng">1</td>
+		    <td class="tg-pxng" colspan="2">Middle Class Families -   C</td>
+		    <td class="tg-pxng">{{data.C_Middle_Class}}</td>
+		  </tr>
+		  <tr>
+		    <td class="tg-kixb">Number of Families</td>
+		    <td class="tg-kixb">{{data.Total_Family}}</td>
+		    <td class="tg-kixb" colspan="2">Poor Families -                D</td>
+		    <td class="tg-kixb">{{data.D_Poor}}</td>
+		  </tr>
+		  <tr>
+		    <td class="tg-pxng">Total Population</td>
+		    <td class="tg-pxng">{{Total_Population}}</td>
+		    <td class="tg-pxng" colspan="2">Very Poor Families -        E</td>
+		    <td class="tg-pxng">{{data.E_Very_Poor}}</td>
+		  </tr>
+		  <tr>
+		    <td class="tg-kixb">Married</td>
+		    <td class="tg-kixb">{{data.Married}}</td>
+		    <td class="tg-kixb" colspan="2">Zakaath Eligible Families</td>
+		    <td class="tg-kixb">{{data.D_Poor|add:data.E_Very_Poor}}</td>
+		  </tr>
+		  <tr>
+		    <td class="tg-pxng">Voters</td>
+		    <td class="tg-pxng">{{data.voter}}</td>
+		    <td class="tg-pxng" colspan="2">Nikkah Assistance Required</td>
+		    <td class="tg-pxng"></td>
+		  </tr>
+		  <tr>
+		    <td class="tg-kixb">Persons without Voter Id             </td>
+		    <td class="tg-kixb">{{data.non_voter}}</td>
+		    <td class="tg-kixb" colspan="2">Families having Interest Loan</td>
+		    <td class="tg-kixb"></td>
+		  </tr>
+		  <tr>
+		    <td class="tg-pxng">Male</td>
+		    <td class="tg-pxng">{{data.Total_Male}}</td>
+		    <td class="tg-pxng" colspan="2">Deserted Destitute Widows</td>
+		    <td class="tg-pxng"></td>
+		  </tr>
+		  <tr>
+		    <td class="tg-kixb">Female</td>
+		    <td class="tg-kixb">{{data.Total_Female}}</td>
+		    <td class="tg-kixb" colspan="2">Widows</td>
+		    <td class="tg-kixb">{{data.Widow}}</td>
+		  </tr>
+		  <tr>
+		    <td class="tg-pxng">Men        Age &gt;= 60</td>
+		    <td class="tg-pxng">{{data.Male_age_60}}</td>
+		    <td class="tg-pxng" colspan="2">Orphans</td>
+		    <td class="tg-pxng"></td>
+		  </tr>
+		  <tr>
+		    <td class="tg-kixb">Women  Age &gt;= 60</td>
+		    <td class="tg-kixb">{{data.Female_age_60}}</td>
+		    <td class="tg-kixb" colspan="2">Families without Ration Card</td>
+		    <td class="tg-kixb"></td>
+		  </tr>
+		  <tr>
+		    <td class="tg-pxng">Men Age bw 22 - 59</td>
+		    <td class="tg-pxng">{{data.Male_age_between_22to59}}</td>
+		    <td class="tg-pxng" colspan="2">Daily Prayer Observers</td>
+		    <td class="tg-pxng"></td>
+		  </tr>
+		  <tr>
+		    <td class="tg-kixb">Women Age bw 22 - 59</td>
+		    <td class="tg-kixb">{{data.Female_age_between_22to59}}</td>
+		    <td class="tg-kixb" colspan="2">Observe Only Jumma Prayer (Male)</td>
+		    <td class="tg-kixb"></td>
+		  </tr>
+		  <tr>
+		    <td class="tg-pxng">Boys Age bw 11 - 21</td>
+		    <td class="tg-pxng">{{data.Male_age_between_11to21}}</td>
+		    <td class="tg-7un6" rowspan="3"><br><br>MOTHER TONGUE</td>
+		    <td class="tg-pxng">TAMIL</td>
+		    <td class="tg-pxng">{{data.Mother_Tongue.Tamil}}</td>
+		  </tr>
+		  <tr>
+		    <td class="tg-kixb">Girls Age bw 11 - 21</td>
+		    <td class="tg-kixb">{{data.Female_age_between_11to21}}</td>
+		    <td class="tg-kixb">URDU</td>
+		    <td class="tg-kixb">{{data.Mother_Tongue.Urdu}}</td>
+		  </tr>
+		  <tr>
+		    <td class="tg-pxng">Children Age &lt; 11</td>
+		    <td class="tg-pxng">{{data.Child_upto_11_age}}</td>
+		    <td class="tg-pxng">OTHERS</td>
+		    <td class="tg-pxng">{{data.Mother_Tongue.Others}}</td>
+		  </tr>
+		  <tr>
+		    <td class="tg-kixb">Able to recite Qur'an</td>
+		    <td class="tg-kixb"></td>
+		    <td class="tg-kixb" colspan="2"></td>
+		    <td class="tg-kixb"></td>
+		  </tr>
+		</table>
+	</body>
+</html>

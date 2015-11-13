@@ -49,7 +49,7 @@
                 <a class="navbar-brand" style="color: #484747;font-size: 23px;" href="#">Census app</a>
             </div>
             <!-- /.navbar-header -->
-            <ul class="nav navbar-top-links navbar-right">
+            <!-- <ul class="nav navbar-top-links navbar-right"> -->
                 <!-- <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown">
                         <i style="font-size: 22px;" class="fa fa-envelope fa-fw"></i> <i style="display: none;"class="fa fa-caret-down"></i>
@@ -234,7 +234,10 @@
                         </li>
                     </ul>
                 </li> -->
-                <li class="dropdown">
+                <button style="float:right;margin: 10px;background-color:red;" class="btn btn-default" type="button">
+                    <a style="color:white !important;text-decoration: none;" href="/logout_view/"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
+                </button>
+                <!-- <li class="dropdown">
                     <a class="dropdown-toggle" data-toggle="dropdown" style="cursor:pointer;">
                         <i class="fa fa-user fa-fw" style="font-size: 22px;"></i> <i style="display: none;"class="fa fa-caret-down"></i>
                     </a>
@@ -247,10 +250,9 @@
                         <li><a href="/logout_view/"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
                         </li>
                     </ul>
-                    <!-- /.dropdown-user -->
-                </li>
+                </li> -->
                 <!-- /.dropdown -->
-            </ul>
+            <!-- </ul> -->
             <!-- /.navbar-top-links -->
             <div class="navbar-default sidebar" role="navigation">
                 <div class="sidebar-nav navbar-collapse">
@@ -875,8 +877,9 @@
                 <td><input style="display: inline-block;height: 34px;border-radius: 2px; width: 100%;float: left;" class="form-control" type="text" ng-model="ReportValues.muhalla.mohalla_id" valid-number ng-change="clear_error()" placeholder="Muhalla ID" readonly/></td>
                 <td><select style="display: inline-block;height: 34px;width: 98%;border-radius: 2px; float: left;" ng-model="ReportValues.report_name" ng-change="fetchReportAPI(ReportDatas,ReportValues)" ng-options="gen for gen in senses_reports" class="form-control"><option value="">SELECT REPORT</option></select>
                     </td>
-                <td><button target="_blank" ng-disabled="!ReportValues.muhalla || !ReportValues.report_name" type="submit" style="display: inline-block;height: 34px;width: 98%;border-radius: 2px; float: left;" ng-click="export_to_pdf(ReportHeader,getReportData,ReportValues)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Export</button>
-                    </td>    
+                <td><a download="{{get_pdfname}}" href="/static/pdf/{{get_pdfname}}" target="_blank"><button ng-disabled="!ReportValues.muhalla || !ReportValues.report_name || !get_pdfname" type="submit" style="display: inline-block;height: 34px;width: 98%;border-radius: 2px; float: left;" class="btn-sm btn btn-primary"><i class="fa fa-cloud-download"></i>&nbsp;Export</button></a>
+                    </td>
+                    <!--ng-click="export_to_pdf(ReportHeader,getReportData,ReportValues)"--> 
 
             </tr>
             </table>
@@ -1580,17 +1583,6 @@
                             </div>
                         </div>
                     </div>
-                    <a href="#">
-                        <div class="panel-footer">
-                            <a ng-click="reportbt=false" href="#/reports">
-                                <span class="pull-left">View Details</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i>
-                                </span>
-                            </a>
-                            
-                            <div class="clearfix"></div>
-                        </div>
-                    </a>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
@@ -1606,16 +1598,6 @@
                             </div>
                         </div>
                     </div>
-                    <a href="#">
-                        <div class="panel-footer">
-                            <a ng-click="reportbt=false" href="#/reports">
-                                <span class="pull-left">View Details</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i>
-                                </span>
-                            </a>
-                            <div class="clearfix"></div>
-                        </div>
-                    </a>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
@@ -1631,16 +1613,6 @@
                             </div>
                         </div>
                     </div>
-                    <a href="#">
-                        <div class="panel-footer">
-                            <a ng-click="reportbt=false" href="#/reports">
-                                <span class="pull-left">View Details</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i>
-                                </span>
-                            </a>
-                            <div class="clearfix"></div>
-                        </div>
-                    </a>
                 </div>
             </div>
             <div class="col-lg-3 col-md-6">
@@ -1648,7 +1620,7 @@
                     <div class="panel-heading">
                         <div class="row">
                             <div class="col-xs-3">
-                                <i class="fa fa-user` fa-5x"></i>
+                                <i class="fa fa-users fa-5x"></i>
                             </div>
                             <div class="col-xs-9 text-right">
                                 <div class="huge">{{dashboard_data.fam_member}}</div>
@@ -1656,16 +1628,6 @@
                             </div>
                         </div>
                     </div>
-                    <a href="#">
-                        <div class="panel-footer">
-                            <a ng-click="reportbt=false" href="#/reports">
-                                <span class="pull-left">View Details</span>
-                                <span class="pull-right"><i class="fa fa-arrow-circle-right"></i>
-                                </span>
-                            </a>
-                            <div class="clearfix"></div>
-                        </div>
-                    </a>
                 </div>
             </div>
         </div>
@@ -1676,10 +1638,10 @@
                         <i class="fa fa-bar-chart-o fa-fw"></i> New Family Entries
                         <div class="pull-right">
                             <div class="btn-group">
-                                <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                <!--<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
                                     Actions
                                     <span class="caret"></span>
-                                </button>
+                                </button>-->
                                 <ul class="dropdown-menu pull-right" role="menu">
                                     <li><a href="#">Action</a>
                                     </li>
@@ -1696,7 +1658,7 @@
                     </div>
                     <div class="panel-body">
                         <div id="morris-area-chart" style="position: relative; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
-                            <svg height="342" style="margin-left:-11px"version="1.1" width="701" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="overflow: hidden; position: relative;">
+                            <svg height="342" style="margin-left:-11px;width:100%;"version="1.1" width="701" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="overflow: hidden; position: relative;">
                                 <desc style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Created with Raphaël 2.1.2</desc>
                                 <defs style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></defs>
                                 <text x="49.21875" y="308" text-anchor="end" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal">
@@ -1777,166 +1739,10 @@
                         </div>
                     </div>
                 </div>
-                <div class="panel panel-default" style="border-radius: 2px;">
-                    <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> Mahallas
-                        <div class="pull-right">
-                            <div class="btn-group">
-                                <button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
-                                    Actions
-                                    <span class="caret"></span>
-                                </button>
-                                <ul class="dropdown-menu pull-right" role="menu">
-                                    <li><a href="#">Action</a>
-                                    </li>
-                                    <li><a href="#">Another action</a>
-                                    </li>
-                                    <li><a href="#">Something else here</a>
-                                    </li>
-                                    <li class="divider"></li>
-                                    <li><a href="#">Separated link</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="panel-body">
-                        <div class="row">
-                            <!--<div class="col-lg-4">
-                                <div class="table-responsive">
-                                    <table class="table table-bordered table-hover table-striped">
-                                        <thead>
-                                            <tr>
-                                                <th>#</th>
-                                                <th>Date</th>
-                                                <th>Time</th>
-                                                <th>Amount</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr>
-                                                <td>3326</td>
-                                                <td>10/21/2013</td>
-                                                <td>3:29 PM</td>
-                                                <td>$321.33</td>
-                                            </tr>
-                                            <tr>
-                                                <td>3325</td>
-                                                <td>10/21/2013</td>
-                                                <td>3:20 PM</td>
-                                                <td>$234.34</td>
-                                            </tr>
-                                            <tr>
-                                                <td>3324</td>
-                                                <td>10/21/2013</td>
-                                                <td>3:03 PM</td>
-                                                <td>$724.17</td>
-                                            </tr>
-                                            <tr>
-                                                <td>3323</td>
-                                                <td>10/21/2013</td>
-                                                <td>3:00 PM</td>
-                                                <td>$23.71</td>
-                                            </tr>
-                                            <tr>
-                                                <td>3322</td>
-                                                <td>10/21/2013</td>
-                                                <td>2:49 PM</td>
-                                                <td>$8345.23</td>
-                                            </tr>
-                                            <tr>
-                                                <td>3321</td>
-                                                <td>10/21/2013</td>
-                                                <td>2:23 PM</td>
-                                                <td>$245.12</td>
-                                            </tr>
-                                            <tr>
-                                                <td>3320</td>
-                                                <td>10/21/2013</td>
-                                                <td>2:15 PM</td>
-                                                <td>$5663.54</td>
-                                            </tr>
-                                            <tr>
-                                                <td>3319</td>
-                                                <td>10/21/2013</td>
-                                                <td>2:13 PM</td>
-                                                <td>$943.45</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>-->
-                            <div class="col-lg-8">
-                                <div id="morris-bar-chart" style="position: relative; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
-                                    <svg height="342" version="1.1" width="457" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="overflow: hidden; position: relative; left: -0.546875px;">
-                                        <desc style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Created with Raphaël 2.1.2</desc>
-                                        <defs style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></defs>
-                                        <text x="32.53125" y="308" text-anchor="end" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal">
-                                            <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">0</tspan>
-                                        </text>
-                                        <path fill="none" stroke="#aaaaaa" d="M45.03125,308H432" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
-                                        <text x="32.53125" y="237.25" text-anchor="end" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal">
-                                            <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">25</tspan>
-                                        </text>
-                                        <path fill="none" stroke="#aaaaaa" d="M45.03125,237.25H432" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
-                                        <text x="32.53125" y="166.5" text-anchor="end" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal">
-                                            <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">50</tspan>
-                                        </text>
-                                        <path fill="none" stroke="#aaaaaa" d="M45.03125,166.5H432" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
-                                        <text x="32.53125" y="95.75" text-anchor="end" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal">
-                                            <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">75</tspan>
-                                        </text>
-                                        <path fill="none" stroke="#aaaaaa" d="M45.03125,95.75H432" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
-                                        <text x="32.53125" y="25" text-anchor="end" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal">
-                                            <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">100</tspan>
-                                        </text>
-                                        <path fill="none" stroke="#aaaaaa" d="M45.03125,25H432" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
-                                        <text x="404.359375" y="320.5" text-anchor="middle" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal" transform="matrix(1,0,0,1,0,7)">
-                                            <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2012</tspan>
-                                        </text>
-                                        <text x="293.796875" y="320.5" text-anchor="middle" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal" transform="matrix(1,0,0,1,0,7)">
-                                            <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2010</tspan>
-                                        </text>
-                                        <text x="183.234375" y="320.5" text-anchor="middle" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal" transform="matrix(1,0,0,1,0,7)">
-                                            <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2008</tspan>
-                                        </text>
-                                        <text x="72.671875" y="320.5" text-anchor="middle" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal" transform="matrix(1,0,0,1,0,7)">
-                                            <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2006</tspan>
-                                        </text>
-                                        <rect x="51.94140625" y="25" width="19.23046875" height="283" rx="0" ry="0" fill="#0b62a4" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
-                                        <rect x="74.171875" y="53.29999999999998" width="19.23046875" height="254.70000000000002" rx="0" ry="0" fill="#7a92a3" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
-                                        <rect x="107.22265625" y="95.75" width="19.23046875" height="212.25" rx="0" ry="0" fill="#0b62a4" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
-                                        <rect x="129.453125" y="124.04999999999998" width="19.23046875" height="183.95000000000002" rx="0" ry="0" fill="#7a92a3" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
-                                        <rect x="162.50390625" y="166.5" width="19.23046875" height="141.5" rx="0" ry="0" fill="#0b62a4" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
-                                        <rect x="184.734375" y="194.8" width="19.23046875" height="113.19999999999999" rx="0" ry="0" fill="#7a92a3" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
-                                        <rect x="217.78515625" y="95.75" width="19.23046875" height="212.25" rx="0" ry="0" fill="#0b62a4" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
-                                        <rect x="240.015625" y="124.04999999999998" width="19.23046875" height="183.95000000000002" rx="0" ry="0" fill="#7a92a3" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
-                                        <rect x="273.06640625" y="166.5" width="19.23046875" height="141.5" rx="0" ry="0" fill="#0b62a4" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
-                                        <rect x="295.296875" y="194.8" width="19.23046875" height="113.19999999999999" rx="0" ry="0" fill="#7a92a3" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
-                                        <rect x="328.34765625" y="95.75" width="19.23046875" height="212.25" rx="0" ry="0" fill="#0b62a4" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
-                                        <rect x="350.578125" y="124.04999999999998" width="19.23046875" height="183.95000000000002" rx="0" ry="0" fill="#7a92a3" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
-                                        <rect x="383.62890625" y="25" width="19.23046875" height="283" rx="0" ry="0" fill="#0b62a4" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
-                                        <rect x="405.859375" y="53.29999999999998" width="19.23046875" height="254.70000000000002" rx="0" ry="0" fill="#7a92a3" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
-                                    </svg>
-                                    <div class="morris-hover morris-default-style" style="left: 87.453125px; top: 136px; display: none;">
-                                        <div class="morris-hover-row-label">2007</div>
-                                        <div class="morris-hover-point" style="color: #0b62a4">
-                                            Series A: 75
-                                        </div>
-                                        <div class="morris-hover-point" style="color: #7a92a3">
-                                            Series B: 65
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
                 <!-- /.panel -->
             </div>
             <!-- /.col-lg-8 -->
             <div class="col-lg-4">
-                
                 <div class="panel panel-default" style="border-radius: 2px;">
                     <div class="panel-heading">
                         <i class="fa fa-bar-chart-o fa-fw"></i> Mahallas Chart
@@ -1960,9 +1766,101 @@
                                 </text>
                             </svg>
                         </div>
-                        <a href="#" class="btn btn-default btn-block" style="border-radius:2px;">View Details</a>
                     </div>
                 </div>
+            </div>
+            <div class="col-lg-12">
+                <div class="panel panel-default" style="border-radius: 2px;">
+                        <div class="panel-heading">
+                            <i class="fa fa-bar-chart-o fa-fw"></i> Mahallas
+                            <div class="pull-right">
+                                <div class="btn-group">
+                                    <!--<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
+                                        Actions
+                                        <span class="caret"></span>
+                                    </button>-->
+                                    <ul class="dropdown-menu pull-right" role="menu">
+                                        <li><a href="#">Action</a>
+                                        </li>
+                                        <li><a href="#">Another action</a>
+                                        </li>
+                                        <li><a href="#">Something else here</a>
+                                        </li>
+                                        <li class="divider"></li>
+                                        <li><a href="#">Separated link</a>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="panel-body">
+                            <div class="row">
+                                <div class="col-lg-12">
+                                    <div id="morris-bar-chart" style="position: relative; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
+                                        <svg height="342" version="1.1" width="457" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="overflow: hidden; position: relative; left: -0.546875px;">
+                                            <desc style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Created with Raphaël 2.1.2</desc>
+                                            <defs style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></defs>
+                                            <text x="32.53125" y="308" text-anchor="end" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal">
+                                                <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">0</tspan>
+                                            </text>
+                                            <path fill="none" stroke="#aaaaaa" d="M45.03125,308H432" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
+                                            <text x="32.53125" y="237.25" text-anchor="end" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal">
+                                                <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">25</tspan>
+                                            </text>
+                                            <path fill="none" stroke="#aaaaaa" d="M45.03125,237.25H432" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
+                                            <text x="32.53125" y="166.5" text-anchor="end" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal">
+                                                <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">50</tspan>
+                                            </text>
+                                            <path fill="none" stroke="#aaaaaa" d="M45.03125,166.5H432" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
+                                            <text x="32.53125" y="95.75" text-anchor="end" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal">
+                                                <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">75</tspan>
+                                            </text>
+                                            <path fill="none" stroke="#aaaaaa" d="M45.03125,95.75H432" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
+                                            <text x="32.53125" y="25" text-anchor="end" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal">
+                                                <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">100</tspan>
+                                            </text>
+                                            <path fill="none" stroke="#aaaaaa" d="M45.03125,25H432" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
+                                            <text x="404.359375" y="320.5" text-anchor="middle" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal" transform="matrix(1,0,0,1,0,7)">
+                                                <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2012</tspan>
+                                            </text>
+                                            <text x="293.796875" y="320.5" text-anchor="middle" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal" transform="matrix(1,0,0,1,0,7)">
+                                                <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2010</tspan>
+                                            </text>
+                                            <text x="183.234375" y="320.5" text-anchor="middle" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal" transform="matrix(1,0,0,1,0,7)">
+                                                <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2008</tspan>
+                                            </text>
+                                            <text x="72.671875" y="320.5" text-anchor="middle" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal" transform="matrix(1,0,0,1,0,7)">
+                                                <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2006</tspan>
+                                            </text>
+                                            <rect x="51.94140625" y="25" width="19.23046875" height="283" rx="0" ry="0" fill="#0b62a4" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
+                                            <rect x="74.171875" y="53.29999999999998" width="19.23046875" height="254.70000000000002" rx="0" ry="0" fill="#7a92a3" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
+                                            <rect x="107.22265625" y="95.75" width="19.23046875" height="212.25" rx="0" ry="0" fill="#0b62a4" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
+                                            <rect x="129.453125" y="124.04999999999998" width="19.23046875" height="183.95000000000002" rx="0" ry="0" fill="#7a92a3" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
+                                            <rect x="162.50390625" y="166.5" width="19.23046875" height="141.5" rx="0" ry="0" fill="#0b62a4" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
+                                            <rect x="184.734375" y="194.8" width="19.23046875" height="113.19999999999999" rx="0" ry="0" fill="#7a92a3" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
+                                            <rect x="217.78515625" y="95.75" width="19.23046875" height="212.25" rx="0" ry="0" fill="#0b62a4" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
+                                            <rect x="240.015625" y="124.04999999999998" width="19.23046875" height="183.95000000000002" rx="0" ry="0" fill="#7a92a3" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
+                                            <rect x="273.06640625" y="166.5" width="19.23046875" height="141.5" rx="0" ry="0" fill="#0b62a4" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
+                                            <rect x="295.296875" y="194.8" width="19.23046875" height="113.19999999999999" rx="0" ry="0" fill="#7a92a3" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
+                                            <rect x="328.34765625" y="95.75" width="19.23046875" height="212.25" rx="0" ry="0" fill="#0b62a4" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
+                                            <rect x="350.578125" y="124.04999999999998" width="19.23046875" height="183.95000000000002" rx="0" ry="0" fill="#7a92a3" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
+                                            <rect x="383.62890625" y="25" width="19.23046875" height="283" rx="0" ry="0" fill="#0b62a4" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
+                                            <rect x="405.859375" y="53.29999999999998" width="19.23046875" height="254.70000000000002" rx="0" ry="0" fill="#7a92a3" stroke="none" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></rect>
+                                        </svg>
+                                        <div class="morris-hover morris-default-style" style="left: 87.453125px; top: 136px; display: none;">
+                                            <div class="morris-hover-row-label">2007</div>
+                                            <div class="morris-hover-point" style="color: #0b62a4">
+                                                Series A: 75
+                                            </div>
+                                            <div class="morris-hover-point" style="color: #7a92a3">
+                                                Series B: 65
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
             </div>
         </div>
     </script>

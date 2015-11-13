@@ -623,6 +623,8 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         }
         console.log('data',data)
         if(values.muhalla != '') {
+            $scope.ReportHeader = true;
+            $scope.getReportData = false;
             appBusy.set("Loading....");
             $http.post('/fetchReportData/',{
                 data : data,
@@ -675,6 +677,20 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                     $scope.getReportData = response.member_details;
                     $scope.ReportValues.report_name = 'New filter'
                 }
+                if(response.report_type == 'Mohalla Report') {
+                    var pdf_data = response.pdf_report;
+                }
+                else {
+                    var pdf_data = $scope.getReportData;
+                }                    
+                $http.post('/report_to_pdf/',{
+                    header : $scope.ReportHeader,
+                    data : pdf_data,
+                    report : $scope.ReportValues,
+                }).success(function(response){
+                    console.log('success',response)
+                    $scope.get_pdfname = response.pdfname;
+                })
             })
         }
     }
