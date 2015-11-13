@@ -965,13 +965,9 @@ def report_to_pdf(request):
         else:
             pdf_filename = 'reports_gen.pdf'
             html_filename = '%s/templates/report_to_pdf.html'%file_path
+        pdf_filepath = '%s/static/pdf/%s'%(file_path,pdf_filename)    
         html_content = render_to_string(html_filename,{'header':data['header'],'data':data['data'],'report':data['report'],'total':len(data['data'])})
-        response = pdfkit.from_string(html_content, pdf_filename)
-        # open_pdf = '%s/%s'%(file_path,pdf_filename)
-        # f = open(open_pdf,'r')
-        # response = f.read()
-        # f.close()
-        # return HttpResponse(response,content_type='Application/pdf')
+        response = pdfkit.from_string(html_content, pdf_filepath)
         return HttpResponse(content=json.dumps({'data':data,'pdfname':pdf_filename}),content_type='Application/json')
     else:
         file_path = os.path.dirname(os.path.dirname(__file__))
@@ -987,8 +983,6 @@ def report_to_pdf(request):
         f = open(open_pdf,'r')
         response = f.read()
         f.close()
-        # response = HttpResponse(content_type="application/pdf")
-        # response["Content-Disposition"] = "attachment; pdf_filename="+pdf_filename
         return HttpResponse(response,content_type='Application/pdf')
 
 def matrix_taluk_api(request):
@@ -1004,7 +998,7 @@ def matrix_taluk_api(request):
             compaign_name = request.GET['service_name']
             for j in item_list:
                 count_dict[j] = count_dict.setdefault(j,0) + 1
-            data = {'data':count_dict,'district':district,'campaign':compaign_name}      
+            data = json.dumps({'data':count_dict,'district':district,'campaign':compaign_name})      
         elif request.GET['scheme_name'] != 'none':
             scheme = SubScheme.objects.get(name=request.GET['scheme_name'])           
             data = map(lambda x:{'scheme_name':x.scheme.name,'taluk':x.member.muhalla.taluk.taluk_name,'district':x.member.muhalla.taluk.district.district_name},Member_scheme.objects.filter(scheme=scheme,status=True,solution='Not Yet')) 
@@ -1025,6 +1019,7 @@ def matrix_taluk_api(request):
             data = json.dumps({'data':count_dict,'district':district,'campaign':compaign_name})             
         else:
             data = []
+        print 'data',data    
         try:
             if request.GET['callback']:
                 callback_val = request.GET['callback']
@@ -1034,7 +1029,7 @@ def matrix_taluk_api(request):
         # except:
             # print 'repr',repr(format_exc())
         print 'data',data    
-        return HttpResponse(content=data,content_type='Application/json')    
+        return HttpResponse(data,content_type='Application/json')    
 
 def fetch_data_api(request):
     if request.method == 'GET':

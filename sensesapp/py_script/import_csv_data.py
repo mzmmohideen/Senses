@@ -167,12 +167,15 @@ def importcsvdata(value):
                 # member add
                 member_id = '%s / %s' %(family.family_id,val[18])
                 try:
-                  dob_date = data_date - relativedelta(years=eval(val[21])) if val[21] else data_date
+                  dob_date = data_date - relativedelta(years=eval(val[21])) if val[21] else '0'
                 except:
                   try:
                     dob_date = data_date - relativedelta(years=eval(val[21].split(' ')[0]))
                   except:
-                    dob_date = data_date - relativedelta(years=eval(val[21][:1]))
+                    try:
+                      dob_date = data_date - relativedelta(years=eval(val[21][:1]))
+                    except:
+                      dob_date = data_date - relativedelta(years=0)                      
                 mem_age = str(datetime.now().year-dob_date.year)
                 if val[23]:
                       if val[23] == 'M':
