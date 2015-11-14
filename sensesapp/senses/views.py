@@ -587,6 +587,12 @@ def fetchReportData(request):
             rep_data = {'Taluk':muhalla.taluk.taluk_name,'Taluk Count':1,'Total Family ':len(get_family),'Total Population':len(get_memData),'Total Male':tot_men,'Total Female':tot_women,'Married':married,'Male age 60+':men_age_60,'Female age 60+':women_age_60,'Male age between 22-59':men_age_22to59,'Female age between 22-59':women_age_22to59,'Male age between 11-21':men_age_11to21,'Female age between 11-21':women_age_11to21,'Child upto 11 age ':child_upto11,'A - Well Settled':cat_A,'B - Full Filled':cat_B,'C - Middle Class':cat_C,'D - Poor':cat_D,'E - Very Poor':cat_E,'Widow':widowed,'Divorced':divorced,'Mother Tongue':{'Tamil':lang_tamil,'Urdu':lang_urdu,'Others':lang_others}}
             pdf_rep_data = {'Taluk':muhalla.taluk.taluk_name,'Taluk_Count':1,'Total_Family ':len(get_family),'non_voter':non_voter,'voter':voter,'Total_Population':len(get_memData),'Total_Male':tot_men,'Total_Female':tot_women,'Married':married,'Male_age_60':men_age_60,'Female_age_60':women_age_60,'Male_age_between_22to59':men_age_22to59,'Female_age_between_22to59':women_age_22to59,'Male_age_between_11to21':men_age_11to21,'Female_age_between_11to21':women_age_11to21,'Child_upto_11_age':child_upto11,'A_Well_Settled':cat_A,'B_Full_Filled':cat_B,'C_Middle_Class':cat_C,'D_Poor':cat_D,'E_Very_Poor':cat_E,'Widow':widowed,'Divorced':divorced,'Mother_Tongue':{'Tamil':lang_tamil,'Urdu':lang_urdu,'Others':lang_others}}
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'non_voter':non_voter,'voter':voter,'reports':rep_data,'pdf_report':pdf_rep_data}),content_type='Application/json')
+        elif data['report_type'] == 'Needs Types':
+            scheme_data = map(lambda x:{'name':x.name,'need_id':x.subscheme_id,'beneficiaries':len(Member_scheme.objects.filter(scheme=x,status=True,solution='Solved')),'total':len(Member_scheme.objects.filter(scheme=x,status=True))},SubScheme.objects.all())
+            service_data = map(lambda x:{'name':x.name,'need_id':x.service_id,'beneficiaries':len(Member_service.objects.filter(scheme=x,status=True,solution='Solved')),'total':len(Member_service.objects.filter(scheme=x,status=True))},Service.objects.all())
+            dis_data = map(lambda x:{'name':x.disease_name,'total':len(Medical.objects.filter(disease=x)),'beneficiaries':0,'need_id':x.disease_id},Disease.objects.all())       
+            rep_data = scheme_data + service_data + dis_data
+            return HttpResponse(content=json.dumps({'report_type':data['report_type'],'reports':rep_data}),content_type='Application/json')
         # return HttpResponse(content=json.dumps({'data':data,'member_details':member_details,'get_mem_service':get_mem_service,'get_mem_medical':get_mem_medical,'get_mem_scheme':get_mem_scheme,'get_memData':get_memData}),content_type='Application/json')
     
     elif request.method == 'GET':
@@ -1005,6 +1011,9 @@ def report_to_pdf(request):
         elif data['report']['report_name'] == 'Persons Need to join Jumrah Madarasa':
             pdf_filename = 'jumra_madarasa.pdf'
             html_filename = '%s/templates/jumra_madarasa.html'%file_path
+        elif data['report']['report_name'] == 'Needs Types':
+            pdf_filename = 'needs_types.pdf'
+            html_filename = '%s/templates/needs_types.html'%file_path    
         else:
             pdf_filename = 'reports_gen.pdf'
             html_filename = '%s/templates/report_to_pdf.html'%file_path

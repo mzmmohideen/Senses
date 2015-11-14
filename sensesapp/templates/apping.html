@@ -911,10 +911,17 @@
                         </td>-->        
                         <td class="ng-binding">{{val}}</td>
                     </tr>
+                    <tr ng-show="ReportValues.report_name == 'Needs Types' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
+                        <td>{{$index+1}}</td>
+                        <td>{{key.need_id}}</td>
+                        <td>{{key.name}}</td>
+                        <td>{{key.total}}</td>
+                        <td>{{key.beneficiaries}}</td>
+                    </tr>
                     <tr ng-show="ReportValues.report_name != 'Mohalla Report' && getReportData.length==0" class="ng-scope">
                         <td colspan="7">No Data Found!</td>
                     </tr>
-                     <tr ng-show="ReportValues.report_name == 'New filter' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
+                    <tr ng-show="ReportValues.report_name == 'New filter' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td>{{key.name}} <br/> {{key.address}}</td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>

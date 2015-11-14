@@ -1,0 +1,47 @@
+<html>
+<head>
+<style type="text/css">
+.tg  {border-collapse:collapse;border-spacing:0;border-color:#aabcfe;}
+.tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#669;background-color:#e8edff;}
+.tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#039;background-color:#b9c9fe;}
+.tg .tg-7un6{background-color:#ffffff;color:#000000;text-align:center;vertical-align:top}
+.tg .tg-8v3j{font-weight:bold;background-color:#cd9934;color:#000000;text-align:center;vertical-align:top}
+.tg .tg-bia7{font-weight:bold;background-color:#cd9934;color:#000000;vertical-align:top}
+.tg .tg-eub6{background-color:#cd9934;font-weight:bold;color:#000000;text-align:center;vertical-align:top}
+.tg .tg-p75c{background-color:#cd9934;font-weight:bold;color:#000000;vertical-align:top}
+</style>
+</head>
+<body>
+<table style="width:100%" class="tg">
+  <tr>
+    <th class="tg-8v3j" colspan="3" rowspan="3"><br><br>UNWO <br>CENSUS RECORDS</th>
+    <th class="tg-8v3j">DISTRICT</th>
+    <th class="tg-bia7" colspan="2">{{report.district}}</th>
+  </tr>
+  <tr>
+    <td class="tg-eub6">TALUK</td>
+    <td class="tg-p75c" colspan="2">{{report.taluk}}</td>
+  </tr>
+  <tr>
+    <td class="tg-8v3j">MAHALLA</td>
+    <td class="tg-bia7" colspan="2">{{report.muhalla.name}}</td>
+  </tr>
+  <tr>
+    <td class="tg-eub6">S.No</td>
+    <td class="tg-eub6">Needs ID</td>
+    <td class="tg-eub6" colspan="2">Needs Type</td>
+    <td class="tg-eub6">Total</td>
+    <td class="tg-eub6">Beneficiaries</td>
+  </tr>
+  {% for val in data %}
+  <tr>
+    <td class="tg-7un6"></td>
+    <td class="tg-7un6">{{val.need_id}}</td>
+    <td class="tg-7un6" colspan="2">{{val.name}}</td>
+    <td class="tg-7un6">{{val.total}}</td>
+    <td class="tg-7un6">{{val.beneficiaries}}</td>
+  </tr>
+  {% endfor %}
+</table>
+</body>
+</html>
