@@ -556,7 +556,7 @@
                             <span ng-show="!editMohMember">*****</span>
                             <span ng-show="editMohMember"><input style="display: inline-block;height: 34px;float: left;" class="form-control" type="password" ng-model="moh_user.re_password" placeholder="Password" /></span>
                         </td>
-                        <td><a ng-show="!editMohMember" ng-click="editMohMember=true" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a>
+                        <td><a ng-show="!editMohMember" ng-click="editMohMember=true;moh_user.re_email=fetched_moh_user.email;moh_user.username=fetched_moh_user.username" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a>
                             <a ng-show="editMohMember" ng-click="editMohMember=false;moh_user_create(fetched_moh_user,moh_user,'edit')" class="color-edit"><i class="glyphicon glyphicon-plus"></i></a>
                             <a ng-confirm-click="Are you Sure you want to Delete?" confirmed-click="moh_user_create('',moh_user,'delete')" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
                     </tr>
@@ -656,9 +656,9 @@
                     <tr ng-repeat="member in masjid_member_list" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td class="ng-binding"><span ng-show="!updateMem">{{member.name}}</span><input type="text" ng-show="updateMem" ng-model="member.name"></td>
-                        <td class="ng-binding"><span ng-show="!updateMem">{{member.age}}</span><input type="text" ng-show="updateMem" ng-model="member.age"></td>
+                        <td class="ng-binding"><span ng-show="!updateMem">{{member.age}}</span><input type="text" ng-show="updateMem" valid-number minlength="1" maxlength="3" ng-model="member.age"></td>
                         <td class="ng-binding"><span ng-show="!updateMem">{{member.designation}}</span><input type="text" ng-show="updateMem" ng-model="member.designation"></td>
-                        <td class="ng-binding"><span ng-show="!updateMem">{{member.mobile}}</span><input type="text" ng-show="updateMem" ng-model="member.mobile"></td>
+                        <td class="ng-binding"><span ng-show="!updateMem">{{member.mobile}}</span><input type="text" ng-show="updateMem" valid-number minlength="8" maxlength="20" ng-model="member.mobile"></td>
                         <td class="ng-binding"><span ng-show="!updateMem">{{member.address}}</span><input type="text" ng-show="updateMem" ng-model="member.address"></td>
                         <td><a ng-show="!updateMem" ng-click="updateMem=true;" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a>
                             <a ng-show="updateMem" ng-click="updateMem=false;UpdateMember(MasjidAddValue.mohalla_id,member,member.name,member.age,member.designation,member.mobile,member.address)" class="color-edit"><i class="glyphicon glyphicon-plus"></i></a>
@@ -802,10 +802,10 @@
                 <td> <label for="male">Disease ID *</label> </td>
                 <td> <label for="male">description</label> </td>
             </tr>
-            <tr>
-                <td><select ng-change="getDisease(DiseaseVal.sym_type)" style="display: inline-block;height: 34px;width: 98%;border-radius: 2px;float: left;" ng-model="DiseaseVal.sym_type" ng-options="val for val in ['DISEASE','DISORDER']" class="form-control">
+            <tr ng-init="getDisease('DISEASE')">
+                <!--<td><select ng-change="getDisease(DiseaseVal.sym_type)" style="display: inline-block;height: 34px;width: 98%;border-radius: 2px;float: left;" ng-model="DiseaseVal.sym_type" ng-options="val for val in ['DISEASE','DISORDER']" class="form-control">
                     <option value="">SELECT TYPE</option>
-                </select></td>
+                </select></td>-->
                 <td><ui-select style="display: inline-block;height: 34px;border-radius: 2px;width: 98%;float: left;" on-select="getDisease=DiseaseVal.name;get_disease(getDisease)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="DiseaseVal.name">
                     <ui-select-match placeholder="{{disease_val}}">{{disease_val}}</ui-select-match>
                     <ui-select-choices refresh="getDisease=$select.search;get_disease(getDisease)" repeat="mod in disease_list | filter:$select.search">
@@ -814,7 +814,7 @@
                 </ui-select></td>
                 <td><input style="display: inline-block;height: 34px;width: 98%;border-radius: 2px;float: left;" type="text" placeholder="Disease ID" ng-model="DiseaseVal.disease_id" class="form-control"></td>
                 <td><input style="display: inline-block;height: 34px;width: 98%;border-radius: 2px;float: left;" class="form-control" type="text" ng-model="DiseaseVal.description" placeholder="Description(optional)" /></td>
-                <td><button  ng-disabled="disease_val=='' || disease_val=='SELECT or ADD DISEASE' || !DiseaseVal.sym_type" type="submit" style="width:100%;height: 34px;float:right;" ng-click="add_disease(disease_val,DiseaseVal)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button></td>
+                <td><button  ng-disabled="disease_val=='' || disease_val=='SELECT or ADD DISEASE'" type="submit" style="width:100%;height: 34px;float:right;" ng-click="add_disease(disease_val,DiseaseVal)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button></td>
             </tr>
             </table>
             </div>
@@ -830,9 +830,9 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-show="!DiseaseVal.sym_type">
+                    <!--<tr ng-show="!DiseaseVal.sym_type">
                         <td colspan="8" style="text-align:center;" class="ng-binding">Please Select Type !</td>
-                    </tr>
+                    </tr>-->
                     <tr ng-show="getDiseaseData.length==0">
                         <td colspan="8" style="text-align:center;" class="ng-binding">No Disease Data Found!</td>
                     </tr>
@@ -996,7 +996,7 @@
                         <div class="form-group" style="margin:5px;">
                             <label class="control-label col-xs-3">Age *</label>
                             <div class="col-xs-9">
-                                <input class="form-control" type="text" ng-model="age" valid-number ng-change="clear_error()" placeholder="Age" />
+                                <input class="form-control" valid-number minlength="1" maxlength="3" type="text" ng-model="age" valid-number ng-change="clear_error()" placeholder="Age" />
                             </div>
                         </div>
                         <div class="form-group" style="margin:5px;">
@@ -1008,13 +1008,13 @@
                         <div class="form-group" style="margin:5px;">
                             <label class="control-label col-xs-3">Mobile *</label>
                             <div class="col-xs-9">
-                                <input class="form-control" type="text" ng-model="mobile" ng-change="clear_error()" placeholder="Mobile Number" />
+                                <input class="form-control" valid-number minlength="8" maxlength="20" type="text" ng-model="mobile" ng-change="clear_error()" placeholder="Mobile Number" />
                             </div>
                         </div>
                         <div class="form-group" style="margin:5px;">
                             <label class="control-label col-xs-3">Email</label>
                             <div class="col-xs-9">
-                                <input class="form-control" type="text" ng-model="email" ng-change="clear_error()" placeholder="Email" />
+                                <input class="form-control" valid-entry type="text" ng-model="email" ng-change="clear_error()" placeholder="Email" />
                             </div>
                         </div>
                         <div class="form-group" style="margin:5px;">
@@ -1219,7 +1219,7 @@
                 <tr>
                 <td><input style="display: inline-block;width: 97%;border-radius: 2px;height: 34px;float: left;" type="text" placeholder="Address *" ng-model="FamilyValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
                 <td><input style="display: inline-block;width: 97%;border-radius: 2px;height: 34px;float: left;" type="date" id="date_input" datepicker-popup="{{format}}" ng-model="FamilyValue.report_date" is-open="opened" min-date="minDate" max-date="maxDate" close-on-date-selection='false' datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" class="form-control"/></td>
-                <td><input style="display: inline-block;width: 97%;border-radius: 2px;height: 34px;float: left;" type="text" placeholder="Mobile Number *" ng-model="FamilyValue.mobile_no" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                <td><input style="display: inline-block;width: 97%;border-radius: 2px;height: 34px;float: left;" type="text" placeholder="Mobile Number *" valid-number minlength="8" maxlength="20" ng-model="FamilyValue.mobile_no" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
                 <td><select style="display: inline-block;border-radius: 2px;height: 34px;width: 97%;float: left;" ng-model="FamilyValue.language" ng-options="house for house in ['Tamil','Urdu','Others']" class="form-control">
                     <option value="">Mother Tongue</option>
                 </select></td>
@@ -1280,7 +1280,7 @@
                         <td style="padding-left: 1px; padding-right: 1px;"><input type="text" placeholder="Name" ng-model="FamilyMember.name" style="font-size: 12px; padding-left: 7px;" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
                         <td style="padding-left: 1px; padding-right: 1px;"><select ng-model="FamilyMember.gender" ng-options="gen for gen in family_gender" style="font-size: 11px;height: 29px;padding: 2px 0px 3px;" class="form-control">
                         </select></td>
-                        <td><input ng-change="get_age_or_dob(FamilyMember,FamilyValue,'age')" type="text" placeholder="Age" ng-model="FamilyMember.age" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
+                        <td><input ng-change="get_age_or_dob(FamilyMember,FamilyValue,'age')" type="text" placeholder="Age" valid-number minlength="1" maxlength="3" ng-model="FamilyMember.age" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
                         <td><input ng-change="get_age_or_dob(FamilyMember,FamilyValue,'dob')" type="date" id="date_input" datepicker-popup="{{format}}" ng-model="FamilyMember.dateofbirth" is-open="opened" min-date="minDate" max-date="maxDate" close-on-date-selection='false' datepicker-options="dateOptions" date-disabled="disabled(date, mode)" ng-required="true" close-text="Close" class="form-control"/></td>
                         <td><select ng-model="FamilyMember.family_head" ng-options="val for val in family_head_status" class="form-control">
                         </select></td>

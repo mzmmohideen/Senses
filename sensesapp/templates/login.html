@@ -17,7 +17,7 @@
 				</div>
 				<div ng-show="!correct_pwd" class="login-form">
 					<div class="control-group">
-					<input type="text" ng-model="name" placeholder="&nbsp;&nbsp;&nbsp;username">
+					<input type="text" valid-uname ng-model="name" placeholder="&nbsp;&nbsp;&nbsp;username">
 					</div>
 					<div class="control-group">
 					<input type="password" ng-model="password" placeholder="&nbsp;&nbsp;&nbsp;password"  ng-enter="login(name,password)">
@@ -30,10 +30,10 @@
 				</div>
 				<div ng-show="correct_pwd" class="login-form">
 					<div class="control-group">
-					<input type="text" ng-model="name" placeholder="&nbsp;&nbsp;&nbsp;username">
+					<input type="text" valid-uname ng-model="name" placeholder="&nbsp;&nbsp;&nbsp;username">
 					</div>
 					<div class="control-group">
-					<input type="text" ng-model="email" placeholder="&nbsp;&nbsp;&nbsp;Email">
+					<input type="text" valid-entry ng-model="email" placeholder="&nbsp;&nbsp;&nbsp;Email">
 					</div>
 					<div class="control-group">
 					<input type="password" ng-model="password" placeholder="&nbsp;&nbsp;&nbsp;Password">

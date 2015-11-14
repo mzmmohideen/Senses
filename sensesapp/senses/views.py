@@ -417,7 +417,7 @@ def fetchReportData(request):
                         get_disease = Disease.objects.get(disease_id=dislist['disease_id'])
                         for i in member_data_med:
                             for j in Medical.objects.filter(member=i,disease_id=get_disease):
-                                get_mem_medical.append({'name':j.member.name,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})
+                                get_mem_medical.append({'name':j.member.name,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})
                 else:
                     for i in member_data_med:
                         for j in Medical.objects.filter(member=i):
@@ -484,11 +484,11 @@ def fetchReportData(request):
                         get_service = Service.objects.get(service_id=schlist['service_id'])
                         for i in member_data_service:
                             for j in Member_service.objects.filter(member=i,scheme=get_service):
-                                get_mem_service.append({'name':j.member.name,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'via UNWO'})
+                                get_mem_service.append({'name':j.member.name,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'via UNWO'})
                 else:
                     for i in member_data_service:
                             for j in Member_service.objects.filter(member=i):
-                                get_mem_service.append({'name':j.member.name,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'via UNWO'})
+                                get_mem_service.append({'name':j.member.name,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'via UNWO'})
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_service':get_mem_service}),content_type='Application/json')                
         elif data['report_type'] == 'Government Schemes and Guidance Needers Details' or data['report_type'] == 'Educational Help and Guidance Needers List' or data['report_type'] == 'Help for Discontinued and Guidance Needers List' or data['report_type'] == 'Training/Employment Help and Guidance Needers List':
             get_mem_scheme = []
@@ -526,7 +526,7 @@ def fetchReportData(request):
                         get_scheme = SubScheme.objects.get(subscheme_id=schlist['scheme_id'])
                         for i in member_data_scheme:
                             for j in Member_scheme.objects.filter(member=i,scheme=get_scheme):
-                                get_mem_scheme.append({'name':j.member.name,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'Need Government Scheme Guidance'})
+                                get_mem_scheme.append({'name':j.member.name,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'Need Government Scheme Guidance'})
                 else:
                     for i in member_data_scheme:
                         for j in Member_scheme.objects.filter(member=i):
@@ -543,11 +543,11 @@ def fetchReportData(request):
             except:
                 muhalla = Masjid.objects.all()[0]
             if data['report_type'] == 'Women chldrens Need to join Niswan Madarasa':
-                get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla,Makthab=True,madarasa_details='Girls For Makthab 4-15'))
+                get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'financial_pdf':x.family.financial_status.split(' ')[0],'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla,Makthab=True,madarasa_details='Girls For Makthab 4-15'))
             elif data['report_type'] == 'Childrens Need to join Makthab Madarasa':
-                get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla,Makthab=True,madarasa_details='Boys For Makthab 4-15'))
+                get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'financial_pdf':x.family.financial_status.split(' ')[0],'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla,Makthab=True,madarasa_details='Boys For Makthab 4-15'))
             elif data['report_type'] == 'Persons Need to join Jumrah Madarasa':
-                get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla,Makthab=True,madarasa_details='Jumrah Madarasa for Boys'))    
+                get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'financial_pdf':x.family.financial_status.split(' ')[0],'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla,Makthab=True,madarasa_details='Jumrah Madarasa for Boys'))    
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_memData':get_memData}),content_type='Application/json')
         elif data['report_type'] == 'Mohalla Report':
             print 'mohalla report_type'
@@ -984,6 +984,27 @@ def report_to_pdf(request):
         elif data['report']['report_name'] == 'Educational Help and Guidance Needers List':
             pdf_filename = 'edu_guide_needers.pdf'
             html_filename = '%s/templates/edu_guide_needers.html'%file_path
+        elif data['report']['report_name'] == 'Help for Discontinued and Guidance Needers List':
+            pdf_filename = 'help_for_discontinued.pdf'
+            html_filename = '%s/templates/help_for_discontinued.html'%file_path
+        elif data['report']['report_name'] == 'Basic Help Needers List':
+            pdf_filename = 'basic_help_needers.pdf'
+            html_filename = '%s/templates/basic_help_needers.html'%file_path  
+        elif data['report']['report_name'] == 'Help for Poor Peoples and Guidance Needers List':
+            pdf_filename = 'help_for_poor_people.pdf'
+            html_filename = '%s/templates/help_for_poor_people.html'%file_path   
+        elif data['report']['report_name'] == 'Training/Employment Help and Guidance Needers List':
+            pdf_filename = 'training_employment.pdf'
+            html_filename = '%s/templates/training_employment.html'%file_path
+        elif data['report']['report_name'] == 'Childrens Need to join Makthab Madarasa':
+            pdf_filename = 'maktab_madarasa.pdf'
+            html_filename = '%s/templates/maktab_madarasa.html'%file_path
+        elif data['report']['report_name'] == 'Women chldrens Need to join Niswan Madarasa':
+            pdf_filename = 'niswan_madarasa.pdf'
+            html_filename = '%s/templates/niswan_madarasa.html'%file_path
+        elif data['report']['report_name'] == 'Persons Need to join Jumrah Madarasa':
+            pdf_filename = 'jumra_madarasa.pdf'
+            html_filename = '%s/templates/jumra_madarasa.html'%file_path
         else:
             pdf_filename = 'reports_gen.pdf'
             html_filename = '%s/templates/report_to_pdf.html'%file_path
