@@ -2,7 +2,7 @@ import os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sensesapp.settings")
 from senses.models import *
-import csv,json
+import csv,json,xlrd
 from os import listdir
 from collections import defaultdict
 from django.core.exceptions import ObjectDoesNotExist
@@ -53,21 +53,24 @@ def importcsvdata(value):
        # exit()
        # scraped_csv = open('%s/productscrapper/%s'%(s,name))
        # csv_data = open('%s/csv/%s'%(s,name),'rb')
-       if type(name) != str:
-        print 'yes',name
-        csv_data = name
-       else:
+       if str(name).lower().endswith(('.xls','xlsx')):
+        data = []
+        wb = xlrd.open_workbook(filename=None,file_contents=name.read())
+        sh = wb.sheet_by_name('Sheet1')
+        for i in xrange(sh.nrows):
+          data.append(sh.row_values(i))
+        maxLenObj = max(map(len,data))
+       elif str(name).lower().endswith(('.csv','csvx')):
         csv_data = open('%s/csv/%s'%(s,name))
-       print 'csv_data',csv_data
-       # exit() 
-       data = list(csv.reader(csv_data))
-       # print 'filename',data
-       exit()
-       a = [i[0].split('|') for i in data[1:]]
-       maxLenObj = max(map(len,a))
+        a = list(csv.reader(csv_data))
+        data = [i[0].split('|') for i in a[1:]]
+        maxLenObj = max(map(len,data))
+       else:
+        return 'Please upload only Valid Files! these extensions only (.csv,csvx,.xls,.xlsx) Accepted!'        
        for i in data[1:]:
             try:
-                val = i[0].split('|')
+                val = i
+                # val = i[0].split('|')
                 if len(val) < maxLenObj:
                   val = val + ['']*(maxLenObj-len(val))
                 try:
@@ -77,19 +80,8 @@ def importcsvdata(value):
                         data_date = datetime.now()
                 except:
                   data_date = datetime.now()
-                print 'val',val  
-                if val[1]:
-                  # district_val = val[1]
-                  district_val = data[1][0].split('|')[1]
-                else:
-                  print 'no district name'
-                  district_val = data[1][0].split('|')[1]
-                if val[2]:
-                  taluk_name = val[2]
-                  taluk_name = data[1][0].split('|')[2]
-                else:
-                  print 'no taluk name'
-                  taluk_name = data[1][0].split('|')[2]
+                district_val = data[1][1] if val[1] else data[1][1]
+                taluk_name = data[1][2] if val[2] else data[1][2]
                 if district_val == 'Ramnad':
                   district_val = 'Ramanathapuram'                  
                 district_value = District.objects.get(district_name=district_val)  
@@ -104,7 +96,7 @@ def importcsvdata(value):
                 else:
                   csv_mohalla_id = val[6]
                 mohalla_location = val[9] if val[9] else ''
-                mohalla_name = data[1][0].split('|')[5]  
+                mohalla_name = data[1][5]  
                 # mohalla_name = val[5] if val[5] else mohalla_location
                 if Masjid.objects.filter(taluk=taluk,name=mohalla_name):
                       # muhalla_update = Masjid.objects.filter(taluk=taluk,name=mohalla_name).update(mohalla_id=csv_mohalla_id,taluk=taluk,district=district_value,musallas='',location=mohalla_location)
@@ -136,7 +128,7 @@ def importcsvdata(value):
                 else:
                       volunteer = False
                 family_needs = val[69] if val[69] else ''
-                familyid = '%s / %s' %(masjid.mohalla_id,val[4])
+                familyid = '%s / %s' %(masjid.mohalla_id,int(val[4]))
                 language = val[12] if val[12] else ''
                 ration_card = val[13] if val[13] else ''
                 if val[7] or val[8] or val[9]:
@@ -168,7 +160,16 @@ def importcsvdata(value):
                 else:
                   house_cat = ''
                 # mobile_no = val[10] if len(val[10]) else val[10][:10]
-                mobile_no = val[10] if val[10] else ''
+                try:
+                  mobile_no = int(val[10]) if val[10] else 0
+                except:
+                  try:
+                    mobile_no = int(val[10][:10])
+                  except:
+                    try:
+                      mobile_no = int(val[10].split('/')[0])
+                    except:
+                      mobile_no = 0                   
                 if Family.objects.filter(family_id=familyid):
                       family_update = Family.objects.filter(family_id=familyid).update(muhalla=masjid,report_date=data_date,language=language,ration_card=ration_card,address=fam_address,mobile=mobile_no,house_type=fam_house,toilet=toilet,house_cat=house_cat,financial_status=financial_status,health_insurance=insurance,volunteer=volunteer,donor=donor,family_needs=family_needs)
                       family = Family.objects.get(family_id=familyid)
@@ -176,7 +177,11 @@ def importcsvdata(value):
                 else:
                       family = Family.objects.create(family_id=familyid,muhalla=masjid,report_date=data_date,language=language,ration_card=ration_card,address=fam_address,mobile=mobile_no,house_type=fam_house,toilet=toilet,house_cat=house_cat,financial_status=financial_status,health_insurance=insurance,volunteer=volunteer,donor=donor,family_needs=family_needs)
                 # member add
-                member_id = '%s / %s' %(family.family_id,val[18])
+                if val[18]:
+                  mem_val = eval(val[18])
+                else:
+                  mem_val = 1             
+                member_id = '%s / %s' %(family.family_id,int(mem_val))
                 try:
                   dob_date = data_date - relativedelta(years=eval(val[21])) if val[21] else data_date
                 except:
@@ -241,7 +246,7 @@ def importcsvdata(value):
                 else:
                    madarasa_details = ''
                    makhtab = False
-                family_head = True if val[18] == '1' else False   
+                family_head = True if val[18] == 1 else False
                 if Member.objects.filter(mem_id=member_id,family=family):
                       memval = Member.objects.filter(mem_id=member_id,family=family).update(family_head=family_head,dateofbirth=dob_date,muhalla=family.muhalla,taluk=taluk,district=district_value,name=val[19],gender=gender,age=mem_age,Relation=relation,qualification=qualification,marital_status=marital_status,voter_status=voterstatus,curr_location=location,occupation=occupation,Makthab=makhtab,madarasa_details=madarasa_details)
                       member = Member.objects.get(mem_id=member_id,family=family)
@@ -484,7 +489,9 @@ def importcsvdata(value):
                       mem_service = Member_service.objects.create(member=member,scheme=Service.objects.get(name='Other Government Schemes'),status=True,solution="Not Yet")
             except:
               print 'report',repr(format_exc())
-              exit()
+              return 'Something Went Wrong!'
+              # exit()
+
 
 if __name__ == "__main__":
      importcsvdata('upload')

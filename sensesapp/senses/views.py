@@ -955,35 +955,34 @@ def dashboard_api(request):
         donor_interest = len(Member.objects.filter(donor=True))
         return HttpResponse(content=json.dumps({'muhalla':muhalla,'fam_member':fam_member,'tot_family':tot_family,'volunteer_interest':volunteer_interest,'donor_interest':donor_interest}),content_type='Application/json')
 
-def csv_from_excel(xlsfile):
-    print 'xlsfile'
-    csv_name = '%s.csv'%str(xlsfile).split('.')[0]
-    print 'csv_name',xlsfile.file
-    # f = open(xlsfile,"rb")
-    # f.read()
-    # print 'f',f
-    wb = xlrd.open_workbook(filename=None,file_contents=xlsfile.read())
-    # f.close()
-    print 'wb',wb
-    sh = wb.sheet_by_name('Sheet1')
-    csv_file = open(csv_name, 'wb')
-    wr = csv.writer(csv_file, quoting=csv.QUOTE_ALL)
-    for rownum in xrange(sh.nrows):
-        wr.writerow(sh.row_values(rownum))
-    csv_file.close()
-    f = open(csv_file, 'r')
-    f.read()
-    f.close()
-    return f
+#convert xls to csv
+# def csv_from_excel(xlsfile):
+#     print 'xlsfile'
+#     csv_name = '%s.csv'%str(xlsfile).split('.')[0]
+#     print 'csv_name',xlsfile.file
+#     # f = open(xlsfile,"rb")
+#     # f.read()
+#     # print 'f',f
+#     wb = xlrd.open_workbook(filename=None,file_contents=xlsfile.read())
+#     # f.close()
+#     print 'wb',wb
+#     sh = wb.sheet_by_name('Sheet1')
+#     print sh.row_values(1),'rows'
+#     # exit()
+#     csv_file = open(csv_name, 'wb')
+#     wr = csv.writer(csv_file, quoting=csv.QUOTE_ALL)
+#     for rownum in xrange(sh.nrows):
+#         wr.writerow(sh.row_values(1))
+#     csv_file.close()
+#     f = open(csv_file, 'r')
+#     f.read()
+#     f.close()
+#     return f
+#end    
 
 def upload_bulk_data(request):
     get_csv = request.FILES['csv_file']
-    print 'get_csv',get_csv
-    if str(get_csv).lower().endswith(('.xls','xlsx')):
-        xls_to_csv = csv_from_excel(get_csv)
-    else:
-        xls_to_csv = get_csv
-    csv_import = importcsvdata(xls_to_csv)
+    csv_import = importcsvdata(get_csv)
     if csv_import == None:
         response = 'Data Imported Successfully!'
     else:
@@ -1043,9 +1042,16 @@ def report_to_pdf(request):
         else:
             pdf_filename = 'reports_gen.pdf'
             html_filename = '%s/templates/report_to_pdf.html'%file_path
-        pdf_filepath = '%s/static/pdf/%s'%(file_path,pdf_filename)    
+        pdf_filepath = '%s/static/pdf/%s'%(file_path,pdf_filename)
+        options = {
+            'page-size': 'Letter',
+            'margin-top': '0.75in',
+            'margin-right': '0.75in',
+            'margin-bottom': '0.75in',
+            'margin-left': '0.75in',
+        }    
         html_content = render_to_string(html_filename,{'header':data['header'],'data':data['data'],'report':data['report'],'total':len(data['data']),'finacial_value':data['finacial_value']})
-        response = pdfkit.from_string(html_content, pdf_filepath)
+        response = pdfkit.from_string(html_content, pdf_filepath,options=options)
         return HttpResponse(content=json.dumps({'data':data,'pdfname':pdf_filename}),content_type='Application/json')
     else:
         file_path = os.path.dirname(os.path.dirname(__file__))
