@@ -45,13 +45,24 @@ def importcsvdata(value):
      if value == 'upload':
       filenames = find_csv_filenames('%s/csv/'%s)
      else:
-      filenames = [value]      
+      filenames = [value]
+     print 'value',filenames[0],type(filenames[0])
+     # exit()       
      for name in filenames:
+       # print 'filename',name,type(name)
+       # exit()
        # scraped_csv = open('%s/productscrapper/%s'%(s,name))
        # csv_data = open('%s/csv/%s'%(s,name),'rb')
-       csv_data = open('%s/csv/%s'%(s,name))
-       print 'filename',name
+       if type(name) != str:
+        print 'yes',name
+        csv_data = name
+       else:
+        csv_data = open('%s/csv/%s'%(s,name))
+       print 'csv_data',csv_data
+       # exit() 
        data = list(csv.reader(csv_data))
+       # print 'filename',data
+       exit()
        a = [i[0].split('|') for i in data[1:]]
        maxLenObj = max(map(len,a))
        for i in data[1:]:

@@ -6,8 +6,10 @@ from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import *
 from django.http import HttpResponseRedirect
 import json,csv
+import xlrd
 import os, sys
 import pdfkit,pdfcrowd
+import collections
 from django.template.loader import render_to_string
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth import logout
@@ -953,11 +955,35 @@ def dashboard_api(request):
         donor_interest = len(Member.objects.filter(donor=True))
         return HttpResponse(content=json.dumps({'muhalla':muhalla,'fam_member':fam_member,'tot_family':tot_family,'volunteer_interest':volunteer_interest,'donor_interest':donor_interest}),content_type='Application/json')
 
+def csv_from_excel(xlsfile):
+    print 'xlsfile'
+    csv_name = '%s.csv'%str(xlsfile).split('.')[0]
+    print 'csv_name',xlsfile.file
+    # f = open(xlsfile,"rb")
+    # f.read()
+    # print 'f',f
+    wb = xlrd.open_workbook(filename=None,file_contents=xlsfile.read())
+    # f.close()
+    print 'wb',wb
+    sh = wb.sheet_by_name('Sheet1')
+    csv_file = open(csv_name, 'wb')
+    wr = csv.writer(csv_file, quoting=csv.QUOTE_ALL)
+    for rownum in xrange(sh.nrows):
+        wr.writerow(sh.row_values(rownum))
+    csv_file.close()
+    f = open(csv_file, 'r')
+    f.read()
+    f.close()
+    return f
+
 def upload_bulk_data(request):
     get_csv = request.FILES['csv_file']
     print 'get_csv',get_csv
-    csv_import = importcsvdata(get_csv)
-    print 'csv_import',
+    if str(get_csv).lower().endswith(('.xls','xlsx')):
+        xls_to_csv = csv_from_excel(get_csv)
+    else:
+        xls_to_csv = get_csv
+    csv_import = importcsvdata(xls_to_csv)
     if csv_import == None:
         response = 'Data Imported Successfully!'
     else:
@@ -1068,7 +1094,7 @@ def matrix_taluk_api(request):
             get_district = filter(None,map(lambda y:{'disease_name':y['disease_name'],'taluk':y['taluk'],'district':y['district']} if y['district']==district else None,data))
             item_list = [dic['taluk'] for dic in data]
             compaign_id = request.GET['disease_id']
-            compaign_name = request.GET['disease_name']
+            compaign_name = disease.disease_name
             for j in item_list:
                 count_dict[j] = count_dict.setdefault(j,0) + 1     
             data = json.dumps({'data':count_dict,'district':district,'campaign':compaign_name,'compaign_id':compaign_id})
@@ -1109,7 +1135,8 @@ def fetch_data_api(request):
             # schemes_data[i.name].append({'total_count':tot_count_dict,'unsolved_district_count':count_dict,'total_scheme_count':len(tot_scheme_data)})
             count_dict['The_Nilgiris'] = count_dict.pop('The Nilgiris')
             tot_count_dict['The_Nilgiris'] = tot_count_dict.pop('The Nilgiris')
-            schemes_data.append({'scheme_name':i.name,'scheme_id':i.subscheme_id,'total_count':tot_count_dict,'unsolved_district_count':count_dict,'total_scheme_count':len(tot_scheme_data),'total_unsolved_scheme_count':len(scheme_data)})
+            count_data = collections.OrderedDict(sorted(count_dict.items()))
+            schemes_data.append({'scheme_name':i.name,'scheme_id':i.subscheme_id,'total_count':tot_count_dict,'unsolved_district_count':count_data,'total_scheme_count':len(tot_scheme_data),'total_unsolved_scheme_count':len(scheme_data)})
 
         for i in Service.objects.all():
             serv_data = map(lambda x:{'scheme_name':x.scheme.name,'service_id':x.scheme.service_id,'district':x.member.muhalla.taluk.district.district_name},Member_service.objects.filter(scheme=i,status=True,solution='Not Yet'))
@@ -1123,15 +1150,18 @@ def fetch_data_api(request):
             for k in tot_item_list:
                 tot_count_dict[k] = tot_count_dict.setdefault(k,0) + 1
             count_dict['The_Nilgiris'] = count_dict.pop('The Nilgiris')
-            tot_count_dict['The_Nilgiris'] = tot_count_dict.pop('The Nilgiris')    
-            service_data.append({'scheme_name':i.name,'service_id':i.service_id,'total_count':tot_count_dict,'unsolved_district_count':count_dict,'total_scheme_count':len(tot_scheme_data)})    
+            tot_count_dict['The_Nilgiris'] = tot_count_dict.pop('The Nilgiris')
+            count_data = collections.OrderedDict(sorted(count_dict.items()))
+            service_data.append({'scheme_name':i.name,'service_id':i.service_id,'total_count':tot_count_dict,'unsolved_district_count':count_data,'total_scheme_count':len(tot_scheme_data)})    
         for d in Disease.objects.all():
             dis_data = map(lambda x:{'disease_name':x.disease.disease_name,'disease_id':x.disease.disease_id,'district':x.member.muhalla.taluk.district.district_name},Medical.objects.filter(disease=d))
             count_dict = {'Ariyalur':0,'Chennai':0,'Coimbatore':0,'Cuddalore':0,'Dharmapuri':0,'Dindigul':0,'Erode':0,'Kanchipuram':0,'Kanyakumari':0,'Karur':0,'Krishnagiri':0,'Madurai':0,'Nagapattinam':0,'Namakkal':0,'The Nilgiris':0,'Perambalur':0,'Pudukkottai':0,'Ramanathapuram':0,'Salem':0,'Sivaganga':0,'Thanjavur':0,'Theni':0,'Thoothukudi':0,'Tiruchirappalli':0,'Tirunelveli':0,'Tiruppur':0,'Tiruvallur':0,'Tiruvannamalai':0,'Tiruvarur':0,'Vellore':0,'Viluppuram':0,'Virudhunagar':0}
             item_list = [dic['district'] for dic in dis_data]
             for j in item_list:
                 count_dict[j] = count_dict.setdefault(j,0) + 1
-            disease_data.append({'disease_name':d.disease_name,'disease_id':d.disease_id,'disease_count':count_dict,'total_count':len(dis_data)})    
+            count_dict['The_Nilgiris'] = count_dict.pop('The Nilgiris')   
+            count_data = collections.OrderedDict(sorted(count_dict.items()))
+            disease_data.append({'disease_name':d.disease_name,'disease_id':d.disease_id,'disease_count':count_data,'total_count':len(dis_data)})    
 
         data = json.dumps({'schemes_data':schemes_data,'service_data':service_data,'disease_data':disease_data})
         try:
