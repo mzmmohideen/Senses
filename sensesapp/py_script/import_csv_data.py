@@ -61,11 +61,17 @@ def importcsvdata(value):
         for i in xrange(sh.nrows):
           data.append(sh.row_values(i))
         maxLenObj = max(map(len,data))
-       elif str(name).lower().endswith(('.csv','csvx')):
+       elif str(name).lower().endswith(('.csv','csvx')) and value == 'upload':
         csv_data = open('%s/csv/%s'%(s,name))
         a = list(csv.reader(csv_data))
         data = [i[0].split('|') for i in a[1:]]
         maxLenObj = max(map(len,data))
+       elif str(name).lower().endswith(('.csv','csvx')):
+        print 'local'
+        # csv_data = open('%s'%name)
+        a = list(csv.reader(name))
+        data = [i[0].split('|') for i in a[1:]]
+        maxLenObj = max(map(len,data)) 
        else:
         return 'Please upload only Valid Files! these extensions only (.csv,csvx,.xls,.xlsx) Accepted!'        
        for i in data[1:]:

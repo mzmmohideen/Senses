@@ -256,8 +256,11 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         }
         console.log('val',$scope.sub_scheme_val)
     }
+    $scope.upload_csv_bt = true;
     $scope.upload_csv = function(csv_file) {
+        console.log('click')
         appBusy.set("Loading....");
+        $scope.upload_csv_bt = false;
         var fileUrl = '/upload_bulk_data/';
         var send = new FormData();
         console.log('csv_file',csv_file)
@@ -269,7 +272,8 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             }
         }).success(function(data) {
             alert(data.data)
-            appBusy.set('Done...');              
+            appBusy.set('Done...');
+            $scope.upload_csv_bt = true;              
             $timeout( function() {              
                 appBusy.set(false);
             }, 1000);
