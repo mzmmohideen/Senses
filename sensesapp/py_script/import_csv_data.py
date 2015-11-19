@@ -3,6 +3,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "sensesapp.settings")
 from senses.models import *
 import csv,json,xlrd
+import re
 from os import listdir
 from collections import defaultdict
 from django.core.exceptions import ObjectDoesNotExist
@@ -399,7 +400,8 @@ def importcsvdata(value):
                 if disease_id:
                   try:
                     disease_list = []
-                    disease_id_list = disease_id.split(',')
+                    # disease_id_list = disease_id.split(',')
+                    disease_id_list = re.split(r'[ &/,]+',disease_id)
                     for i in disease_id_list:
                       if Disease.objects.filter(disease_id=i):
                         get_disease = Disease.objects.get(disease_id=i)
