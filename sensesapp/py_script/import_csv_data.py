@@ -253,7 +253,7 @@ def importcsvdata(value):
                 else:
                    madarasa_details = ''
                    makhtab = False
-                family_head = True if val[18] == 1 else False
+                family_head = True if mem_val == 1 else False
                 if Member.objects.filter(mem_id=member_id,family=family):
                       memval = Member.objects.filter(mem_id=member_id,family=family).update(family_head=family_head,dateofbirth=dob_date,muhalla=family.muhalla,taluk=taluk,district=district_value,name=val[19],gender=gender,age=mem_age,Relation=relation,qualification=qualification,marital_status=marital_status,voter_status=voterstatus,curr_location=location,occupation=occupation,Makthab=makhtab,madarasa_details=madarasa_details)
                       member = Member.objects.get(mem_id=member_id,family=family)

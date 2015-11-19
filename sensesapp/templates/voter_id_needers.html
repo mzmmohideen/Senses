@@ -45,7 +45,7 @@
       </tr>
       {% for val in data %}
       <tr>
-        <td class="tg-83xr" rowspan="2"></td>
+        <td class="tg-83xr" rowspan="2">{{ forloop.counter }}</td>
         <td class="tg-kixb" rowspan="2">{{val.family_head}}</td>
         <td class="tg-83xr">{{val.age}}</td>
         <td class="tg-83xr">{{val.gender}}</td>

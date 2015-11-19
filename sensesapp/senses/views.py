@@ -1047,7 +1047,7 @@ def report_to_pdf(request):
             'page-size': 'Letter',
             'margin-top': '0.75in',
             'margin-right': '0.75in',
-            'margin-bottom': '0.75in',
+            'margin-bottom': '0.7in',
             'margin-left': '0.75in',
         }    
         html_content = render_to_string(html_filename,{'header':data['header'],'data':data['data'],'report':data['report'],'total':len(data['data']),'finacial_value':data['finacial_value']})
