@@ -35,9 +35,9 @@ app.directive('ngEnter', function() {
 app.config(['$routeProvider',
     function($routeProvider) {
         $routeProvider.
-        when('/dashboard', {
-            templateUrl: 'dashboard.html',
-        }).
+        // when('/dashboard', {
+        //     templateUrl: 'dashboard.html',
+        // }).
         when('/muhalla', {
             templateUrl: 'muhalla.html',
         }).
@@ -51,7 +51,7 @@ app.config(['$routeProvider',
             templateUrl: 'settings.html',
         }).
         otherwise({
-            redirectTo: '/dashboard'
+            redirectTo: '/muhalla'
         });
     }
 ]);
