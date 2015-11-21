@@ -3,7 +3,7 @@ underscore.factory('_', function() {
     'use strict';
     return window._; // assumes underscore has already been loaded on the page
 });
-var app = angular.module('mohalla_user', ['ngCookies', 'ui.bootstrap', 'ngRoute', 'ui.select', 'underscore','ngSanitize']);
+var app = angular.module('mohalla_user', ['ngCookies', 'ui.bootstrap', 'ngRoute', 'ui.select', 'underscore','ngSanitize','loading.services']);
 app.run(function($http, $cookies) {
     console.log($cookies.csrftoken,'csrrf')
     $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
@@ -18,7 +18,12 @@ app.service('masjid_data', function($rootScope) {
     };
 
 });
-
+app.config(function (appBusyProvider) {
+    'use strict';
+    appBusyProvider.setMsg('Registering ...');
+    appBusyProvider.setTimeout(50);
+    appBusyProvider.setClazz('appBusy');
+});
 app.directive('ngEnter', function() {
     return function(scope, element, attrs) {
         element.bind("keydown keypress", function(event) {
@@ -69,7 +74,7 @@ app.directive('ngConfirmClick', [
             }
         };
 }])
-app.controller('MohallaUserCtrl', function($scope, _, $http, masjid_data, $location,$modal) {
+app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, masjid_data, $location,$modal) {
     $scope.user_logout = function() {
         console.log('triger')
         window.location.href = '/logout_view/'
@@ -77,8 +82,13 @@ app.controller('MohallaUserCtrl', function($scope, _, $http, masjid_data, $locat
     $scope.get_muhallaData = function() {
         $http.get('/get_mahallauser_data/',{}).success(function(response){
             $scope.muhalla_values = response.muhalla;
+            $scope.ReportValues.district = response.muhalla.district;
+            $scope.ReportValues.taluk = response.muhalla.taluk;
+            $scope.ReportValues.muhalla_id = response.muhalla.mohalla_id;
+            $scope.ReportValues.muhalla = response.muhalla.mohalla;
             $scope.getMasjidMember(response.muhalla)
             $scope.getFamilyinfo()
+            $scope.getMasjidList($scope.ReportValues)
             console.log('scope',$scope.muhalla_values)
         })
     }
@@ -95,6 +105,267 @@ app.controller('MohallaUserCtrl', function($scope, _, $http, masjid_data, $locat
         }).success(function(response) {
             alert(response.data)
             $scope.getMasjidMember(data)
+        })
+    }
+    $scope.ReportValues = {
+        district : '',
+        taluk : '',
+        muhalla : '',
+        muhalla_id : '',
+        report_name : '',      
+    }
+    $scope.ReportDatas = {
+        age_from : '',
+        age_to : '',
+        gender : '',
+        marital_status : '',
+        voter_status : '',
+        financial : '',
+        muhalla_id : '',
+        taluk : '',
+        district : '',
+        report_type : '',
+    }
+    $scope.diseaseid_list = []
+    $scope.filter_disease_value = function(diseaseid_list) {
+        console.log('val',$scope.diseaseid_list)
+        $scope.diseaseid_list = diseaseid_list
+        console.log('value',diseaseid_list,$scope.diseaseid_list)
+    }
+    $scope.schemeid_list = []
+    $scope.filter_scheme_value = function(schemeid_list) {
+        $scope.schemeid_list = schemeid_list
+        console.log('value',schemeid_list,$scope.schemeid_list)
+    }
+    $scope.serviceid_list = []
+    $scope.filter_service_value = function(serviceid_list) {
+        $scope.serviceid_list = serviceid_list
+        console.log('value',serviceid_list,$scope.serviceid_list)
+    }  
+    $scope.getMasjidList = function(data) {
+        $http.get('/add_masjid/').success(function(response){
+            console.log('response',response)
+            $scope.mahallaList = response.data;
+            console.log('mahalla',$scope.mahallaList)
+            console.log('dataMasjid',data)
+            // $scope.ReportValues.muhalla = '';
+            $scope.tot_mohalla_list = _.pluck($scope.mahallaList,"mohalla_id")
+            // $scope.masjidList = _.pluck(_.filter($scope.mahallaList,function(num) {return num.district == data.district && num.taluk == data.taluk}),"mohalla_id")
+            $scope.ReportValues.muhalla = _.filter($scope.mahallaList,function(num) {return num.district == data.district && num.taluk == data.taluk && num.name == data.muhalla})[0]
+        })
+    } 
+    $scope.fetchReportAPI = function(data,values) {
+        if(values.report_name == 'Total Family Details') {
+            $scope.voter_status_dt = false;
+            $scope.tot_fam_dt = true;
+            $scope.govt_needers = false;
+            $scope.edu_needers = false;
+            $scope.medical_needers = false;
+            $scope.service_needers = false;
+            $scope.tot_fam_jakath = false;
+            $scope.basic_needs = false;
+        }
+        else if(values.report_name == 'Government Voter ID Needers') {
+            $scope.voter_status_dt = true;
+            $scope.tot_fam_dt = false;
+            $scope.service_needers = false;
+            $scope.govt_needers = false;
+            $scope.edu_needers = false;
+            $scope.medical_needers = false;
+            $scope.basic_needs = false;
+            $scope.tot_fam_jakath = false;
+        }
+        else if(values.report_name == 'Families Eligible for Jakaath' || values.report_name == 'Basic Help Needers List') {
+            if(values.report_name == 'Basic Help Needers List') {
+                $scope.basic_needs = true;
+                $scope.tot_fam_jakath = false;
+            }
+            else if(values.report_name == 'Families Eligible for Jakaath') {
+                $scope.basic_needs = false;
+                $scope.tot_fam_jakath = true;
+            }
+            $scope.voter_status_dt = false;
+            $scope.govt_needers = false;
+            $scope.edu_needers = false;
+            $scope.tot_fam_dt = false;
+            $scope.service_needers = false;
+            $scope.medical_needers = false;
+        }
+        else if(values.report_name == 'Help for Poor Peoples and Guidance Needers List') {
+            $scope.service_needers = true;
+            $scope.medical_needers = false;
+            $scope.voter_status_dt = false;
+            $scope.govt_needers = false;
+            $scope.edu_needers = false;
+            $scope.tot_fam_jakath = false;
+            $scope.tot_fam_dt = false;
+            $scope.basic_needs = false;
+        }
+        else if(values.report_name == 'Medical Needs and Guidance Needers Details') {
+            $scope.medical_needers = true;
+            $scope.voter_status_dt = false;
+            $scope.govt_needers = false;
+            $scope.service_needers = false;
+            $scope.edu_needers = false;
+            $scope.tot_fam_jakath = false;
+            $scope.tot_fam_dt = false;
+            $scope.basic_needs = false;
+        }
+        else if(values.report_name == 'Government Schemes and Guidance Needers Details' || values.report_name == 'Training/Employment Help and Guidance Needers List' || values.report_name == 'Help for Discontinued and Guidance Needers List' || values.report_name == 'Educational Help and Guidance Needers List') {
+            if(values.report_name == 'Government Schemes and Guidance Needers Details') {
+                $scope.edu_needers = false;
+                $scope.govt_needers = true;
+            }
+            else if(values.report_name == 'Educational Help and Guidance Needers List' || values.report_name == 'Training/Employment Help and Guidance Needers List' || values.report_name == 'Help for Discontinued and Guidance Needers List') {
+                $scope.edu_needers = true;
+                $scope.govt_needers = false;
+            }
+            $scope.medical_needers = false;
+            $scope.voter_status_dt = false;
+            $scope.tot_fam_jakath = false;
+            $scope.service_needers = false;
+            $scope.basic_needs = false;
+            $scope.tot_fam_dt = false;
+        }
+        else if(values.report_name == 'Women chldrens Need to join Niswan Madarasa' || values.report_name == 'Persons Need to join Jumrah Madarasa' || values.report_name == 'Childrens Need to join Makthab Madarasa') {
+            $scope.madarasa_needers = true;
+            $scope.edu_needers = false;
+            $scope.govt_needers = false;
+            $scope.medical_needers = false;
+            $scope.voter_status_dt = false;
+            $scope.tot_fam_jakath = false;
+            $scope.service_needers = false;
+            $scope.basic_needs = false;
+            $scope.tot_fam_dt = false;
+        }
+        else if(values.report_name == 'Mohalla Report') {
+            $scope.madarasa_needers = false;
+            $scope.edu_needers = false;
+            $scope.govt_needers = false;
+            $scope.medical_needers = false;
+            $scope.voter_status_dt = false;
+            $scope.tot_fam_jakath = false;
+            $scope.service_needers = false;
+            $scope.basic_needs = false;
+            $scope.tot_fam_dt = false;
+        }
+        else {
+            $scope.madarasa_needers = false;
+            $scope.edu_needers = false;
+            $scope.govt_needers = false;
+            $scope.medical_needers = false;
+            $scope.voter_status_dt = false;
+            $scope.tot_fam_jakath = false;
+            $scope.service_needers = false;
+            $scope.basic_needs = false;
+            $scope.tot_fam_dt = false;
+        }
+        data.district = values.district;
+        data.taluk = values.taluk;
+        if(values.muhalla == 'all') {
+            data.muhalla_id = 'all';
+        }
+        else {
+            data.muhalla_id = values.muhalla.mohalla_id;
+        }
+        if(values.report_name == '') {
+            data.report_type = '';
+        }
+        else {
+            data.report_type = values.report_name;
+        }
+        if(values.muhalla != '') {
+            $scope.ReportHeader = true;
+            $scope.getReportData = false;
+            appBusy.set("Loading....");
+            $http.post('/fetchReportData/',{
+                data : data,
+                diseaseid_list : $scope.diseaseid_list,
+                schemeid_list : $scope.schemeid_list,
+                serviceid_list : $scope.serviceid_list,
+            }).success(function(response) {
+                appBusy.set('Done...');              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
+                if(response.report_type == 'Total Family Details') {
+                    $scope.ReportHeader = ['S.No','Name & Address','Age & Gender','Family ID & Mobile NO','Financial Status & Jakaath']
+                    $scope.getReportData = response.get_family;
+                }
+                else if(response.report_type == 'Basic Help Needers List') {
+                    $scope.ReportHeader = ['S.No','Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
+                    $scope.getReportData = response.get_family;
+                }
+                else if(response.report_type == 'Families Eligible for Jakaath') {
+                    $scope.ReportHeader = ['S.No','Needers Name','Age & Gender','Financial Status & Family ID','Mobile NO','Address']
+                    $scope.getReportData = response.get_family;
+                }
+                else if(response.report_type == 'Medical Needs and Guidance Needers Details') {
+                    $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
+                    $scope.getReportData = response.get_mem_medical;
+                }
+                else if(response.report_type == 'Help for Poor Peoples and Guidance Needers List') {
+                    $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
+                    $scope.getReportData = response.get_mem_service;
+                }
+                else if(response.report_type == 'Government Schemes and Guidance Needers Details' || response.report_type == 'Help for Discontinued and Guidance Needers List' || response.report_type == 'Training/Employment Help and Guidance Needers List' || response.report_type == 'Educational Help and Guidance Needers List') {
+                    $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
+                    $scope.getReportData = response.get_mem_scheme;
+                }
+                else if(response.report_type == 'Government Voter ID Needers') {
+                    $scope.ReportHeader = ['S.No','Needers Name','Age & Gender','Financial Status & Family ID','Mobile NO','Address']
+                    $scope.getReportData = response.get_mem_voter;
+                }
+                else if(response.report_type == 'Women chldrens Need to join Niswan Madarasa' || response.report_type == 'Persons Need to join Jumrah Madarasa' || response.report_type == 'Childrens Need to join Makthab Madarasa') {
+                    $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
+                    $scope.getReportData = response.get_memData;
+                }
+                else if(response.report_type == 'Mohalla Report') {
+                    $scope.ReportHeader = ['S.No','Details','Counts']
+                    $scope.getReportData = response.reports;
+                }
+                else if(response.report_type == 'Needs Types') {
+                    $scope.ReportHeader = ['S.No','Needs ID','Needs Type','Total','beneficiaries']
+                    $scope.getReportData = response.reports;
+                }
+                else {
+                    $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
+                    $scope.getReportData = response.member_details;
+                    $scope.ReportValues.report_name = 'New filter'
+                }
+                if(response.report_type == 'Mohalla Report') {
+                    var pdf_data = response.pdf_report;
+                }
+                else {
+                    var pdf_data = $scope.getReportData;
+                }
+                if (response.report_type == 'Total Family Details' || response.report_type == 'Basic Help Needers List' || response.report_type == 'Families Eligible for Jakaath') {
+                    var finacial_value = response.finacial_value;
+                }
+                else {
+                    var finacial_value = '';
+                }
+                console.log('finacial_value',finacial_value)
+                $http.post('/report_to_pdf/',{
+                    header : $scope.ReportHeader,
+                    data : pdf_data,
+                    report : $scope.ReportValues,
+                    finacial_value : finacial_value,
+                }).success(function(response){
+                    console.log('success',response)
+                    $scope.get_pdfname = response.pdfname;
+                })
+            })
+        }
+    }
+    $scope.export_to_pdf = function(header,data,report) {
+        $http.post('/report_to_pdf/',{
+            header : header,
+            data : data,
+            report : report,
+        }).success(function(response){
+            console.log('success',response)
+            window.open('/'+response.pdfname)
         })
     }
     $scope.add_member = function(member_name,age,designation,mobile,address,status) {
@@ -592,3 +863,52 @@ app.controller('MohallaUserCtrl', function($scope, _, $http, masjid_data, $locat
     // family_update_controller end
 
 })
+
+var appServices = angular.module('loading.services', []).provider("appBusy", function() {
+
+    this.msg = "Loading ...";
+    this.timeout = 1000;
+    this.clazz = "appBusy";
+
+    var body = angular.element(window.document.body);
+    var domEl = null;
+
+    this.show = function(msg) {
+        msg = msg || this.msg;
+        if (!domEl) {
+            domEl = angular.element('<div></div>').addClass(this.clazz);
+            domEl.text(msg);
+            setTimeout(function() {
+                if (domEl)
+                    body.append(domEl);
+            }, this.timeout);
+        } else {
+            domEl.text(msg);
+        }
+    }
+    this.hide = function() {
+        if (domEl) {
+            domEl.remove();
+            domEl = null;
+        }
+    }
+    this.$get = function() {
+        var self = this;
+        return {
+            set: function(msg) {
+                if (typeof msg == 'boolean') {
+                    msg === true ? self.show() : self.hide();
+                } else self.show(msg);
+            }
+        }
+    }
+    this.setMsg = function(val) {
+        this.msg = val;
+    }
+    this.setTimeout = function(val) {
+        this.timeout = val;
+    }
+    this.setClazz = function(val) {
+        this.clazz = val;
+    }
+});

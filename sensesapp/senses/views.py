@@ -992,7 +992,7 @@ def upload_bulk_data(request):
 def report_to_pdf(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        print 'data',data
+        print 'report',data['report']
         file_path = os.path.dirname(os.path.dirname(__file__))
         if data['report']['report_name'] == 'Mohalla Report':
             pdf_filename = 'mohalla_report.pdf'
