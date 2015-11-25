@@ -691,7 +691,7 @@
             <div class=" col-lg-12">
                 <span style="display: inline-block;height: 34px;width: 16.5%;float: left;"> <input class="form-control" type="text" ng-model="ReportValues.district" readonly/></span>
                 <span style="display: inline-block;height: 34px;width: 16.5%;float: left;"> <input class="form-control" type="text" ng-model="ReportValues.taluk" readonly/></span>
-                <span style="display: inline-block;height: 34px;width: 16.5%;float: left;"> <input class="form-control" type="text" ng-model="ReportValues.muhalla" readonly/></span>
+                <span style="display: inline-block;height: 34px;width: 16.5%;float: left;"> <input class="form-control" type="text" ng-model="ReportValues.muhalla.mohalla_id" readonly/></span>
                 <span style="display: inline-block;height: 34px;width: 16.5%;float: left;"> <input class="form-control" type="text" ng-model="ReportValues.muhalla_id" readonly/></span>
                 <span style="display: inline-block;height: 34px;width: 16.5%;float: left;"> 
                     <select ng-model="ReportValues.report_name" ng-change="fetchReportAPI(ReportDatas,ReportValues)" ng-options="gen for gen in senses_reports" class="form-control"><option value="">SELECT REPORT</option>
@@ -708,7 +708,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-show="report_name == 'Mohalla Report'" ng-repeat="(key,val) in getReportData" class="ng-scope">
+                    <tr ng-show="ReportValues.report_name == 'Mohalla Report'" ng-repeat="(key,val) in getReportData" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td ng-show="key!='Mother Tongue'" class="ng-binding">{{key}} {{getReportData.length}}</td>
                         <!--<td ng-show="key=='Mother Tongue'" class="ng-binding">
@@ -725,17 +725,17 @@
                         </td>-->        
                         <td class="ng-binding">{{val}}</td>
                     </tr>
-                    <tr ng-show="report_name != 'Mohalla Report' && getReportData.length==0" class="ng-scope">
+                    <tr ng-show="ReportValues.report_name != 'Mohalla Report' && getReportData.length==0" class="ng-scope">
                         <td colspan="7">No Data Found!</td>
                     </tr>
-                    <tr ng-show="report_name == 'Total Family Details' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
+                    <tr ng-show="ReportValues.report_name == 'Total Family Details' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td>{{key.family_head}} <br/> {{key.address}} </td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>
                         <td>{{key.familyid}} <br/> {{key.mobile}} </td>
                         <td>{{key.financial_status.split(' ')[0]}} <br/> {{get_jakaath_status(key.financial_status.split(' ')[0])}} </td>
                     </tr>
-                    <tr ng-show="report_name == 'Families Eligible for Jakaath' || report_name == 'Government Voter ID Needers' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
+                    <tr ng-show="ReportValues.report_name == 'Families Eligible for Jakaath' || report_name == 'Government Voter ID Needers' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td>{{key.family_head}}</td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>
@@ -743,7 +743,7 @@
                         <td>{{key.mobile}} </td>
                         <td> {{key.address}} </td>
                     </tr>
-                    <tr ng-show="report_name == 'Basic Help Needers List' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
+                    <tr ng-show="ReportValues.report_name == 'Basic Help Needers List' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td>{{key.family_head}} <br/> {{key.address}}</td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>
@@ -751,7 +751,7 @@
                         <td>{{key.mobile}} </td>
                         <td> Help for Basic Needs(Food,Dress,Place) </td>
                     </tr>
-                    <tr ng-show="report_name == 'Medical Needs and Guidance Needers Details' || report_name == 'Government Schemes and Guidance Needers Details' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
+                    <tr ng-show="ReportValues.report_name == 'Medical Needs and Guidance Needers Details' || report_name == 'Government Schemes and Guidance Needers Details' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td>{{key.name}} <br/> {{key.address}}</td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>
@@ -759,7 +759,7 @@
                         <td>{{key.mobile}} </td>
                         <td> {{key.needer}} for<br/>{{key.needs}} </td>
                     </tr>
-                    <tr ng-show="report_name == 'Educational Help and Guidance Needers List' || report_name == 'Help for Discontinued and Guidance Needers List' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
+                    <tr ng-show="ReportValues.report_name == 'Educational Help and Guidance Needers List' || report_name == 'Help for Discontinued and Guidance Needers List' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td>{{key.name}} <br/> {{key.address}}</td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>
@@ -767,7 +767,7 @@
                         <td>{{key.mobile}} </td>
                         <td> {{key.needs}} <br/> Qualification: {{key.qualification}} </td>
                     </tr>
-                    <tr ng-show="report_name == 'Childrens Need to join Makthab Madarasa' || report_name == 'Persons Need to join Jumrah Madarasa' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
+                    <tr ng-show="ReportValues.report_name == 'Childrens Need to join Makthab Madarasa' || report_name == 'Persons Need to join Jumrah Madarasa' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td>{{key.name}} <br/> {{key.address}}</td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>

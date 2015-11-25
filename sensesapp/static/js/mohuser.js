@@ -82,13 +82,9 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
     $scope.get_muhallaData = function() {
         $http.get('/get_mahallauser_data/',{}).success(function(response){
             $scope.muhalla_values = response.muhalla;
-            $scope.ReportValues.district = response.muhalla.district;
-            $scope.ReportValues.taluk = response.muhalla.taluk;
-            $scope.ReportValues.muhalla_id = response.muhalla.mohalla_id;
-            $scope.ReportValues.muhalla = response.muhalla.mohalla;
-            $scope.getMasjidMember(response.muhalla)
+            $scope.getMasjidMember($scope.muhalla_values)
             $scope.getFamilyinfo()
-            $scope.getMasjidList($scope.ReportValues)
+            $scope.getMasjidList($scope.muhalla_values)
             console.log('scope',$scope.muhalla_values)
         })
     }
@@ -147,11 +143,16 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             console.log('response',response)
             $scope.mahallaList = response.data;
             console.log('mahalla',$scope.mahallaList)
-            console.log('dataMasjid',data)
+            console.log('dataMasjid',response.data[0],data)
             // $scope.ReportValues.muhalla = '';
             $scope.tot_mohalla_list = _.pluck($scope.mahallaList,"mohalla_id")
             // $scope.masjidList = _.pluck(_.filter($scope.mahallaList,function(num) {return num.district == data.district && num.taluk == data.taluk}),"mohalla_id")
-            $scope.ReportValues.muhalla = _.filter($scope.mahallaList,function(num) {return num.district == data.district && num.taluk == data.taluk && num.name == data.muhalla})[0]
+            $scope.muhalla_name = _.filter($scope.mahallaList,function(num) {return num.district == data.district && num.taluk == data.taluk && num.mohalla_id == data.mohalla_id})[0]
+            $scope.ReportValues.district = $scope.muhalla_values.district;
+            $scope.ReportValues.taluk = $scope.muhalla_values.taluk;
+            $scope.ReportValues.muhalla_id = $scope.muhalla_values.mohalla_id;
+            $scope.ReportValues.muhalla = $scope.muhalla_name;
+            console.log('name',$scope.muhalla_name)
         })
     } 
     $scope.fetchReportAPI = function(data,values) {
@@ -262,12 +263,7 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
         }
         data.district = values.district;
         data.taluk = values.taluk;
-        if(values.muhalla == 'all') {
-            data.muhalla_id = 'all';
-        }
-        else {
-            data.muhalla_id = values.muhalla.mohalla_id;
-        }
+        data.muhalla_id = values.muhalla_id;
         if(values.report_name == '') {
             data.report_type = '';
         }
@@ -284,6 +280,7 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
                 schemeid_list : $scope.schemeid_list,
                 serviceid_list : $scope.serviceid_list,
             }).success(function(response) {
+                console.log('data response',response)
                 appBusy.set('Done...');              
                 $timeout( function() {              
                     appBusy.set(false);
@@ -345,7 +342,8 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
                 else {
                     var finacial_value = '';
                 }
-                console.log('finacial_value',finacial_value)
+                console.log('finacial_value',$scope.ReportHeader)
+                console.log('finacial_value',$scope.ReportValues)
                 $http.post('/report_to_pdf/',{
                     header : $scope.ReportHeader,
                     data : pdf_data,
@@ -519,7 +517,7 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             console.log('varerror',data[2],$scope.FamilyValue.masjid)
             $scope.familyList = _.filter(data.data,function(data_val) { return data_val.taluk == $scope.FamilyValue.taluk && data_val.district_name == $scope.FamilyValue.district && data_val.muhalla == $scope.FamilyValue.masjid });
             
-            console.log('val',$scope.familyList)
+            // console.log('val',$scope.familyList)
         })
     }
     $scope.getFamilyMembers = function(familyid) {

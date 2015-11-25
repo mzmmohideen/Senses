@@ -231,7 +231,7 @@ def masjid_member(request):
                         return HttpResponse(content=json.dumps({'data':'Email ID Exist!'}),content_type='Application/json')    
                     else:
                         create_moh_user = User.objects.create(username=moh_user,email=data['email'])
-                        create_moh_user.set_password = '%s%s'%(moh_user,'123')
+                        create_moh_user.set_password = '%s123'%moh_user
                         create_moh_user.save()
                         user_add = SensesMembers.objects.create(user=create_moh_user,member_type='Mohalla User',masjid=masjid_val)
                         # response = 'Mohalla User Created Successfully!'
