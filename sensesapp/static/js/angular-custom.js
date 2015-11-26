@@ -27,7 +27,13 @@ app.directive('ngEnter', function() {
         });
     };
 });
-
+app.filter('SortData', function() {
+    return function(input) {
+        if(input != undefined) {
+            return input.sort();
+        }
+    }
+});
 app.directive('validUname', function() {
   return {
     require: '?ngModel',
@@ -356,7 +362,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.disease_list = _.pluck(data.response,"name")
             $scope.disease_dict = data.response;
             $scope.getDiseaseData = data.response;
-            console.log($scope.getDiseaseData)
+            // console.log($scope.getDiseaseData)
         })
     }
     $scope.deleteDisease = function(value) {
@@ -525,16 +531,26 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             }
             else {
                 var email = data.re_email;
-                var password_val = data.password;
+                // var password_val = data.password;
             }
+            var username = data.username;
+        }
+        else if(status == 'delete') {
+            console.log('values',values,data)
+            var email = data.email;
+            var password_val = data.password;
+            var username = values.username;
         }
         else {
             var email = data.email;
+            var password_val = data.password;
+            var username = data.username;
+
         }
         console.log('data',data)
         $http.post('/new_member/',{
             mohalla_id: data.muhalla.mohalla_id,
-            username: data.username,
+            username: username,
             email: email,
             password: data.password,
             re_password: password_val,

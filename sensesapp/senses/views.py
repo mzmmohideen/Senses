@@ -223,15 +223,17 @@ def masjid_member(request):
             masjid_val = Masjid.objects.get(mohalla_id=data['data']['mohalla_id'])
             coordinator = True if data['coordinator'] == 'Yes' else False
             if coordinator:
-                moh_user = str(masjid_val.mohalla_id.replace(' ','').replace('/','_'))
+                moh_user = str(masjid_val.mohalla_id.replace(' ','').replace('/',''))
                 if not User.objects.filter(username=moh_user):
                     if SensesMembers.objects.filter(member_type='Mohalla User',masjid=masjid_val):
                         return HttpResponse(content=json.dumps({'data':'Mohalla User Exist!'}),content_type='Application/json')    
-                    elif User.objects.filter(email=data['email']):
-                        return HttpResponse(content=json.dumps({'data':'Email ID Exist!'}),content_type='Application/json')    
+                    elif data['email'] != '':
+                        if User.objects.filter(email=data['email']):
+                            return HttpResponse(content=json.dumps({'data':'Email ID Exist!'}),content_type='Application/json')    
                     else:
-                        create_moh_user = User.objects.create(username=moh_user,email=data['email'])
-                        create_moh_user.set_password = '%s123'%moh_user
+                        password = '%s123'%moh_user
+                        create_moh_user = User.objects.create(username=moh_user,email=data['email'],last_name=password)
+                        create_moh_user.set_password(password)
                         create_moh_user.save()
                         user_add = SensesMembers.objects.create(user=create_moh_user,member_type='Mohalla User',masjid=masjid_val)
                         # response = 'Mohalla User Created Successfully!'
@@ -586,8 +588,8 @@ def fetchReportData(request):
             lang_others = sum(1 if(x['language']=='Others') else 0 for x in get_family)
             widowed = sum(1 if(x['marital_status']=='Widow' and x['gender']=='FEMALE') else 0 for x in get_memData)
             divorced = sum(1 if(x['marital_status']=='Devorced' and x['gender']=='FEMALE') else 0 for x in get_memData)
-            rep_data = {'Taluk':muhalla.taluk.taluk_name,'Taluk Count':1,'Total Family ':len(get_family),'Total Population':len(get_memData),'Total Male':tot_men,'Total Female':tot_women,'Married':married,'Male age 60+':men_age_60,'Female age 60+':women_age_60,'Male age between 22-59':men_age_22to59,'Female age between 22-59':women_age_22to59,'Male age between 11-21':men_age_11to21,'Female age between 11-21':women_age_11to21,'Child upto 11 age ':child_upto11,'A - Well Settled':cat_A,'B - Full Filled':cat_B,'C - Middle Class':cat_C,'D - Poor':cat_D,'E - Very Poor':cat_E,'Widow':widowed,'Divorced':divorced,'Mother Tongue':{'Tamil':lang_tamil,'Urdu':lang_urdu,'Others':lang_others}}
-            pdf_rep_data = {'Taluk':muhalla.taluk.taluk_name,'Taluk_Count':1,'Total_Family ':len(get_family),'non_voter':non_voter,'voter':voter,'Total_Population':len(get_memData),'Total_Male':tot_men,'Total_Female':tot_women,'Married':married,'Male_age_60':men_age_60,'Female_age_60':women_age_60,'Male_age_between_22to59':men_age_22to59,'Female_age_between_22to59':women_age_22to59,'Male_age_between_11to21':men_age_11to21,'Female_age_between_11to21':women_age_11to21,'Child_upto_11_age':child_upto11,'A_Well_Settled':cat_A,'B_Full_Filled':cat_B,'C_Middle_Class':cat_C,'D_Poor':cat_D,'E_Very_Poor':cat_E,'Widow':widowed,'Divorced':divorced,'Mother_Tongue':{'Tamil':lang_tamil,'Urdu':lang_urdu,'Others':lang_others}}
+            rep_data = {'Taluk':muhalla.taluk.taluk_name,'Taluk Count':1,'Total Family':len(get_family),'Total Population':len(get_memData),'Total Male':tot_men,'Total Female':tot_women,'Married':married,'Male age 60+':men_age_60,'Female age 60+':women_age_60,'Male age between 22-59':men_age_22to59,'Female age between 22-59':women_age_22to59,'Male age between 11-21':men_age_11to21,'Female age between 11-21':women_age_11to21,'Child upto 11 age ':child_upto11,'A - Well Settled':cat_A,'B - Full Filled':cat_B,'C - Middle Class':cat_C,'D - Poor':cat_D,'E - Very Poor':cat_E,'Widow':widowed,'Divorced':divorced,'Mother Tongue':{'Tamil':lang_tamil,'Urdu':lang_urdu,'Others':lang_others}}
+            pdf_rep_data = {'Taluk':muhalla.taluk.taluk_name,'Taluk_Count':1,'Total_Family':len(get_family),'non_voter':non_voter,'voter':voter,'Total_Population':len(get_memData),'Total_Male':tot_men,'Total_Female':tot_women,'Married':married,'Male_age_60':men_age_60,'Female_age_60':women_age_60,'Male_age_between_22to59':men_age_22to59,'Female_age_between_22to59':women_age_22to59,'Male_age_between_11to21':men_age_11to21,'Female_age_between_11to21':women_age_11to21,'Child_upto_11_age':child_upto11,'A_Well_Settled':cat_A,'B_Full_Filled':cat_B,'C_Middle_Class':cat_C,'D_Poor':cat_D,'E_Very_Poor':cat_E,'Widow':widowed,'Divorced':divorced,'Mother_Tongue':{'Tamil':lang_tamil,'Urdu':lang_urdu,'Others':lang_others}}
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'non_voter':non_voter,'voter':voter,'reports':rep_data,'pdf_report':pdf_rep_data}),content_type='Application/json')
         elif data['report_type'] == 'Needs Types':
             scheme_data = map(lambda x:{'name':x.name,'need_id':x.subscheme_id,'beneficiaries':len(Member_scheme.objects.filter(scheme=x,status=True,solution='Solved')),'total':len(Member_scheme.objects.filter(scheme=x,status=True))},SubScheme.objects.all())
