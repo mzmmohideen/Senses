@@ -82,13 +82,18 @@ def importcsvdata(value):
                   val = val + ['']*(maxLenObj-len(val))
                 try:
                   if val[3]:
-                        data_date = datetime.strptime(val[3],"%d/%m/%Y")
+                    if len(val[3].split('/')[2]) == 2:
+                      curr_date = '%s/%s/20%s'%(val[3].split('/')[0],val[3].split('/')[1],val[3].split('/')[2])
+                      data_date = datetime.strptime(curr_date,"%d/%m/%Y")
+                    else:
+                      data_date = datetime.strptime(val[3],"%d/%m/%Y")
+                      
                   else:
                         data_date = datetime.now()
                 except:
                   data_date = datetime.now()
-                district_val = data[1][1] if val[1] else data[1][1]
-                taluk_name = data[1][2] if val[2] else data[1][2]
+                district_val = data[1][1].capitalize() if val[1] else data[1][1].capitalize()
+                taluk_name = data[1][2].capitalize() if val[2] else data[1][2].capitalize()
                 if district_val == 'Ramnad':
                   district_val = 'Ramanathapuram'                  
                 district_value = District.objects.get(district_name=district_val)  
@@ -103,7 +108,7 @@ def importcsvdata(value):
                 else:
                   csv_mohalla_id = val[6]
                 mohalla_location = val[9] if val[9] else ''
-                mohalla_name = data[1][5]  
+                mohalla_name = data[1][5] if data[1][5] else data[1][9]  
                 # mohalla_name = val[5] if val[5] else mohalla_location
                 if Masjid.objects.filter(taluk=taluk,name=mohalla_name):
                       # muhalla_update = Masjid.objects.filter(taluk=taluk,name=mohalla_name).update(mohalla_id=csv_mohalla_id,taluk=taluk,district=district_value,musallas='',location=mohalla_location)
@@ -185,18 +190,18 @@ def importcsvdata(value):
                       family = Family.objects.create(family_id=familyid,muhalla=masjid,report_date=data_date,language=language,ration_card=ration_card,address=fam_address,mobile=mobile_no,house_type=fam_house,toilet=toilet,house_cat=house_cat,financial_status=financial_status,health_insurance=insurance,volunteer=volunteer,donor=donor,family_needs=family_needs)
                 # member add
                 if val[18]:
-                  mem_val = eval(val[18])
+                  mem_val = int(val[18])
                 else:
                   mem_val = 1             
                 member_id = '%s / %s' %(family.family_id,int(mem_val))
                 try:
-                  dob_date = data_date - relativedelta(years=eval(val[21])) if val[21] else data_date
+                  dob_date = data_date - relativedelta(years=int(val[21])) if val[21] else data_date
                 except:
                   try:
-                    dob_date = data_date - relativedelta(years=eval(val[21].split(' ')[0]))
+                    dob_date = data_date - relativedelta(years=int(val[21].split(' ')[0]))
                   except:
                     try:
-                      dob_date = data_date - relativedelta(years=eval(val[21][:1]))
+                      dob_date = data_date - relativedelta(years=int(val[21][:1]))
                     except:
                       dob_date = data_date - relativedelta(years=0)                      
                 mem_age = str(datetime.now().year-dob_date.year)
@@ -222,7 +227,11 @@ def importcsvdata(value):
                 else:
                       voterstatus = False
                 relation = val[22] if val[22] else ''
-                qualification = val[25] if val[25] else ''
+                qualify = val[25] if val[25] else ''
+                try:
+                  qualification = int(qualify)
+                except:
+                  qualification = qualify                  
                 if val[27]:
                       if val[27] == 'L':
                            location = 'Local'
@@ -254,6 +263,7 @@ def importcsvdata(value):
                    madarasa_details = ''
                    makhtab = False
                 family_head = True if mem_val == 1 else False
+                print 'member',name,occupation,len(val[19]),val[19]
                 if Member.objects.filter(mem_id=member_id,family=family):
                       memval = Member.objects.filter(mem_id=member_id,family=family).update(family_head=family_head,dateofbirth=dob_date,muhalla=family.muhalla,taluk=taluk,district=district_value,name=val[19],gender=gender,age=mem_age,Relation=relation,qualification=qualification,marital_status=marital_status,voter_status=voterstatus,curr_location=location,occupation=occupation,Makthab=makhtab,madarasa_details=madarasa_details)
                       member = Member.objects.get(mem_id=member_id,family=family)
