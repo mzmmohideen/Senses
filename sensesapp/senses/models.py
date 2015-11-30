@@ -86,6 +86,7 @@ class Member(models.Model):
     gender = models.CharField(max_length=10,choices=GENDER)
     dateofbirth = models.DateTimeField(default=timezone.now)
     age = models.IntegerField(max_length=4, default=0)
+    mem_age_month = models.IntegerField(max_length=4, default=0)
     Relation = models.CharField(max_length=20)
     family_head = models.BooleanField(default=False)
     marital_status = models.CharField(max_length=20,choices=MARITAL)

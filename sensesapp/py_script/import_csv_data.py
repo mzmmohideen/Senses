@@ -41,6 +41,13 @@ def find_csv_filenames( path_to_dir, suffix=".csv" ):
     filenames = listdir(path_to_dir)
     return [ filename for filename in filenames if filename.endswith( suffix ) ]
 
+def monthdelta(date, delta):
+    m, y = (date.month+delta) % 12, date.year + ((date.month)+delta-1) // 12
+    if not m: m = 12
+    d = min(date.day, [31,
+        29 if y%4==0 and not y%400==0 else 28,31,30,31,30,31,31,30,31,30,31][m-1])
+    return date.replace(day=d,month=m, year=y)    
+
 def importcsvdata(value):
      s = os.path.dirname(__file__)
      if value == 'upload':
@@ -195,7 +202,10 @@ def importcsvdata(value):
                   mem_val = 1             
                 member_id = '%s / %s' %(family.family_id,int(mem_val))
                 try:
-                  dob_date = data_date - relativedelta(years=int(val[21])) if val[21] else data_date
+                  if 'M' in val[21]:
+                    dob_date = monthdelta(data_date,int(val[21].split('M')[0]))
+                  else:
+                    dob_date = data_date - relativedelta(years=int(val[21])) if val[21] else data_date
                 except:
                   try:
                     dob_date = data_date - relativedelta(years=int(val[21].split(' ')[0]))
@@ -204,7 +214,11 @@ def importcsvdata(value):
                       dob_date = data_date - relativedelta(years=int(val[21][:1]))
                     except:
                       dob_date = data_date - relativedelta(years=0)                      
-                mem_age = str(datetime.now().year-dob_date.year)
+                mem_age = int(datetime.now().year-dob_date.year)
+                if mem_age == 0:
+                  mem_age_month = int(datetime.now().month-dob_date.month)
+                else:
+                  mem_age_month = 0                  
                 if val[23]:
                       if val[23] == 'M':
                            marital_status = 'Married'
@@ -263,12 +277,11 @@ def importcsvdata(value):
                    madarasa_details = ''
                    makhtab = False
                 family_head = True if mem_val == 1 else False
-                print 'member',name,occupation,len(val[19]),val[19]
                 if Member.objects.filter(mem_id=member_id,family=family):
-                      memval = Member.objects.filter(mem_id=member_id,family=family).update(family_head=family_head,dateofbirth=dob_date,muhalla=family.muhalla,taluk=taluk,district=district_value,name=val[19],gender=gender,age=mem_age,Relation=relation,qualification=qualification,marital_status=marital_status,voter_status=voterstatus,curr_location=location,occupation=occupation,Makthab=makhtab,madarasa_details=madarasa_details)
+                      memval = Member.objects.filter(mem_id=member_id,family=family).update(family_head=family_head,dateofbirth=dob_date,muhalla=family.muhalla,taluk=taluk,district=district_value,name=val[19],gender=gender,age=mem_age,mem_age_month=mem_age_month,Relation=relation,qualification=qualification,marital_status=marital_status,voter_status=voterstatus,curr_location=location,occupation=occupation,Makthab=makhtab,madarasa_details=madarasa_details)
                       member = Member.objects.get(mem_id=member_id,family=family)
                 else:
-                      member = Member.objects.create(mem_id=member_id,family=family,family_head=family_head,dateofbirth=dob_date,muhalla=family.muhalla,taluk=taluk,district=district_value,name=val[19],gender=gender,age=mem_age,Relation=relation,qualification=qualification,marital_status=marital_status,voter_status=voterstatus,curr_location=location,occupation=occupation,Makthab=makhtab,madarasa_details=madarasa_details)
+                      member = Member.objects.create(mem_id=member_id,family=family,family_head=family_head,dateofbirth=dob_date,muhalla=family.muhalla,taluk=taluk,district=district_value,name=val[19],gender=gender,age=mem_age,mem_age_month=mem_age_month,Relation=relation,qualification=qualification,marital_status=marital_status,voter_status=voterstatus,curr_location=location,occupation=occupation,Makthab=makhtab,madarasa_details=madarasa_details)
                 
                 old_age = True if val[33] == 'Y' else False
                 if old_age:
