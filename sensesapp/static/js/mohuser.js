@@ -540,6 +540,16 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
         location : '', 
         occupation : '', 
     }
+    $scope.family_gender = ['MALE','FEMALE']
+    $scope.FamilyMember.gender = $scope.family_gender[0]
+    $scope.family_head_status = ['Yes','No']
+    $scope.FamilyMember.family_head = $scope.family_head_status[0]
+    $scope.family_marital_status = ['Married','Single','Widow','Devorced','Aged Unmarried Woman']
+    $scope.FamilyMember.marital_status = $scope.family_marital_status[0]
+    $scope.fam_voter_status = ['Yes','No']
+    $scope.FamilyMember.voter = $scope.fam_voter_status[0]
+    $scope.fam_mem_location = ['Local','Outstation','Foreign']
+    $scope.FamilyMember.location = $scope.fam_mem_location[0]
     $scope.add_Familymembers = function(data,family,status) {
         console.log('data',data,family)
         var family_id = family.familyid.family_id;

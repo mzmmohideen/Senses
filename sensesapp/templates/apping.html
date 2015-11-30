@@ -353,6 +353,13 @@
                             </select>
                             <span style="cursor:pointer;" ng-click="ReportDatas.financial='';"><i class="fa fa-times"></i></span>
                         </div>
+                        <div ng-show="house_type_filter" style="margin-left:15px;margin-top:15px;">
+                            <span style="text-decoration:none">House Type</span> &nbsp; 
+                            <select ng-model="ReportDatas.house" ng-options="house for house in ['Rent','Own']" style="width:45%;display:inline-block;" class="form-control">
+                                <option value="">House Type</option>
+                            </select>
+                            <span style="cursor:pointer;" ng-click="ReportDatas.house='';"><i class="fa fa-times"></i></span>
+                        </div>
                         <div ng-show="tot_fam_jakath && !basic_needs" style="margin-left:15px;margin-top:15px;">
                             <span style="text-decoration:none">Financial Status</span> &nbsp; 
                             <select ng-model="ReportDatas.financial" ng-options="financial for financial in ['D - Poor','E - Very Poor']" style="width:45%;display:inline-block;" class="form-control">
@@ -402,7 +409,7 @@
                         </div>
                         <div style="margin-left:15px;margin-top:15px;">
                             <button ng-click="fetchReportAPI(ReportDatas,ReportValues)" class="btn-sm btn btn-primary" style="width:45%;float:left;"><i class="fa fa-filter"></i>Apply Filter</button>
-                            <button ng-click="ReportDatas.age_from='';ReportDatas.age_to='';ReportDatas.gender='';ReportDatas.marital_status='';ReportDatas.voter_status='';ReportDatas.financial='';ReportDatas.financial='';" class="btn-sm btn btn-primary" style="width:45%;float:left;"><i class="fa fa-times"></i>Clear All</button>
+                            <button ng-click="ReportDatas.age_from='';ReportDatas.age_to='';ReportDatas.gender='';ReportDatas.marital_status='';ReportDatas.voter_status='';ReportDatas.house='';ReportDatas.financial='';ReportDatas.financial='';" class="btn-sm btn btn-primary" style="width:45%;float:left;"><i class="fa fa-times"></i>Clear All</button>
                         </div>    
 
                 </div>
@@ -936,7 +943,7 @@
                         <td>{{key.mobile}} </td>
                         <td> {{key.needs}}</td>
                     </tr>
-                    <tr ng-show="ReportValues.report_name == 'Total Family Details' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
+                    <tr ng-show="ReportValues.report_name == 'Total Family Details' || 'Own House & Rent House families' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td>{{key.family_head}} <br/> {{key.address}} </td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>

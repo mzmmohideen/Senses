@@ -589,6 +589,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         financial : '',
         muhalla_id : '',
         taluk : '',
+        house : '',
         district : '',
         report_type : '',
     }
@@ -609,7 +610,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         console.log('value',serviceid_list,$scope.serviceid_list)
     }    
     $scope.fetchReportAPI = function(data,values) {
-        if(values.report_name == 'Total Family Details') {
+        if(values.report_name == 'Total Family Details' || values.report_name == 'Own House & Rent House families') {
             $scope.voter_status_dt = false;
             $scope.tot_fam_dt = true;
             $scope.govt_needers = false;
@@ -618,6 +619,12 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.service_needers = false;
             $scope.tot_fam_jakath = false;
             $scope.basic_needs = false;
+            if(values.report_name == 'Own House & Rent House families') {
+                $scope.house_type_filter = true;
+            }
+            else {
+                $scope.house_type_filter = false;
+            }
         }
         else if(values.report_name == 'Government Voter ID Needers') {
             $scope.voter_status_dt = true;
@@ -628,6 +635,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.medical_needers = false;
             $scope.basic_needs = false;
             $scope.tot_fam_jakath = false;
+            $scope.house_type_filter = false;
         }
         else if(values.report_name == 'Families Eligible for Jakaath' || values.report_name == 'Basic Help Needers List') {
             if(values.report_name == 'Basic Help Needers List') {
@@ -643,6 +651,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.edu_needers = false;
             $scope.tot_fam_dt = false;
             $scope.service_needers = false;
+            $scope.house_type_filter = false;
             $scope.medical_needers = false;
         }
         else if(values.report_name == 'Help for Poor Peoples and Guidance Needers List') {
@@ -654,6 +663,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.tot_fam_jakath = false;
             $scope.tot_fam_dt = false;
             $scope.basic_needs = false;
+            $scope.house_type_filter = false;
         }
         else if(values.report_name == 'Medical Needs and Guidance Needers Details') {
             $scope.medical_needers = true;
@@ -664,6 +674,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.tot_fam_jakath = false;
             $scope.tot_fam_dt = false;
             $scope.basic_needs = false;
+            $scope.house_type_filter = false;
         }
         else if(values.report_name == 'Government Schemes and Guidance Needers Details' || values.report_name == 'Training/Employment Help and Guidance Needers List' || values.report_name == 'Help for Discontinued and Guidance Needers List' || values.report_name == 'Educational Help and Guidance Needers List') {
             if(values.report_name == 'Government Schemes and Guidance Needers Details') {
@@ -680,6 +691,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.service_needers = false;
             $scope.basic_needs = false;
             $scope.tot_fam_dt = false;
+            $scope.house_type_filter = false;
         }
         else if(values.report_name == 'Women chldrens Need to join Niswan Madarasa' || values.report_name == 'Persons Need to join Jumrah Madarasa' || values.report_name == 'Childrens Need to join Makthab Madarasa') {
             $scope.madarasa_needers = true;
@@ -691,6 +703,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.service_needers = false;
             $scope.basic_needs = false;
             $scope.tot_fam_dt = false;
+            $scope.house_type_filter = false;
         }
         else if(values.report_name == 'Mohalla Report') {
             $scope.madarasa_needers = false;
@@ -702,6 +715,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.service_needers = false;
             $scope.basic_needs = false;
             $scope.tot_fam_dt = false;
+            $scope.house_type_filter = false;
         }
         else {
             $scope.madarasa_needers = false;
@@ -713,6 +727,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.service_needers = false;
             $scope.basic_needs = false;
             $scope.tot_fam_dt = false;
+            $scope.house_type_filter = false;
         }
         data.district = values.district;
         data.taluk = values.taluk;
@@ -743,7 +758,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 $timeout( function() {              
                     appBusy.set(false);
                 }, 1000);
-                if(response.report_type == 'Total Family Details') {
+                if(response.report_type == 'Total Family Details'  || response.report_type == 'Own House & Rent House families') {
                     $scope.ReportHeader = ['S.No','Name & Address','Age & Gender','Family ID & Mobile NO','Financial Status & Jakaath']
                     $scope.getReportData = response.get_family;
                 }
@@ -794,7 +809,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 else {
                     var pdf_data = $scope.getReportData;
                 }
-                if (response.report_type == 'Total Family Details' || response.report_type == 'Basic Help Needers List' || response.report_type == 'Families Eligible for Jakaath') {
+                if (response.report_type == 'Total Family Details'  || response.report_type == 'Own House & Rent House families' || response.report_type == 'Basic Help Needers List' || response.report_type == 'Families Eligible for Jakaath') {
                     var finacial_value = response.finacial_value;
                 }
                 else {
@@ -850,7 +865,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                     $scope.ReportHeader = ['S.No','Details','Counts']
                     $scope.getReportData = data.reports;
                 }
-                else if(fam_data.report_name == 'Total Family Details') {
+                else if(fam_data.report_name == 'Total Family Details'  || fam_data.report_name == 'Own House & Rent House families') {
                     $scope.ReportHeader = ['S.No','Name & Address','Age & Gender','Family ID & Mobile NO','Financial Status & Jakaath']
                     $scope.getReportData = data.get_family;
                 }
@@ -1049,7 +1064,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         $scope.muhallaData = _.filter($scope.mahallaList, function(data){ return data.district == val.district && data.taluk == val.taluk })
         console.log('mahalla',$scope.muhallaData)
     }
-    $scope.senses_reports = ['Mohalla Report','Total Family Details','Families Eligible for Jakaath','Medical Needs and Guidance Needers Details','Government Schemes and Guidance Needers Details','Government Voter ID Needers','Educational Help and Guidance Needers List','Help for Discontinued and Guidance Needers List','Basic Help Needers List','Help for Poor Peoples and Guidance Needers List','Training/Employment Help and Guidance Needers List','Childrens Need to join Makthab Madarasa','Persons Need to join Jumrah Madarasa','Women chldrens Need to join Niswan Madarasa','Needs Types']
+    $scope.senses_reports = ['Mohalla Report','Total Family Details','Families Eligible for Jakaath','Medical Needs and Guidance Needers Details','Government Schemes and Guidance Needers Details','Government Voter ID Needers','Educational Help and Guidance Needers List','Help for Discontinued and Guidance Needers List','Basic Help Needers List','Help for Poor Peoples and Guidance Needers List','Training/Employment Help and Guidance Needers List','Childrens Need to join Makthab Madarasa','Persons Need to join Jumrah Madarasa','Women chldrens Need to join Niswan Madarasa','Needs Types','Families without toilets','Own House & Rent House families']
     // ,'தொகுப்பு அறிக்கை'
     $scope.getLocation = function() {
         $http.get('/addLocation/',{}).success(function(data) {

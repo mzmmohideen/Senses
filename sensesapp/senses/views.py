@@ -363,7 +363,7 @@ def fetchReportData(request):
             member_details = get_mem_medical + get_mem_scheme + get_mem_service
             get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.all())
             return HttpResponse(content=json.dumps({'member_details':member_details,'get_mem_service':get_mem_service,'get_mem_medical':get_mem_medical,'get_mem_scheme':get_mem_scheme,'get_memData':get_memData}),content_type='Application/json')
-        elif data['report_type'] == 'Total Family Details' or data['report_type'] == 'Basic Help Needers List' or data['report_type'] == 'Families Eligible for Jakaath':
+        elif data['report_type'] == 'Total Family Details' or data['report_type'] == 'Own House & Rent House families' or data['report_type'] == 'Basic Help Needers List' or data['report_type'] == 'Families Eligible for Jakaath':
             try:
                 if data['muhalla_id']:
                     muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
@@ -378,6 +378,19 @@ def fetchReportData(request):
             if data['report_type'] == 'Basic Help Needers List':
                 family_value = Family.objects.filter(muhalla=muhalla,financial_status='E - Very Poor')
                 finacial_value = 'E'
+            elif data['report_type'] == 'Own House & Rent House families':
+                try:
+                    if data['financial']:
+                        family_value = Family.objects.filter(muhalla=muhalla,financial_status=data['financial'])
+                        finacial_value = data['financial'].split(' ')[0]
+                    else:
+                        family_value = Family.objects.filter(muhalla=muhalla)                    
+                        finacial_value = 'ALL'
+                    if data['house']:
+                        family_value = family_value.filter(house_type=data['house'])                        
+                except:
+                    family_value = Family.objects.filter(muhalla=muhalla)
+                    finacial_value = 'ALL'            
             else:
                 try:
                     if data['financial']:
@@ -387,8 +400,9 @@ def fetchReportData(request):
                         family_value = Family.objects.filter(muhalla=muhalla)                    
                         finacial_value = 'ALL'
                 except:
-                    family_value = Family.objects.filter(muhalla=muhalla)               
-            get_family = map(lambda x:{'familyid':x.family_id,'address':x.address,'mobile':x.mobile,'family_head':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].name if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'family_head_occ':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].occupation if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'age':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].age if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'gender':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].gender if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'fam_member':Member.objects.filter(family=Family.objects.get(family_id=x.family_id)).count(),'financial_pdf':x.financial_status.split(' ')[0],'jakath_family': 'Yes' if x.financial_status.split(' ')[0] == 'E' or x.financial_status.split(' ')[0] == 'D' else 'No','financial_status':x.financial_status,'muhalla':x.muhalla.name,'ration_card':x.ration_card,'language':x.language},family_value)
+                    family_value = Family.objects.filter(muhalla=muhalla)   
+                    finacial_value = 'ALL'            
+            get_family = map(lambda x:{'familyid':x.family_id,'house_type':x.house_type,'address':x.address,'mobile':x.mobile,'family_head':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].name if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'family_head_occ':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].occupation if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'age':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].age if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'gender':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].gender if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'fam_member':Member.objects.filter(family=Family.objects.get(family_id=x.family_id)).count(),'financial_pdf':x.financial_status.split(' ')[0],'jakath_family': 'Yes' if x.financial_status.split(' ')[0] == 'E' or x.financial_status.split(' ')[0] == 'D' else 'No','financial_status':x.financial_status,'muhalla':x.muhalla.name,'ration_card':x.ration_card,'language':x.language},family_value)
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_family':get_family,'finacial_value':finacial_value}),content_type='Application/json')
         elif data['report_type'] == 'Medical Needs and Guidance Needers Details':
             get_mem_medical = []
