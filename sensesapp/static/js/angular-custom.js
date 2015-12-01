@@ -610,7 +610,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         console.log('value',serviceid_list,$scope.serviceid_list)
     }    
     $scope.fetchReportAPI = function(data,values) {
-        if(values.report_name == 'Total Family Details' || values.report_name == 'Own House & Rent House families') {
+        if(values.report_name == 'Total Family Details' || values.report_name == 'Own House & Rent House families' || values.report_name == 'Families without toilets') {
             $scope.voter_status_dt = false;
             $scope.tot_fam_dt = true;
             $scope.govt_needers = false;
@@ -770,6 +770,10 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                     $scope.ReportHeader = ['S.No','Needers Name','Age & Gender','Financial Status & Family ID','Mobile NO','Address']
                     $scope.getReportData = response.get_family;
                 }
+                else if(response.report_type == 'Families without toilets') {
+                    $scope.ReportHeader = ['S.No','Needers Name','Age & Gender','Financial Status & Family ID','Mobile NO','Address']
+                    $scope.getReportData = response.get_family;
+                }
                 else if(response.report_type == 'Medical Needs and Guidance Needers Details') {
                     $scope.ReportHeader = ['S.No','Needers Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']
                     $scope.getReportData = response.get_mem_medical;
@@ -809,7 +813,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 else {
                     var pdf_data = $scope.getReportData;
                 }
-                if (response.report_type == 'Total Family Details'  || response.report_type == 'Own House & Rent House families' || response.report_type == 'Basic Help Needers List' || response.report_type == 'Families Eligible for Jakaath') {
+                if (response.report_type == 'Total Family Details' || response.report_type == 'Families without toilets'  || response.report_type == 'Own House & Rent House families' || response.report_type == 'Basic Help Needers List' || response.report_type == 'Families Eligible for Jakaath') {
                     var finacial_value = response.finacial_value;
                 }
                 else {

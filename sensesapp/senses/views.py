@@ -363,7 +363,7 @@ def fetchReportData(request):
             member_details = get_mem_medical + get_mem_scheme + get_mem_service
             get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.all())
             return HttpResponse(content=json.dumps({'member_details':member_details,'get_mem_service':get_mem_service,'get_mem_medical':get_mem_medical,'get_mem_scheme':get_mem_scheme,'get_memData':get_memData}),content_type='Application/json')
-        elif data['report_type'] == 'Total Family Details' or data['report_type'] == 'Own House & Rent House families' or data['report_type'] == 'Basic Help Needers List' or data['report_type'] == 'Families Eligible for Jakaath':
+        elif data['report_type'] == 'Total Family Details' or data['report_type'] == 'Own House & Rent House families' or data['report_type'] == 'Basic Help Needers List' or data['report_type'] == 'Families Eligible for Jakaath' or data['report_type'] == 'Families without toilets' :
             try:
                 if data['muhalla_id']:
                     muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
@@ -1037,6 +1037,12 @@ def report_to_pdf(request):
         elif data['report']['report_name'] == 'Total Family Details':
             pdf_filename = 'family_report.pdf'
             html_filename = '%s/templates/family_details.html'%file_path
+        elif data['report']['report_name'] == 'Families without toilets':
+            pdf_filename = 'fam_wo_toilet.pdf'
+            html_filename = '%s/templates/fam_wo_toilet.html'%file_path    
+        elif data['report']['report_name'] == 'Own House & Rent House families':
+            pdf_filename = 'own_rent_house_report.pdf'
+            html_filename = '%s/templates/own_rent_house.html'%file_path    
         elif data['report']['report_name'] == 'Families Eligible for Jakaath':
             pdf_filename = 'fam_eligible_jakath.pdf'
             html_filename = '%s/templates/fam_eligible_jakath.html'%file_path    

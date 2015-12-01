@@ -943,14 +943,14 @@
                         <td>{{key.mobile}} </td>
                         <td> {{key.needs}}</td>
                     </tr>
-                    <tr ng-show="ReportValues.report_name == 'Total Family Details' || 'Own House & Rent House families' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
+                    <tr ng-show="ReportValues.report_name == 'Total Family Details' || ReportValues.report_name == 'Own House & Rent House families' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td>{{key.family_head}} <br/> {{key.address}} </td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>
                         <td>{{key.familyid}} <br/> {{key.mobile}} </td>
                         <td>{{key.financial_status.split(' ')[0]}} <br/> {{get_jakaath_status(key.financial_status.split(' ')[0])}} </td>
                     </tr>
-                    <tr ng-show="ReportValues.report_name == 'Families Eligible for Jakaath' || ReportValues.report_name == 'Government Voter ID Needers' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
+                    <tr ng-show="ReportValues.report_name == 'Families Eligible for Jakaath' || ReportValues.report_name == 'Government Voter ID Needers' || ReportValues.report_name == 'Families without toilets' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td>{{key.family_head}}</td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>
