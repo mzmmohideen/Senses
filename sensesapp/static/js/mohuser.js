@@ -155,8 +155,24 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             console.log('name',$scope.muhalla_name)
         })
     } 
+    $scope.header_sort = function(val,header,data) {
+        console.log('val',header,data,val)
+        appBusy.set("Loading....");
+        $http.post('/sortReportData/',{
+            data : data,
+            sort_val : val,
+        }).success(function(response) {
+            console.log('data response',response.sort_data)
+            appBusy.set('Done...');              
+            $timeout( function() {              
+                appBusy.set(false);
+            }, 1000);
+            $scope.ReportHeader = header;
+            $scope.getReportData = response.sort_data;
+        })
+    }
     $scope.fetchReportAPI = function(data,values) {
-        if(values.report_name == 'Total Family Details') {
+        if(values.report_name == 'Total Family Details' || values.report_name == 'Own House & Rent House families' || values.report_name == 'Families without toilets') {
             $scope.voter_status_dt = false;
             $scope.tot_fam_dt = true;
             $scope.govt_needers = false;
@@ -165,6 +181,12 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             $scope.service_needers = false;
             $scope.tot_fam_jakath = false;
             $scope.basic_needs = false;
+            if(values.report_name == 'Own House & Rent House families') {
+                $scope.house_type_filter = true;
+            }
+            else {
+                $scope.house_type_filter = false;
+            }
         }
         else if(values.report_name == 'Government Voter ID Needers') {
             $scope.voter_status_dt = true;
@@ -175,6 +197,7 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             $scope.medical_needers = false;
             $scope.basic_needs = false;
             $scope.tot_fam_jakath = false;
+            $scope.house_type_filter = false;
         }
         else if(values.report_name == 'Families Eligible for Jakaath' || values.report_name == 'Basic Help Needers List') {
             if(values.report_name == 'Basic Help Needers List') {
@@ -191,6 +214,7 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             $scope.tot_fam_dt = false;
             $scope.service_needers = false;
             $scope.medical_needers = false;
+            $scope.house_type_filter = false;
         }
         else if(values.report_name == 'Help for Poor Peoples and Guidance Needers List') {
             $scope.service_needers = true;
@@ -201,6 +225,7 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             $scope.tot_fam_jakath = false;
             $scope.tot_fam_dt = false;
             $scope.basic_needs = false;
+            $scope.house_type_filter = false;
         }
         else if(values.report_name == 'Medical Needs and Guidance Needers Details') {
             $scope.medical_needers = true;
@@ -211,6 +236,7 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             $scope.tot_fam_jakath = false;
             $scope.tot_fam_dt = false;
             $scope.basic_needs = false;
+            $scope.house_type_filter = false;
         }
         else if(values.report_name == 'Government Schemes and Guidance Needers Details' || values.report_name == 'Training/Employment Help and Guidance Needers List' || values.report_name == 'Help for Discontinued and Guidance Needers List' || values.report_name == 'Educational Help and Guidance Needers List') {
             if(values.report_name == 'Government Schemes and Guidance Needers Details') {
@@ -227,6 +253,7 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             $scope.service_needers = false;
             $scope.basic_needs = false;
             $scope.tot_fam_dt = false;
+            $scope.house_type_filter = false;
         }
         else if(values.report_name == 'Women chldrens Need to join Niswan Madarasa' || values.report_name == 'Persons Need to join Jumrah Madarasa' || values.report_name == 'Childrens Need to join Makthab Madarasa') {
             $scope.madarasa_needers = true;
@@ -238,6 +265,7 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             $scope.service_needers = false;
             $scope.basic_needs = false;
             $scope.tot_fam_dt = false;
+            $scope.house_type_filter = false;
         }
         else if(values.report_name == 'Mohalla Report') {
             $scope.madarasa_needers = false;
@@ -249,6 +277,7 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             $scope.service_needers = false;
             $scope.basic_needs = false;
             $scope.tot_fam_dt = false;
+            $scope.house_type_filter = false;
         }
         else {
             $scope.madarasa_needers = false;
@@ -260,6 +289,7 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             $scope.service_needers = false;
             $scope.basic_needs = false;
             $scope.tot_fam_dt = false;
+            $scope.house_type_filter = false;
         }
         data.district = values.district;
         data.taluk = values.taluk;
@@ -285,7 +315,7 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
                 $timeout( function() {              
                     appBusy.set(false);
                 }, 1000);
-                if(response.report_type == 'Total Family Details') {
+                if(response.report_type == 'Total Family Details'  || response.report_type == 'Own House & Rent House families') {
                     $scope.ReportHeader = ['S.No','Name & Address','Age & Gender','Family ID & Mobile NO','Financial Status & Jakaath']
                     $scope.getReportData = response.get_family;
                 }
@@ -294,6 +324,10 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
                     $scope.getReportData = response.get_family;
                 }
                 else if(response.report_type == 'Families Eligible for Jakaath') {
+                    $scope.ReportHeader = ['S.No','Needers Name','Age & Gender','Financial Status & Family ID','Mobile NO','Address']
+                    $scope.getReportData = response.get_family;
+                }
+                else if(response.report_type == 'Families without toilets') {
                     $scope.ReportHeader = ['S.No','Needers Name','Age & Gender','Financial Status & Family ID','Mobile NO','Address']
                     $scope.getReportData = response.get_family;
                 }
@@ -336,14 +370,13 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
                 else {
                     var pdf_data = $scope.getReportData;
                 }
-                if (response.report_type == 'Total Family Details' || response.report_type == 'Basic Help Needers List' || response.report_type == 'Families Eligible for Jakaath') {
+                if (response.report_type == 'Total Family Details' || response.report_type == 'Families without toilets'  || response.report_type == 'Own House & Rent House families' || response.report_type == 'Basic Help Needers List' || response.report_type == 'Families Eligible for Jakaath') {
                     var finacial_value = response.finacial_value;
                 }
                 else {
                     var finacial_value = '';
                 }
-                console.log('finacial_value',$scope.ReportHeader)
-                console.log('finacial_value',$scope.ReportValues)
+                console.log('values',$scope.getReportData)
                 $http.post('/report_to_pdf/',{
                     header : $scope.ReportHeader,
                     data : pdf_data,
@@ -602,7 +635,7 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             console.log('val',$scope.get_password)
         })
     }
-    $scope.senses_reports = ['Mohalla Report','Total Family Details','Families Eligible for Jakaath','Medical Needs and Guidance Needers Details','Government Schemes and Guidance Needers Details','Government Voter ID Needers','Educational Help and Guidance Needers List','Help for Discontinued and Guidance Needers List','Basic Help Needers List','Help for Poor Peoples and Guidance Needers List','Training/Employment Help and Guidance Needers List','Childrens Need to join Makthab Madarasa','Persons Need to join Jumrah Madarasa','Women chldrens Need to join Niswan Madarasa']
+    $scope.senses_reports = ['Mohalla Report','Total Family Details','Families Eligible for Jakaath','Medical Needs and Guidance Needers Details','Government Schemes and Guidance Needers Details','Government Voter ID Needers','Educational Help and Guidance Needers List','Help for Discontinued and Guidance Needers List','Basic Help Needers List','Help for Poor Peoples and Guidance Needers List','Training/Employment Help and Guidance Needers List','Childrens Need to join Makthab Madarasa','Persons Need to join Jumrah Madarasa','Women chldrens Need to join Niswan Madarasa','Needs Types','Families without toilets','Own House & Rent House families']
     $scope.getFamilyReport = function(fam_data,report_name) {
         console.log('report_name',fam_data,report_name)
         $http.get('/fetchReportData/?muhalla_id='+fam_data.mohalla_id,{}).success(function(data){

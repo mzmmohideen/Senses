@@ -27,6 +27,18 @@ app.directive('ngEnter', function() {
         });
     };
 });
+app.filter('limitTocustom', function() {
+    'use strict';
+    return function(input, limit) {
+        if (input) {
+            if (limit > input.length) {
+                return input.slice(0, limit);
+            } else {
+                return input.slice(0, limit) + '...';
+            }
+        }
+    };
+});
 app.filter('SortData', function() {
     return function(input) {
         if(input != undefined) {
@@ -218,17 +230,14 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
     // $scope.format = $scope.formats[0];
     $scope.today = function() {
         $scope.dt = new Date();
-        console.log('dayt',$scope.dt)
     };
     $scope.today();
     $scope.group_value="Select the Group in the list or Enter New...";
     $scope.get_group = function(prog,sem) {
-        console.log('program',prog,sem,$scope.group_data)
         $scope.group_list = [];       
         for(var i in $scope.group_data) {
             if($scope.group_data[i].program == prog.name && $scope.group_data[i].semester == sem) {
                 $scope.group_list.push($scope.group_data[i].name)
-                // console.log('program',$scope.group_list)
             }    
         }
     }
@@ -244,13 +253,11 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.scheme_val = 'SELECT or ADD SCHEMES';
         }
         else {
-            console.log('val',scheme)
             $scope.scheme_val = scheme;
         }
     }
     $scope.sub_scheme_val = 'SELECT or ADD SUB SCHEME';
     $scope.get_sub_scheme = function(scheme) {
-        console.log('val1',typeof(scheme))
         if(!scheme) {
             $scope.sub_scheme_val = 'SELECT or ADD SUB SCHEME';
         }
@@ -260,16 +267,13 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         else if(typeof(scheme) == 'object') {
             $scope.sub_scheme_val = scheme.sub;
         }
-        console.log('val',$scope.sub_scheme_val)
     }
     $scope.upload_csv_bt = true;
     $scope.upload_csv = function(csv_file) {
-        console.log('click')
         appBusy.set("Loading....");
         $scope.upload_csv_bt = false;
         var fileUrl = '/upload_bulk_data/';
         var send = new FormData();
-        console.log('csv_file',csv_file)
         send.append('csv_file', csv_file);
         $http.post(fileUrl, send, {
             transformRequest: angular.identity,
@@ -299,11 +303,9 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         else {
             $scope.service_val = service;
         }
-        console.log('service_val',$scope.service_val)
     }
     $scope.getService = function() {
         $http.get('/ServiceData/',{}).success(function(data) {
-            console.log('datascheme',data)
             $scope.service_list = _.pluck(data.data,"service")
             $scope.getServices = data.data;
         })
@@ -315,28 +317,29 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.district_code = ''
         }
         else {
-            console.log('val',district)
             $scope.district_val = district;
             if($scope.DisCode[district][0]) {
-                console.log('dis$scope.DisCode',$scope.DisCode[district][0])
                 $scope.district_code = $scope.DisCode[district][0]
             }
             else {
-                console.log('Elsesdis$scope.DisCode',district)
                 $scope.district_code = ''
             }
 
         }
     }
     $scope.editTaluk = function(district_val,taluk,tot_taluk,index,status) {
-        console.log(district_val,taluk,tot_taluk[district_val][index])
+        appBusy.set("Updating....");
         $http.post('/addLocation/',{
             district : district_val,
             edit_taluk : taluk,
             taluk : tot_taluk[district_val][index],
             status : status,
         }).success(function(response){
-            alert(response.data)
+            appBusy.set(response.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
+            // alert(response.data)
             $scope.getLocation()
         })
     }
@@ -348,7 +351,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
     }
     $scope.disease_val = 'SELECT or ADD DISEASE';
     $scope.get_disease = function(disease) {
-        console.log('val',disease)
         if(!disease) {
             $scope.disease_val = 'SELECT or ADD DISEASE';
         }
@@ -357,34 +359,38 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         }
     }
     $scope.getDisease = function(sym_type) {
-        console.log('sym_type',sym_type)
         $http.get('/DiseaseData/?type='+sym_type,{}).success(function(data) {
             $scope.disease_list = _.pluck(data.response,"name")
             $scope.disease_dict = data.response;
             $scope.getDiseaseData = data.response;
-            // console.log($scope.getDiseaseData)
         })
     }
     $scope.deleteDisease = function(value) {
-        console.log('delete',value)
+        appBusy.set("Deleting....");
         $http.get('/DiseaseData/?disease='+value.name,{}).success(function(data) {
-            alert(data.response)
+            appBusy.set(data.response);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
+            // alert(data.response)
             $scope.getDisease(value.type)
-            console.log('val',data)
         })
     }
     $scope.add_disease = function(disease_val,data) {
         var symptom_type = data.sym_type;
-        console.log('value',symptom_type)
+        appBusy.set("Adding....");
         $http.post('/DiseaseData/',{
             sym_type: symptom_type,
             description: data.description,
             disease_id: data.disease_id,
             disease: disease_val, 
         }).success(function(data){
-            alert(data.response)
+            appBusy.set(data.response);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
+            // alert(data.response)
             $scope.getDisease(symptom_type)
-            console.log('value',data)
         })
     }
     $scope.scheme_values = {
@@ -415,7 +421,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.getValue = ['Yes','No']
         }
         else {
-            console.log('var',field)
             $scope.get_val()
             $scope.scheme_values.value = ''
             $scope.getValue = []
@@ -486,16 +491,12 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         })
     }
     $scope.getMasjidList = function(data) {
-        console.log('mahalla',$scope.mahallaList)
-        console.log('dataMasjid',data)
         $scope.ReportValues.muhalla = '';
         $scope.tot_mohalla_list = _.pluck($scope.mahallaList,"mohalla_id")
         $scope.masjidList = _.pluck(_.filter($scope.mahallaList,function(num) {return num.district == data.district && num.taluk == data.taluk}),"mohalla_id")
         $scope.muhallaList = _.filter($scope.mahallaList,function(num) {return num.district == data.district && num.taluk == data.taluk})
-        console.log('val',$scope.masjidList)
     }
     $scope.report_value_change = function() {
-        console.log('valchange')
         $scope.ReportValues.district = ''
         $scope.ReportValues.taluk = ''
         $scope.ReportValues.muhalla = ''
@@ -503,7 +504,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         $scope.ReportHeader = []
         $scope.getReportData = []
         $http.get('/matrix_taluk_api/?district=Chennai&scheme_name=Old Age Pension&service_name=none',{}).success(function(data){
-            console.log('data',data)
         })
     }
     $scope.moh_user = {
@@ -536,7 +536,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             var username = data.username;
         }
         else if(status == 'delete') {
-            console.log('values',values,data)
             var email = data.email;
             var password_val = data.password;
             var username = values.username;
@@ -547,7 +546,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             var username = data.username;
 
         }
-        console.log('data',data)
+        appBusy.set("Creating....");
         $http.post('/new_member/',{
             mohalla_id: data.muhalla.mohalla_id,
             username: username,
@@ -557,7 +556,11 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             member_type: data.member_type,
             status: status,
         }).success(function(response) {
-            alert(response.data)
+            // alert(response.data)
+            appBusy.set(response.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
             $scope.getMohallaUser(data)
             $scope.moh_user.username = ''
             $scope.moh_user.email = ''
@@ -566,9 +569,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         })
     }
     $scope.getMohallaUser = function(mohalla_data) {
-        console.log('mohalla_data',mohalla_data)
         $http.get('/new_member/?muhalla_id='+mohalla_data.muhalla.mohalla_id,{}).success(function(data){
-            console.log('data',data)
             if(data.data) {
                 $scope.fetched_moh_user = []
             }
@@ -577,7 +578,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             }
             // $scope.fetched_moh_user = data.data[0];
             // $scope.fetched_moh_user = _.filter(data.data,function(val){ return val.Member_type == mohalla_data.member_type});
-            // console.log('scope',$scope.fetched_moh_user.length)
         })
     }
     $scope.ReportDatas = {
@@ -595,19 +595,15 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
     }
     $scope.diseaseid_list = []
     $scope.filter_disease_value = function(diseaseid_list) {
-        console.log('val',$scope.diseaseid_list)
         $scope.diseaseid_list = diseaseid_list
-        console.log('value',diseaseid_list,$scope.diseaseid_list)
     }
     $scope.schemeid_list = []
     $scope.filter_scheme_value = function(schemeid_list) {
         $scope.schemeid_list = schemeid_list
-        console.log('value',schemeid_list,$scope.schemeid_list)
     }
     $scope.serviceid_list = []
     $scope.filter_service_value = function(serviceid_list) {
         $scope.serviceid_list = serviceid_list
-        console.log('value',serviceid_list,$scope.serviceid_list)
     }    
     $scope.fetchReportAPI = function(data,values) {
         if(values.report_name == 'Total Family Details' || values.report_name == 'Own House & Rent House families' || values.report_name == 'Families without toilets') {
@@ -743,7 +739,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         else {
             data.report_type = values.report_name;
         }
-        console.log('data',data)
         if(values.muhalla != '') {
             $scope.ReportHeader = true;
             $scope.getReportData = false;
@@ -819,14 +814,12 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 else {
                     var finacial_value = '';
                 }
-                console.log('finacial_value',finacial_value)
                 $http.post('/report_to_pdf/',{
                     header : $scope.ReportHeader,
                     data : pdf_data,
                     report : $scope.ReportValues,
                     finacial_value : finacial_value,
                 }).success(function(response){
-                    console.log('success',response)
                     $scope.get_pdfname = response.pdfname;
                 })
             })
@@ -838,12 +831,10 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             data : data,
             report : report,
         }).success(function(response){
-            console.log('success',response)
             // var file = new Blob([response], { type: 'application/pdf' });
             // saveAs(file, 'filename.pdf');
             window.open('/'+response.pdfname)
             // if(response.data == true) {
-            //     console.log('down',response)
             //     window.location.href = '/'+response.pdfname
             // }
         })
@@ -855,7 +846,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
     }
     $scope.get_dis_val()
     $scope.getFamilyReport = function(fam_data) {
-        console.log('value',fam_data)        
         if(fam_data.muhalla != '') {
             appBusy.set("Loading....");
             $http.get('/fetchReportData/?muhalla_id='+fam_data.muhalla.mohalla_id,{}).success(function(data){
@@ -883,7 +873,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                         $scope.getReportData = _.filter(data.get_family,function(val){ return val.financial_status.split(' ')[0] == 'E'});
                     }
                     else if(fam_data.report_name == 'Government Voter ID Needers') {
-                        console.log('voter',data.get_memdata)
                         $scope.getReportData = _.filter(data.get_memdata,function(val){ return val.voter == false && parseInt(val.age) >= 18});
                     }                
                 }
@@ -918,9 +907,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                         $scope.getReportData = _.filter(data.get_memData,function(val) {return val.makthab == true && val.makthab_status == 'Girls For Makthab 4-15'});
                     }
                 }
-                console.log('data',$scope.getReportData)
                 // $scope.getReportData = data.reports;
-                console.log('reportdata',$scope.getReportData)
             })
         }
     }
@@ -929,15 +916,13 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         else if(financial == 'D' || financial == 'E') { return 'YES' }
     }
     $scope.getMasjidMember = function(masjid_data) {
-        console.log('masjid_member',masjid_data)
         $http.get('/masjid_member/?masjid_id=' + masjid_data.mohalla_id).success(function(data){
         // $http.get('/masjid_member/?masjid=' + data.masjid_name+'&taluk='+data.taluk+'&district='+ data.district).success(function(data){
             $scope.masjid_member_list = data.data;
-            console.log('data',data)
         })
     }
     $scope.UpdateMember = function(mohalla_id,member,name,age,designation,mobile,address) {
-            console.log('valllll',mohalla_id,member,name,age,designation,mobile,address)
+            appBusy.set("Updating....");
             $http.post('/masjid_member/',{
                 mohalla_id: mohalla_id,
                 data: member,
@@ -948,7 +933,11 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 address: address,
                 status: 'edit',
             }).success(function(response) {
-                alert(response.data)
+                appBusy.set(response.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
+                // alert(response.data)
                 // $scope.member.name = '';
                 // $scope.member.member.age = '';
                 // $scope.member.member.designation = '';
@@ -957,19 +946,23 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             })
     }
     $scope.DeleteMember = function(mohalla_id,member) {
+        appBusy.set("Deleting....");
         $http.post('/masjid_member/',{
         mohalla_id: mohalla_id,
         data: member,
         status: 'delete',
         }).success(function(response) {
-            alert(response.data)
+            appBusy.set(response.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
+            // alert(response.data)
             $http.get('/masjid_member/?masjid_id=' + mohalla_id).success(function(data){
                 $scope.masjid_member_list = data.data;
             })
         })
     }
     $scope.addMasjid = function(masjid,data,status) {
-        console.log(data,masjid)
         if(data.mohalla_id == "") {
             // if(masjid == "Select mahalla ID from the List") {
             var masjid_val = ''
@@ -981,7 +974,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         else {
             var masjid_val = data.mohalla_id
         }
-        console.log('masjid',masjid,'a',data,'b',masjid_val)
+        appBusy.set("Adding....");
         $http.post('/add_masjid/',{
             data: data,
             district: data.district,
@@ -992,9 +985,12 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             address: data.address,
             status: status,
         }).success(function(response) {
-            console.log('val',response)
             $scope.getMasjidList(data)
-            alert(response.data)
+            // alert(response.data)
+            appBusy.set(response.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
             $scope.new_masjid=false;
             if(response.data == 'Deleted Successfully!') {
                 $scope.get_masjid()
@@ -1007,20 +1003,23 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         })
     }
     $scope.add_location = function(district,district_code,taluk) {
-        console.log('val',district,'taluk',taluk)
+        appBusy.set("Adding....");
         $http.post('/addLocation/',{
             district: district,
             district_code: district_code,
             taluk: taluk,
             status : 'new',
         }).success(function(data) {
-            console.log('data',data)
-            alert(data.data)
+            // alert(data.data)
+            appBusy.set(data.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
             $scope.getLocation();
         })
     }
     $scope.add_schemes = function(scheme,sub,scheme_values) {
-        console.log('val',scheme,'taluk',sub,'scheme_values',scheme_values.scheme_id)
+        appBusy.set("Adding....");
         $http.post('/SchemeData/',{
             scheme: scheme,
             sub: sub,
@@ -1031,8 +1030,11 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             value: scheme_values.value,
             apply: scheme_values.apply,
         }).success(function(data) {
-            console.log('data',data)
-            alert(data.data)
+            // alert(data.data)
+            appBusy.set(data.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
             $scope.get_scheme(scheme)
             $scope.get_sub_scheme()
             $scope.scheme_values.scheme_id = ''
@@ -1041,41 +1043,56 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         })
     }
     $scope.add_service = function(service,service_id,description) {
-        console.log('mahalla',service,description)
         if(description) { var desc = description; } else { var desc = '' }
         var data = {
             service : service,
             service_id : service_id,
             description : desc,
         }
+        appBusy.set("Adding....");
         $http.post('/ServiceData/',{
             data: data,
         }).success(function(data){
-            alert(data.data)
+            // alert(data.data)
+            appBusy.set(data.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
             $scope.getService()
-            console.log('data',data)
+        })
+    }
+    $scope.delete_scheme = function(scheme,sub) {
+        appBusy.set("Deleting....");
+        $http.get('/SchemeData/?del_schem='+sub,{}).success(function(response){
+            // alert(response.data)
+            appBusy.set(response.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
+            $scope.get_scheme(scheme)
+            $scope.get_sub_scheme(sub)
         })
     }
     $scope.delete_service = function(service) {
-        console.log('???',service)
+        appBusy.set("Deleting....");
         $http.get('/ServiceData/?del_ser='+service,{}).success(function(response){
-            alert(response.data)
+            // alert(response.data)
+            appBusy.set(response.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
             $scope.getService()
-            console.log('response',response)
         })
     }
     $scope.getMahallaData = function(val) {
         $scope.muhallaData = _.filter($scope.mahallaList, function(data){ return data.district == val.district && data.taluk == val.taluk })
-        console.log('mahalla',$scope.muhallaData)
     }
     $scope.senses_reports = ['Mohalla Report','Total Family Details','Families Eligible for Jakaath','Medical Needs and Guidance Needers Details','Government Schemes and Guidance Needers Details','Government Voter ID Needers','Educational Help and Guidance Needers List','Help for Discontinued and Guidance Needers List','Basic Help Needers List','Help for Poor Peoples and Guidance Needers List','Training/Employment Help and Guidance Needers List','Childrens Need to join Makthab Madarasa','Persons Need to join Jumrah Madarasa','Women chldrens Need to join Niswan Madarasa','Needs Types','Families without toilets','Own House & Rent House families']
     // ,'தொகுப்பு அறிக்கை'
     $scope.getLocation = function() {
         $http.get('/addLocation/',{}).success(function(data) {
-            // console.log('val',data.district)
             $scope.DisCode = data.district;
             $scope.district_list = _.keys(data.district)
-            console.log('district_list_report',data.data)
             $scope.district_list_report = _.keys(data.district)
             $scope.district_list_report.push('all')
             $scope.getTaluk = data.data;
@@ -1090,7 +1107,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
     }
 
     $scope.add_new_family = function(data) {
-        console.log('masjid_data',data)
         masjid_data.set_MasjidData(data);
         var modalInstance = $modal.open({
             templateUrl: 'add_new_family_modal',
@@ -1107,7 +1123,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         };
         $scope.today();
         var data = masjid_data.get_MasjidData();
-        console.log('data',data)
         $scope.FamilyValue = {
             familyid: '',
             masjid: data.masjid,
@@ -1126,7 +1141,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             financial: '',
         }
         $scope.addFamily = function(value,status) {
-            console.log('value',value.report_date)
             var data = {
                 mobile_no: value.mobile_no,
                 taluk: value.taluk,
@@ -1144,12 +1158,17 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 house: value.house,
                 financial: value.financial,
             }
+            appBusy.set("Saving....");
             $http.post('/familyData/',{
                 value: data,
                 status: 'feed',
                 func: 'new',
             }).success(function(response) {
-                alert(response.data)
+                // alert(response.data)
+                appBusy.set(response.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
                 if(response.data == 'Family Data Saved Successfully!') {
                     if(status == 'continue') {
                        $scope.FamilyValue.ration_card = '';
@@ -1171,7 +1190,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         }
     }
     $scope.add_new_muhalla = function(data) {
-        console.log('masjid_data',data)
         masjid_data.set_MasjidData(data);
         var modalInstance = $modal.open({
             templateUrl: 'add_new_muhalla_modal',
@@ -1191,7 +1209,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             address : '',
         }
         $scope.addMasjid = function(masjid_val,status) {
-            console.log('masjid',data,masjid_val)
+            appBusy.set("Creating....");
             $http.post('/add_masjid/',{
                 district: data.district,
                 taluk: data.taluk,
@@ -1201,8 +1219,11 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 address: masjid_val.address,
                 status: 'new',
             }).success(function(response) {
-                console.log('val',response)
-                alert(response.data)
+                appBusy.set(response.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
+                // alert(response.data)
                 if(response.data == 'Mohalla Created Successfully!') {
                     if(status == 'continue') {
                        $scope.MasjidValue.masjid_name = '';
@@ -1218,10 +1239,9 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             })
         }
         $scope.add_member = function(member_name,age,designation,mobile,address,status) {
-            console.log('member_name',member_name,data)
             if(mobile == undefined) { var mobile_no = ''} else {var mobile_no = mobile}
-            if(address == undefined) { var address_val = ''} else {var address_val = address}    
-            console.log('member_name',mobile_no,address_val)
+            if(address == undefined) { var address_val = ''} else {var address_val = address}  
+            appBusy.set("Adding....");  
             $http.post('/masjid_member/',{
                 member_name: member_name,
                 data: data,
@@ -1231,25 +1251,30 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 address: address_val,
                 status: 'new',
             }).success(function(response) {
-                alert(response.data)
+                // alert(response.data)
+                appBusy.set(response.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
                 if(status == 'continue') {
                    $scope.member_name = '';
                    $scope.age = '';
                    $scope.designation = '';
                    $scope.mobile = '';
                    $scope.address = '';
+                   $scope.email = '';
+                   $scope.whatsapp = false;
+                   $scope.coordinator = false;
                 }
                 else if(status == 'exit') {
                     $modalInstance.dismiss('cancel');
                     window.location.reload();
                 }
-                console.log('response',response)
             })
         }
     }
 
     $scope.add_members = function(data) {
-        console.log('masjid_data',data)
         masjid_data.set_MasjidData(data);
         var modalInstance = $modal.open({
             templateUrl: 'add_members_modal',
@@ -1264,11 +1289,10 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         };
         var data = masjid_data.get_MasjidData();
         $scope.add_member = function(member_name,coordinator,age,designation,mobile,email,whatsapp,address,status) {
-            console.log('member_name',member_name,data)
             if(mobile == undefined) { var mobile_no = ''} else {var mobile_no = mobile}
             if(address == undefined) { var address_val = ''} else {var address_val = address}
             if(email == undefined) { var email_val = ''} else {var email_val = email}    
-            console.log('member_name',mobile_no,address_val)
+            appBusy.set("Adding....");
             $http.post('/masjid_member/',{
                 member_name: member_name,
                 data: data,
@@ -1281,7 +1305,11 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 address: address_val,
                 status: 'new',
             }).success(function(response) {
-                alert(response.data)
+                // alert(response.data)
+                appBusy.set(response.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
                 if(status == 'continue') {
                    $scope.member_name = '';
                    $scope.age = '';
@@ -1293,13 +1321,11 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                     $modalInstance.dismiss('cancel');
                     // window.location.reload();
                 }
-                console.log('response',response)
             })
         }
     }
 
     $scope.Familymembersupdate = function(data) {
-        console.log('masjid_data',data)
         masjid_data.set_MasjidData(data);
         var modalInstance = $modal.open({
             templateUrl: 'add_Familymembers_modal',
@@ -1315,7 +1341,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         $scope.Mem_ID = masjid_data.get_MasjidData();
         $scope.get_user_detail = function(member_id) {
             $http.get('/family_member/?member_id='+member_id,{}).success(function(data){
-            console.log(data,'member_id')
             $scope.popup_mem_name = data.name;
             })
         }
@@ -1353,7 +1378,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         $scope.GetMemData()
         $scope.getScheme = function() {
             $http.get('/getSchemeData/?mem_id='+$scope.Mem_ID,{}).success(function(data) {
-                console.log('datascheme',data)
                 $scope.scheme_list = _.keys(data.data)
                 $scope.getSubScheme = data.data;
             })
@@ -1362,7 +1386,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $http.get('/getServiceData/?mem_id='+$scope.Mem_ID,{}).success(function(data) {
                 $scope.service_list = _.keys(data.data,"service")
                 $scope.getServices = data.data;
-                console.log('datascheme',$scope.getServices)
             })
         }
         // ['Boys For Makthab 4-15','Girls For Makthab 4-15','Adult Makthab','Interest in Aalim/Hifz','Interest in Niswan','Interest in 1yr Muallim']
@@ -1378,14 +1401,13 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                     return ['Interest in Aalim/Hifz','Adult Makthab','Interest in 1yr Muallim']
                 }
                 // else if($scope.MemberUpdate.gender == 'FEMALE' && parseInt($scope.MemberUpdate.age)>15) {
-                //     console.log('yes',$scope.MemberUpdate)
                 //     return ['Interest in Aalim/Hifz','Adult Makthab','Interest in 1yr Muallim']
                 // }
             }
         }
         // $scope.makthabData()
         $scope.update_member = function(data,status) {
-            console.log('member_name',status,data,$scope.Mem_ID)
+            appBusy.set("Updating....");
             $http.post('/UpdateFamily_member/',{
                 // member_name: member_name,
                 data: data,
@@ -1395,12 +1417,14 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 // mobile: mobile,
                 // address: address,
             }).success(function(response) {
-                console.log('response',status)
                 // alert(response)
                 if(response == '"success"') {
-                    console.log('success',status)
                     if(status == 'continue') {
-                        alert('Updated successfully!')
+                        // alert('Updated successfully!')
+                        appBusy.set('Updated successfully!');              
+                            $timeout( function() {              
+                                appBusy.set(false);
+                            }, 1000);
                        //  $scope.member_name = '';
                        // $scope.age = '';
                        // $scope.designation = '';
@@ -1413,11 +1437,9 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                     }
                 }
                 else if (response == '"notfound"') { $modalInstance.dismiss('cancel');};
-                console.log('response',response)
             })
         }
         $scope.get_total_cost = function(value) {
-            console.log('value',value)
             if (value.operation_cost != '') { var a = parseInt(value.operation_cost)} else { var a = 0}
             if (value.cash_hand != '') { var b = parseInt(value.cash_hand)} else { var b = 0}
             $scope.SurgeryValue.cash_needed = a-b
@@ -1482,17 +1504,14 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             // $scope.get_memberScheme()
         }
         $scope.getDisease = function(sym_type) {
-            console.log('sym_type',sym_type)
             $http.get('/DiseaseData/?type='+sym_type,{}).success(function(data) {
                 $scope.disease_list = _.pluck(data.response,"name")
                 $scope.disease_dict = data.response;
                 $scope.getDiseaseData = data.response;
-                console.log($scope.getDiseaseData)
             })
         }
         $scope.MemschemeList = []
         $scope.getMemberScheme = function(scheme_value,scheme_id,Mem_ID) {
-            console.log('MemschemeList',scheme_value,scheme_id,Mem_ID)
             var schemeList = _.find($scope.MemschemeList,function(num) { return num.scheme_id==scheme_id})
             if(schemeList !== undefined) {
                 $scope.MemschemeList.splice(schemeList,1)
@@ -1501,7 +1520,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         }
         $scope.MemserviceList = []
         $scope.getMemberService = function(service_value,service_id,Mem_ID) {
-            console.log('MemserviceList',service_value,service_id,Mem_ID)
             var serviceList = _.find($scope.MemserviceList,function(num) { return num.service_id == service_id; })
             if(serviceList !== undefined) {
                 $scope.MemserviceList.splice(serviceList,1)
@@ -1509,15 +1527,13 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.MemserviceList.push({'service_value':service_value,'service_id':service_id,'Mem_ID':Mem_ID})
         }
         $scope.disease_value = function(disease_id_list) {
-            console.log('val',$scope.disease_id_list)
             // for (var i in disease_id_list) {
             //     $scope.disease_id_list.push(disease_id_list[i].disease_id)
             // }
             $scope.disease_id_list = disease_id_list
-            console.log('value',disease_id_list,$scope.disease_id_list)
         }
         $scope.update_memberScheme = function (getSubScheme,getServices,DiseaseValue,disease_id_list,SurgeryValue,ChronicValue,status) {
-            console.log('mem_id',disease_id_list,DiseaseValue,SurgeryValue,ChronicValue,status)
+            appBusy.set("Updating....");
             $http.post('/updateMemScheme/',{
                 schemeData: getSubScheme,
                 disease_val: DiseaseValue,
@@ -1527,11 +1543,11 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 Servicedata: getServices,
                 mem_id: $scope.Mem_ID,
             }).success(function(data){
-                // if(data.response == 'Please Select Disease First!') {
-                //     alert(data.response)
-                // }
-                // else {
-                alert(data.response)
+                // alert(data.response)
+                appBusy.set(data.response);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
                 if(status == 'exit') {
                     $modalInstance.dismiss('cancel');
                 }
@@ -1543,15 +1559,11 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             })
         }
         $scope.get_memberScheme = function() {
-            console.log('workinng')
             $http.get('/updateMemScheme/?mem_id='+$scope.Mem_ID,{}).success(function(data){
-                console.log('data',data.medical,data.chronic)
                 if(data.medical.length!=0) {
-                    console.log('value',data.medical.length,data.medical)
                     $scope.DiseaseValue.sym_type = data.medical[0].sym_type;
                     // $scope.disease_val = data.medical[0].disease;
                     $scope.disease_id_list = data.medical;
-                    console.log($scope.disease_id_list,'final')
                     $scope.get_disease(data.medical[0].disease)
                     $scope.DiseaseValue.medicine = data.medical[0].medicine_needs;
                     $scope.DiseaseValue.cost = data.medical[0].cost;
@@ -1589,7 +1601,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
     $scope.family_val = '';
     $scope.get_family = function(family) {
         if(!family) {
-            console.log(family,'family')
             $scope.family_val = 'Type or Select Family ID from the List';
             $scope.FamilyValue.familyid='';
             $scope.FamilyValue.ration_card = '';
@@ -1617,7 +1628,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.FamilyValue.ration_card = family.ration_card;
             $scope.FamilyValue.mobile_no = family.mobile;
             $scope.FamilyValue.report_date = new Date(family.date);
-            console.log('data',$scope.FamilyValue.report_date)
             $scope.FamilyValue.address = family.address;
             $scope.FamilyValue.house = family.house_type;
             $scope.FamilyValue.house_type = family.house_cat;
@@ -1656,14 +1666,15 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         financial: '',
     }
     $scope.addFamily = function(family,value,status) {
-        console.log('family',family,'value',value)
         if(status == 'new') {
             var familyid = '';
             var masjid = value.masjid.name;
+            var status_show = 'Adding...'
         }
         else if(status == 'update') {
             var familyid = family;
             var masjid = value.masjid;
+            var status_show = 'Updating...'
         }
         var data = {
             mobile_no: value.mobile_no,
@@ -1691,12 +1702,17 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         // else {
         //     var masjid_val = data.masjid_name
         // }
+        appBusy.set(status_show);
         $http.post('/familyData/',{
             value: data,
             status: 'feed',
             func: status,
         }).success(function(data) {
-            alert(data.data)
+            // alert(data.data)
+            appBusy.set(data.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
             if (data.family) {
                 $scope.get_family(data.family)
             }
@@ -1707,19 +1723,22 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         })
     }
     $scope.deleteFamily = function(familyid) {
-        console.log('familyid',familyid)
+        appBusy.set("Deleting....");
         $http.post('/familyData/',{
             familyid: familyid,
             status: 'delete',
         }).success(function(data) {
-            alert(data.data)
+            // alert(data.data)
+            appBusy.set(data.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
             $scope.get_family()
             $scope.getFamilyinfo();
             $scope.FamilyMembersList = false
         })
     }
     $scope.getFamilyinfo = function() {
-        console.log('get',$scope.FamilyValue)
         // $http.get('/add_masjid/').success(function(data){
         //     $scope.mahallaList = data.data;
         //     $scope.masjidList = _.pluck(data.data,"name")
@@ -1738,14 +1757,11 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         //         $scope.MasjidAddValue.taluk = $scope.getMasjidListData[0].taluk;
         //         $scope.MasjidAddValue.address = $scope.getMasjidListData[0].location;
         //         $scope.getMasjidMember($scope.MasjidAddValue);
-        //         console.log('data',$scope.getMasjidListData)
         //     }
         // })
         $http.get('/familyData/', {}).success(function(data) {
-            console.log('varerror',data)
             $scope.familyList = _.filter(data.data,function(data) { return data.taluk == $scope.FamilyValue.taluk && data.district_name == $scope.FamilyValue.district && data.muhalla == $scope.FamilyValue.masjid.name });
             
-            console.log('val',$scope.familyList)
         })
     }
     $scope.get_age_or_dob = function(FamilyMember,FamilyValue,status) {
@@ -1784,14 +1800,12 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
     $scope.fam_mem_location = ['Local','Outstation','Foreign']
     $scope.FamilyMember.location = $scope.fam_mem_location[0]
     $scope.add_Familymembers = function(data,family,status) {
-        console.log('data',data,typeof(family),typeof(family.familyid))
         if(typeof(family.familyid) == 'object') {
             var family_id = family.familyid.family_id;
         }
         else if(typeof(family.familyid) == 'string') {
             var family_id = family.familyid;
         }
-        console.log('data',family_id)
         if(data.dateofbirth) {
             var dob = data.dateofbirth.toUTCString()
             // var user_dob_date = moment(data.dateofbirth);
@@ -1800,6 +1814,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             var dob = $scope.dt.toUTCString()
             // var user_dob_date = moment($scope.dt);
         }
+        appBusy.set(status);
         // var tod_date = moment($scope.dt)
         // var age = moment.duration(tod_date.diff(user_dob_date)).asYears();
         $http.post('/FamilyMemberData/',{
@@ -1809,7 +1824,11 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             status: status,
             familyid: family_id,
         }).success(function(response) {
-            alert(response.data)
+            // alert(response.data)
+            appBusy.set(response.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
             if(response.data=='success') {
                 $scope.FamilyMember.name = '';
                 $scope.FamilyMember.gender = '';
@@ -1824,14 +1843,11 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 $scope.FamilyMember.location = '';
             }
             $scope.getFamilyMembers(family_id)
-            console.log('response',response)
         })
     }
     $scope.getFamilyMembers = function(familyid) {
-        console.log('value',familyid)
         $http.get('/FamilyMemberData/?family_id='+ familyid, {}).success(function(data) {
             $scope.FamilyMembersList = data;
-            console.log(data,'voter')
         })
     }
     $scope.get_booleanval = function(val) {
@@ -1846,6 +1862,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             var dob = $scope.dt.toUTCString()
             // var user_dob_date = moment($scope.dt);
         }
+        appBusy.set(status);
         // var tod_date = moment($scope.dt)
         // var age = moment.duration(tod_date.diff(user_dob_date)).asYears();
         $http.post('/UpdateFamilyMember/',{
@@ -1854,15 +1871,17 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             age: member.age,
             status: status,
         }).success(function(response){
-            alert(response.data)
+            appBusy.set(response.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
+            // alert(response.data)
             $scope.getFamilyMembers(member.family)
         })
     }
 
     $scope.positionUpdated = function(module,session) {
         $scope.course_value = 'Select the Module in the list or Enter New... ';
-        console.log('module',$scope.course_value,module)
-        console.log('val',session)
         if(module == 'with') {
             $scope.course_module = true;
         }
@@ -1886,36 +1905,11 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
 
     $scope.get_unique_module = function(course_type) {
         return  _.without(_.uniq(_.pluck(_.filter($scope.courses, function(num){ return num.course_type == course_type; }), 'module')),"");
-        // var uniqCourse = _.filter($scope.courses, function(num){ return pluck_module.indexOf(num.module) != -1; });
-        // return pluck_module
     }
-
-    // $scope.upload_csv = function(csv_file, to) {
-    //     console.log(csv_file, to)
-    //     var csv_file = csv_file;
-    //     var fileUrl = '/upload_bulk_csv/';
-    //     var send = new FormData();
-    //     send.append('csv_file', csv_file);
-    //     $http.post(fileUrl, send, {
-    //         data: to,
-    //         transformRequest: angular.identity,
-    //         headers: {
-    //             'Content-Type': undefined
-    //         }
-    //     }).success(function(data) {
-    //         console.log('val', data)
-    //         alert(data.data)
-    //     });
-    // }
-
-
     $scope.get_program = function() {
         return _.filter($scope.program,function(num){ return _.uniq(_.pluck($scope.group_data, "program")).indexOf(num.name) != -1; });
     }
-
-
     $scope.getStaffStudentData = function(staff) {
-        console.log('attendance',staff)
         $http.get("/attendance_sheet/?instructor=" + staff.user, {}).success(function(response) {
             var data = response.data;
             var student_program = [];
@@ -1927,15 +1921,12 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         });
     }
     $scope.getStudentData = function(person,program,group) {
-        console.log(person,program,group)
         $http.post('/getStudent_data/',{
             person : person,
             program : program,
             group : group,
         }).success(function(data){
-            console.log('data')
             $scope.student_list = data.data;
-            // console.log($scope.attendanceData)
 
             
             for(var stud in $scope.student_list){
@@ -1943,7 +1934,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 for(var ses in $scope.attendanceData['sessions']){
                    $scope.student_list[stud]['sessions'][$scope.attendanceData['sessions'][ses]] = true;
                 }
-                // console.log()
             }
             $http.get("/add_attendance/?instructor=" + person.user, {}).success(function(response) {
                 
@@ -1960,7 +1950,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             username: name,
             password: password,
         }
-        console.log(data)
         $http({
             method: 'POST',
             url: '/login_page/',
@@ -1969,7 +1958,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         }).success(function(response) {
-            console.log(response)
             if (response.data == 'success') {
                 window.location.href = '/home/'
             }
@@ -1988,7 +1976,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 'Content-Type': 'application/x-www-form-urlencoded'
             }
         }).success(function(data) {
-            console.log(data)
         })
     }
 

@@ -461,7 +461,7 @@
                 <td style="padding-right: 2%;width: 30%; border-radius: 2px; "><input ng-disabled="DisCode[district_val][0]==district_code" type="text" style="display: inline-block;height: 34px;border-radius: 2px;width: 100%;float: left;" ng-model="district_code" class="form-control" placeholder="DISTRICT CODE"></td>
                 <td style="padding-right: 2%; width: 30%; border-radius: 2px;"><ui-select ng-model="taluk" style="display: inline-block;height: 34px;width: 100%;border-radius: 2px;float: left;" on-select="getTal=taluk;get_taluk(getTal)" reset-search-input="false" theme="bootstrap" ng-disabled="district_val=='' || district_val=='SELECT DISTRICT'">
                     <ui-select-match placeholder="{{taluk_val}}">{{taluk_val}}</ui-select-match>
-                    <ui-select-choices refresh="getTal=$select.search;get_taluk(getTal)" repeat="mod in getTaluk[district_val] | filter:$select.search">
+                    <ui-select-choices refresh="getTal=$select.search;get_taluk(getTal)" repeat="mod in getTaluk[district_val] |SortData | filter:$select.search">
                         <div ng-bind-html="mod | highlight: $select.search"></div>
                     </ui-select-choices>
                 </ui-select></td>
@@ -515,10 +515,10 @@
                 <td style="padding-right: 2%;"><select style="display: inline-block;height: 34px;width: 100%;border-radius: 2px;float: left;" ng-model="moh_user.district" ng-options="gen for gen in district_list|SortData" class="form-control">
                     <option value="">SELECT DISTRICT</option>
                 </select></td>
-                <td style="padding-right: 2%;"><select ng-disabled="!moh_user.district" style="display: inline-block;height: 34px;width: 100%;border-radius: 2px;float: left;" ng-change="getMasjidList(moh_user)" ng-model="moh_user.taluk" ng-options="gen for gen in getTaluk[moh_user.district]" class="form-control">
+                <td style="padding-right: 2%;"><select ng-disabled="!moh_user.district" style="display: inline-block;height: 34px;width: 100%;border-radius: 2px;float: left;" ng-change="getMasjidList(moh_user)" ng-model="moh_user.taluk" ng-options="gen for gen in getTaluk[moh_user.district]|SortData" class="form-control">
                     <option value="">SELECT TALUK</option>
                 </select></td>
-                <td style="padding-right: 2%;"><select ng-disabled="!moh_user.taluk" style="display: inline-block;height: 34px;width: 100%;border-radius: 2px;float: left;" ng-change="getMohallaUser(moh_user)" ng-model="moh_user.muhalla" ng-options="gen.name for gen in muhallaList" class="form-control">
+                <td style="padding-right: 2%;"><select ng-disabled="!moh_user.taluk" style="display: inline-block;height: 34px;width: 100%;border-radius: 2px;float: left;" ng-change="getMohallaUser(moh_user)" ng-model="moh_user.muhalla" ng-options="gen.name for gen in muhallaList|SortData" class="form-control">
                     <option value="">SELECT MUHALLAH</option>
                 </select></td>
                 <td><input style="display: inline-block;height: 34px;width: 100%;border-radius: 2px;float: left;" class="form-control" type="text" ng-model="moh_user.muhalla.mohalla_id" valid-number ng-change="clear_error()" placeholder="Muhalla ID" readonly/></td>
@@ -601,12 +601,12 @@
                     <td><select style="display: inline-block;height: 34px;width: 100%;float: left;margin-right: 10%;border-radius: 2px;" ng-model="MasjidAddValue.district" ng-options="gen for gen in district_list |SortData" class="form-control">
                         <option value="">SELECT DISTRICT</option>
                     </select></td>
-                    <td><select style="display: inline-block;height: 34px;width: 100%;margin-right: 10%;float: left;border-radius: 2px;" ng-change="getMasjidList(MasjidAddValue);get_masjid()" ng-model="MasjidAddValue.taluk" ng-options="gen for gen in getTaluk[MasjidAddValue.district]" class="form-control">
+                    <td><select style="display: inline-block;height: 34px;width: 100%;margin-right: 10%;float: left;border-radius: 2px;" ng-change="getMasjidList(MasjidAddValue);get_masjid()" ng-model="MasjidAddValue.taluk" ng-options="gen for gen in getTaluk[MasjidAddValue.district]|SortData" class="form-control">
                         <option value="">SELECT TALUK</option>
                     </select></td>
                     <td ng-show="!muhalla_val && MasjidAddValue.taluk"><ui-select ng-show="!new_masjid" style="display: inline-block;height: 34px;width: 100%;float: left;" on-select="getmasjid=MasjidAddValue.mohalla_id;get_masjid(getmasjid)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="MasjidAddValue.mohalla_id">
                             <ui-select-match placeholder="{{masjid_val}}">{{masjid_val}}</ui-select-match>
-                            <ui-select-choices refresh="getmasjid=$select.search;get_masjid(getmasjid)" repeat="mod in masjidList | filter:$select.search">
+                            <ui-select-choices refresh="getmasjid=$select.search;get_masjid(getmasjid)" repeat="mod in masjidList |SortData | filter:$select.search">
                                 <div ng-bind-html="mod | highlight: $select.search"></div>
                             </ui-select-choices>
                         </ui-select></td>
@@ -697,14 +697,14 @@
              </tr>
              </table>
                 <ui-select style="display: inline-block;height: 34px;width: 23%;border-radius: 2px;margin-right: 1%;float: left;" on-select="getDis=scheme_values.scheme;get_scheme(getDis)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="scheme_values.scheme">
-                    <ui-select-match placeholder="{{scheme_val}}">{{scheme_val}}</ui-select-match>
-                    <ui-select-choices refresh="getDis=$select.search;get_scheme(getDis)" repeat="mod in scheme_list | filter:$select.search">
+                    <ui-select-match placeholder="{{scheme_val| limitTocustom:25}}">{{scheme_val| limitTocustom:25}}</ui-select-match>
+                    <ui-select-choices refresh="getDis=$select.search;get_scheme(getDis)" repeat="mod in scheme_list |SortData | filter:$select.search">
                         <div ng-bind-html="mod | highlight: $select.search"></div>
                     </ui-select-choices>
                 </ui-select>
                 <ui-select ng-model="scheme_values.sub_scheme" style="display: inline-block;height: 34px;width: 25%;margin-right: 1%;float: left;border-radius: 2px;" on-select="getTal=scheme_values.sub_scheme;get_sub_scheme(getTal)" reset-search-input="false" theme="bootstrap" ng-disabled="scheme_val=='' || scheme_val=='SELECT SCHEMES'">
-                    <ui-select-match placeholder="{{sub_scheme_val}}">{{sub_scheme_val}}</ui-select-match>
-                    <ui-select-choices refresh="getTal=$select.search;get_sub_scheme(getTal)" repeat="mod in getSubScheme[scheme_val] | filter:$select.search">
+                    <ui-select-match placeholder="{{sub_scheme_val| limitTocustom:25}}">{{sub_scheme_val| limitTocustom:25}}</ui-select-match>
+                    <ui-select-choices refresh="getTal=$select.search;get_sub_scheme(getTal)" repeat="mod in getSubScheme[scheme_val] |SortData | filter:$select.search">
                         <div ng-bind-html="mod.sub | highlight: $select.search"></div>
                     </ui-select-choices>
                 </ui-select>
@@ -747,6 +747,7 @@
                         <td class="ng-binding">{{sub.sub}}</td>
                         <td class="ng-binding">{{sub.description}}</td>
                         <td><a ng-click="dispUpdate($index)" data-toggle="modal" data-target="#modCategory" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-click="delete($index)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
+                        <td><a ng-click="dispUpdate($index)" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a><a ng-confirm-click="Are you Sure you want to Delete?" confirmed-click="delete_scheme(scheme_val,sub.sub)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
                     </tr>
                 </tbody>
             </table>
@@ -768,7 +769,7 @@
             <tr>
                 <td><ui-select style="display: inline-block;height: 34px;width: 97%;border-radius:2px; float: left;" on-select="get_ser=service_values;get_service(get_ser)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="service_values">
                     <ui-select-match placeholder="{{service_val}}">{{service_val}}</ui-select-match>
-                    <ui-select-choices refresh="get_ser=$select.search;get_service(get_ser)" repeat="mod in service_list | filter:$select.search">
+                    <ui-select-choices refresh="get_ser=$select.search;get_service(get_ser)" repeat="mod in service_list |SortData | filter:$select.search">
                         <div ng-bind-html="mod | highlight: $select.search"></div>
                     </ui-select-choices>
                 </ui-select></td>
@@ -822,7 +823,7 @@
                 </select></td>-->
                 <td><ui-select style="display: inline-block;height: 34px;border-radius: 2px;width: 98%;float: left;" on-select="getDisease=DiseaseVal.name;get_disease(getDisease)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="DiseaseVal.name">
                     <ui-select-match placeholder="{{disease_val}}">{{disease_val}}</ui-select-match>
-                    <ui-select-choices refresh="getDisease=$select.search;get_disease(getDisease)" repeat="mod in disease_list | filter:$select.search">
+                    <ui-select-choices refresh="getDisease=$select.search;get_disease(getDisease)" repeat="mod in disease_list |SortData | filter:$select.search">
                         <div ng-bind-html="mod | highlight: $select.search"></div>
                     </ui-select-choices>
                 </ui-select></td>
@@ -879,17 +880,17 @@
                 <td><label for="male">PDF</label></td>
             </tr>
             <tr>
-                <td><select style="border-radius:2px;display: inline-block;height: 34px;border-radius: 2px; width: 97%;float: left;" ng-model="ReportValues.district" ng-options="gen for gen in district_list_report" class="form-control">
+                <td><select style="border-radius:2px;display: inline-block;height: 34px;border-radius: 2px; width: 97%;float: left;" ng-model="ReportValues.district" ng-options="gen for gen in district_list_report | SortData" class="form-control">
                     <option value="">SELECT DISTRICT</option>
                 </select></td>
-                <td><select ng-disabled="!ReportValues.district" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;border-radius: 2px; float: left;" ng-change="getMasjidList(ReportValues)" ng-model="ReportValues.taluk" ng-options="gen for gen in getTaluk[ReportValues.district]" class="form-control">
+                <td><select ng-disabled="!ReportValues.district" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;border-radius: 2px; float: left;" ng-change="getMasjidList(ReportValues)" ng-model="ReportValues.taluk" ng-options="gen for gen in getTaluk[ReportValues.district] | SortData" class="form-control">
                     <option value="">SELECT TALUK</option>
                 </select></td>
-                <td><select ng-disabled="!ReportValues.taluk" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;float: left;border-radius: 2px;" ng-model="ReportValues.muhalla" ng-options="gen.name for gen in muhallaList" class="form-control">
+                <td><select ng-disabled="!ReportValues.taluk" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;float: left;border-radius: 2px;" ng-model="ReportValues.muhalla" ng-options="gen.name for gen in muhallaList | SortData" class="form-control">
                     <option value="">SELECT MUHALLAH</option>
                 </select></td>
                 <td><input style="display: inline-block;height: 34px;border-radius: 2px; width: 100%;float: left;" class="form-control" type="text" ng-model="ReportValues.muhalla.mohalla_id" valid-number ng-change="clear_error()" placeholder="Muhalla ID" readonly/></td>
-                <td><select style="display: inline-block;height: 34px;width: 98%;border-radius: 2px; float: left;" ng-model="ReportValues.report_name" ng-change="fetchReportAPI(ReportDatas,ReportValues)" ng-options="gen for gen in senses_reports" class="form-control"><option value="">SELECT REPORT</option></select>
+                <td><select style="display: inline-block;height: 34px;width: 98%;border-radius: 2px; float: left;" ng-model="ReportValues.report_name" ng-change="fetchReportAPI(ReportDatas,ReportValues)" ng-options="gen for gen in senses_reports | SortData" class="form-control"><option value="">SELECT REPORT</option></select>
                     </td>
                 <td><a download="{{get_pdfname}}" href="/static/pdf/{{get_pdfname}}" target="_blank"><button ng-disabled="!ReportValues.muhalla || !ReportValues.report_name || !get_pdfname" type="submit" style="display: inline-block;height: 34px;width: 98%;border-radius: 2px; float: left;" class="btn-sm btn btn-primary"><i class="fa fa-cloud-download"></i>&nbsp;Export</button></a>
                     </td>
@@ -1040,7 +1041,7 @@
                             </div>
                         </div>
                         <div class="form-group" style="margin:5px;">
-                            <label class="control-label col-xs-3">WhatsAapp?</label>
+                            <label class="control-label col-xs-3">WhatsApp?</label>
                             <div class="col-xs-9">
                                 <input type="radio" name="whatsapp" ng-model="whatsapp" value="Yes">Yes
                                 <input type="radio" name="whatsapp" ng-model="whatsapp" value="No">No
@@ -1206,15 +1207,15 @@
                 <td ng-show="new_fam_bt"> <label for="male">Select Family ID</label> </td>
             </tr>
             <tr>
-                <td><select style="display: inline-block;border-radius:2px;height: 34px;width: 97%;float: left;" ng-model="FamilyValue.district" ng-options="gen for gen in district_list" class="form-control">
+                <td><select style="display: inline-block;border-radius:2px;height: 34px;width: 97%;float: left;" ng-model="FamilyValue.district" ng-options="gen for gen in district_list|SortData" class="form-control">
                         <option value="">SELECT DISTRICT</option>
                     </select>
                 </td>
-                <td><select ng-change="getMahallaData(FamilyValue);FamilyValue.masjid=''" style="display: inline-block;height: 34px;width: 97%;border-radius:2px;float: left;" ng-model="FamilyValue.taluk" ng-options="gen for gen in getTaluk[FamilyValue.district]" class="form-control">
+                <td><select ng-change="getMahallaData(FamilyValue);FamilyValue.masjid=''" style="display: inline-block;height: 34px;width: 97%;border-radius:2px;float: left;" ng-model="FamilyValue.taluk" ng-options="gen for gen in getTaluk[FamilyValue.district]|SortData" class="form-control">
                         <option value="">SELECT TALUK</option>
                     </select>
                 </td>
-                <td><select ng-change="getFamilyinfo();" style="display: inline-block;border-radius:2px;height: 34px;width: 100%;float: left;" ng-model="FamilyValue.masjid" ng-options="gen.name for gen in muhallaData" class="form-control">
+                <td><select ng-change="getFamilyinfo();" style="display: inline-block;border-radius:2px;height: 34px;width: 100%;float: left;" ng-model="FamilyValue.masjid" ng-options="gen.name for gen in muhallaData|SortData" class="form-control">
                         <option value="">SELECT MUHALLA </option>
                     </select>
                 </td>
@@ -1226,7 +1227,7 @@
                 <td ng-show="new_fam_bt" >
                     <ui-select ng-disabled="!FamilyValue.masjid" style="display: inline-block;height: 34px;width: 65%;float: left;" on-select="familyid=FamilyValue.familyid;get_family(familyid)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="FamilyValue.familyid">
                         <ui-select-match placeholder="{{family_val}}">{{family_val}}</ui-select-match>
-                        <ui-select-choices refresh="familyid=$select.search;get_family(familyid)" repeat="mod in familyList | filter:$select.search">
+                        <ui-select-choices refresh="familyid=$select.search;get_family(familyid)" repeat="mod in familyList |SortData | filter:$select.search">
                             <div ng-bind-html="mod.family_id | highlight: $select.search"></div>
                         </ui-select-choices>
                     </ui-select>

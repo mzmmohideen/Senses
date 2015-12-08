@@ -7,7 +7,7 @@ from django.views.decorators.csrf import *
 from django.http import HttpResponseRedirect
 import json,csv
 import xlrd
-import os, sys
+import os, sys, operator
 import pdfkit,pdfcrowd
 import collections
 from django.template.loader import render_to_string
@@ -275,7 +275,8 @@ def familyData(request):
             insurance = True if data['health_insurance'] == 'Yes' else False
             if json.loads(request.body)['func'] == 'new':
                 get_fam_id = len(Family.objects.filter(muhalla=masjid))
-                familyid = '%s / %s' %(masjid.mohalla_id,get_fam_id+1)
+                fam_id_val = '%02d'%(get_fam_id+1)
+                familyid = '%s / %s' %(masjid.mohalla_id,fam_id_val)
                 if Family.objects.filter(family_id=familyid):
                     return HttpResponse(content=json.dumps({'data':'Family Number Exist!'}),content_type='Application/json')
                 else:
@@ -1220,3 +1221,9 @@ def fetch_data_api(request):
         except:
             print 'report',repr(format_exc())                               
     return HttpResponse(data,content_type='Application/json')
+
+def sortReportData(request):
+    # json.loads(request.body)['sort_val']
+    sort_data = sorted(json.loads(request.body)['data'],key=itemgetter('familyid'),reverse=True)
+    print 'sort_data',sort_data
+    return HttpResponse(json.dumps({'sort_data':sort_data}),content_type='Application/json')
