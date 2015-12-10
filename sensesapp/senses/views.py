@@ -130,7 +130,6 @@ def addLocation(request):
 def SchemeData(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        print 'data',data
         try:
             if Scheme.objects.filter(scheme_type=data['scheme']):
                 scheme = Scheme.objects.get(scheme_type=data['scheme'])
@@ -139,8 +138,11 @@ def SchemeData(request):
             if SubScheme.objects.filter(scheme=scheme,name=data['sub']):
                 return HttpResponse(content=json.dumps({'data':'Given SubScheme Exist under this Scheme!'}), content_type='Application/json')
             elif SubScheme.objects.filter(subscheme_id=data['scheme_id']):
-                sub_scheme = SubScheme.objects.filter(subscheme_id=data['scheme_id']).update(scheme=scheme,name=data['sub'],description=data['description'])
-                return HttpResponse(content=json.dumps({'data':'Updated'}), content_type='Application/json')
+                if SubScheme.objects.filter(scheme=scheme,name=data['sub']):
+                    return HttpResponse(content=json.dumps({'data':'SubScheme Exist!'}), content_type='Application/json')
+                else:
+                    sub_scheme = SubScheme.objects.filter(subscheme_id=data['scheme_id']).update(scheme=scheme,name=data['sub'],description=data['description'])
+                    return HttpResponse(content=json.dumps({'data':'Updated'}), content_type='Application/json')
             else:
                 subScheme = SubScheme.objects.create(scheme=scheme,subscheme_id=data['scheme_id'],name=data['sub'],description=data['description'])
                 return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
@@ -149,10 +151,15 @@ def SchemeData(request):
             sub_scheme = SubScheme.objects.create(scheme=scheme,name=data['sub'],description=data['description'],subscheme_id=data['scheme_id'])
         return HttpResponse(content=json.dumps({'data':'success'}), content_type='Application/json')
     else:
-        data = defaultdict(list)
-        for i in SubScheme.objects.all():
-            data[i.scheme.scheme_type].append({'sub':i.name,'scheme_id':i.subscheme_id,'description':i.description})
-        return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
+        try:
+            data = request.GET['del_schem']
+            service = SubScheme.objects.filter(name=data).delete()
+            return HttpResponse(content=json.dumps({'data':'Deleted Successfully!'}),content_type='Application/json')
+        except:
+            data = defaultdict(list)
+            for i in SubScheme.objects.all():
+                data[i.scheme.scheme_type].append({'sub':i.name,'scheme_id':i.subscheme_id,'description':i.description})
+            return HttpResponse(content=json.dumps({'data':data}), content_type='Application/json')
 
 def getSchemeData(request):
     data = defaultdict(list)
@@ -275,7 +282,7 @@ def familyData(request):
             insurance = True if data['health_insurance'] == 'Yes' else False
             if json.loads(request.body)['func'] == 'new':
                 get_fam_id = len(Family.objects.filter(muhalla=masjid))
-                fam_id_val = '%02d'%(get_fam_id+1)
+                fam_id_val = '%03d'%(get_fam_id+1)
                 familyid = '%s / %s' %(masjid.mohalla_id,fam_id_val)
                 if Family.objects.filter(family_id=familyid):
                     return HttpResponse(content=json.dumps({'data':'Family Number Exist!'}),content_type='Application/json')
@@ -315,7 +322,8 @@ def familyData(request):
             family = Family.objects.filter(family_id=data['familyid']).delete()
             return HttpResponse(content=json.dumps({'data':'Family Data Deleted Successfully!'}),content_type='Application/json')
     else:
-        family = map(lambda x:{'family_id':x.family_id,'date':convert_to_IST(x.report_date).strftime('%Y-%m-%d'),'muhalla':x.muhalla.name,'language':x.language,'taluk':x.muhalla.taluk.taluk_name,'district_name':x.muhalla.taluk.district.district_name,'ration_card':x.ration_card,'address':x.address,'mobile':x.mobile,'house_type':x.house_type,'house_cat':x.house_cat,'donor':x.donor,'volunteer':x.volunteer,'health_insurance':x.health_insurance,'family_needs':x.family_needs,'toilet':x.toilet,'financial_status':x.financial_status},Family.objects.all())
+        get_mohalla_id = Masjid.objects.get(mohalla_id=request.GET['muhalla_id'])
+        family = sorted(map(lambda x:{'family_id':x.family_id,'date':convert_to_IST(x.report_date).strftime('%Y-%m-%d'),'muhalla':x.muhalla.name,'language':x.language,'taluk':x.muhalla.taluk.taluk_name,'district_name':x.muhalla.taluk.district.district_name,'ration_card':x.ration_card,'address':x.address,'mobile':x.mobile,'house_type':x.house_type,'house_cat':x.house_cat,'donor':x.donor,'volunteer':x.volunteer,'health_insurance':x.health_insurance,'family_needs':x.family_needs,'toilet':x.toilet,'financial_status':x.financial_status},Family.objects.filter(muhalla=get_mohalla_id)),key=itemgetter('family_id'))
         return HttpResponse(content=json.dumps({'data':family}),content_type='Application/json')
 
 def fetchReportData(request):
@@ -677,7 +685,11 @@ def ServiceData(request):
     if request.method == 'POST':
         data = json.loads(request.body)['data']
         if Service.objects.filter(service_id=data['service_id']):
-            return HttpResponse(content=json.dumps({'data':'Service ID Exist!'}),content_type='Application/json')
+            if Service.objects.filter(name=data['service']):
+                return HttpResponse(content=json.dumps({'data':'Disease Name Exist!'}),content_type='Application/json')
+            else:
+                service = Service.objects.filter(service_id=data['service_id']).update(name=data['service'])
+                return HttpResponse(content=json.dumps({'data':'Service Name Updated!'}),content_type='Application/json')
         elif Service.objects.filter(name=data['service']):
             service = Service.objects.filter(name=data['service']).update(description=data['description'])
             return HttpResponse(content=json.dumps({'data':'Description Updated!'}),content_type='Application/json')
@@ -887,8 +899,13 @@ def updateMemScheme(request):
 def DiseaseData(request):
     if request.method == 'POST':
         data = json.loads(request.body)
-        if Disease.objects.filter(disease_name=data['disease_id']):
-            return HttpResponse(content=json.dumps({'response':'Disease ID Exist!'}),content_type='Application/json')
+        if Disease.objects.filter(disease_id=data['disease_id']):
+            if Disease.objects.filter(disease_name=data['disease']):
+                disease = Disease.objects.filter(disease_name=data['disease']).update(description=data['description'])
+                return HttpResponse(content=json.dumps({'response':'Description Updated!'}),content_type='Application/json')
+            else:
+                disease = Disease.objects.filter(disease_id=data['disease_id']).update(description=data['description'],disease_name=data['disease'])
+                return HttpResponse(content=json.dumps({'response':'Disease Name Updated!'}),content_type='Application/json')
         elif Disease.objects.filter(disease_name=data['disease']):
             disease = Disease.objects.filter(disease_name=data['disease']).update(description=data['description'],disease_id=data['disease_id'])
             return HttpResponse(content=json.dumps({'response':'Description updated!'}),content_type='Application/json')

@@ -1061,6 +1061,60 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.getService()
         })
     }
+    $scope.Updatesubscheme = function(scheme,data) {
+        appBusy.set("Adding....");
+        $http.post('/SchemeData/',{
+            scheme: scheme,
+            sub: data.sub,
+            scheme_id: data.scheme_id,
+            description: '',
+        }).success(function(data) {
+            // alert(data.data)
+            appBusy.set(data.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
+            $scope.get_scheme(scheme)
+            $scope.get_sub_scheme()
+            $scope.scheme_values.scheme_id = ''
+        })
+    }
+    $scope.Updateservicedata = function(ser_data) {
+        var data = {
+            service : ser_data.service,
+            service_id : ser_data.service_id,
+            description : '',
+        }
+        appBusy.set("Updating....");
+        $http.post('/ServiceData/',{
+            data: data,
+        }).success(function(data){
+            // alert(data.data)
+            appBusy.set(data.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
+            $scope.getService()
+        })
+    }
+    $scope.Updatediseasedata = function(dis_data,val) {
+        var symptom_type = "DISEASE";
+        appBusy.set("Updating....");
+        $http.post('/DiseaseData/',{
+            sym_type: symptom_type,
+            description: dis_data.description,
+            disease_id: dis_data.disease_id,
+            disease: dis_data.name, 
+        }).success(function(data){
+            appBusy.set(data.response);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
+            // alert(data.response)
+            console.log('val',symptom_type)
+            $scope.getDisease(symptom_type)
+        })
+    }
     $scope.delete_scheme = function(scheme,sub) {
         appBusy.set("Deleting....");
         $http.get('/SchemeData/?del_schem='+sub,{}).success(function(response){
@@ -1759,8 +1813,10 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         //         $scope.getMasjidMember($scope.MasjidAddValue);
         //     }
         // })
-        $http.get('/familyData/', {}).success(function(data) {
-            $scope.familyList = _.filter(data.data,function(data) { return data.taluk == $scope.FamilyValue.taluk && data.district_name == $scope.FamilyValue.district && data.muhalla == $scope.FamilyValue.masjid.name });
+        $http.get('/familyData/?muhalla_id='+$scope.FamilyValue.masjid.mohalla_id, {}).success(function(data) {
+            console.log('Family Value',data)
+            $scope.familyList = data.data;
+            // $scope.familyList = _.filter(data.data,function(data) { return data.taluk == $scope.FamilyValue.taluk && data.district_name == $scope.FamilyValue.district && data.muhalla == $scope.FamilyValue.masjid.name });
             
         })
     }
@@ -1862,6 +1918,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             var dob = $scope.dt.toUTCString()
             // var user_dob_date = moment($scope.dt);
         }
+        console.log('status',status)
         appBusy.set(status);
         // var tod_date = moment($scope.dt)
         // var age = moment.duration(tod_date.diff(user_dob_date)).asYears();
