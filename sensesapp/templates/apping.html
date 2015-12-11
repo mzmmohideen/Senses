@@ -1305,23 +1305,23 @@
                                             <a data-toggle="collapse" style="text-decoration:none;" data-parent="#accordion"  aria-expanded="true" aria-controls="collapseOne">{{header}}</a>
                                         </h4>
                             </accordion-heading>
-                            <div class="form-group" ng-repeat="key in getSubScheme[header]">
-                                <table style="width: 100%;border: 1px solid #ccc;text-align:center;">
-                                <tr>
-                                <td class="ng-binding" style="border: 1px solid #ccc;text-align:center;">{{key.sub}}</td>
-                                <td class="ng-binding" style="border: 1px solid #ccc;text-align:center;"><input type="radio" ng-model="key.status" value="Yes">Yes</td>
-                                <td class="ng-binding" style="border: 1px solid #ccc;text-align:center;"><input type="radio" ng-model="key.status" value="No">No</td>
-                                <td class="ng-binding" style="border: 1px solid #ccc;text-align:center;"><select ng-show="key.status" ng-model="key.solution" ng-options="val for val in ['Solved','Not Yet']" style="width:20%">
+                            <!--<div class="form-group">-->
+                            <table class="table table-bordered">
+                                <tr ng-repeat="key in getSubScheme[header]">
+                                <td>{{key.sub}}</td>
+                                <td><input type="radio" ng-model="key.status" value="Yes">Yes</td>
+                                <td><input type="radio" ng-model="key.status" value="No">No</td>
+                                <td><select ng-show="key.status" ng-model="key.solution" ng-options="val for val in ['Solved','Not Yet']" style="width:100%">
                                     <option value="">SELECT SOLUTION</option>
                                 </select></td>
                                 </tr>
-                                </table>
+                            </table>
                                 <!--<span ng-repeat="a in ['Yes','No']">
                                     <input type="radio" name="{{key.scheme_id}}" ng-change="getMemberScheme(scheme_value,key.scheme_id,Mem_ID)" ng-model="scheme_value" value="{{a}}">{{a}}
                                      {{key.scheme_id}}<input type="radio" name="key.scheme_id" ng-model="key.scheme_id" value="Yes">Yes
                                     <input type="radio" name="key.scheme_id" ng-model="key.scheme_id" value="No">No
                                 </span>-->
-                            </div>
+                            <!--</div>-->
                     </accordion-group>
                     <accordion-group>
                           <div style="background-color:#F5F5F5 !important;">
@@ -1331,14 +1331,25 @@
                                 </h4>
                             </accordion-heading>
                           </div>
-                          <div class="form-group" ng-repeat="(key,val) in getServices">
+                          <table class="table table-bordered">
+                                <tr ng-repeat="(key,val) in getServices">
+                                    <td>{{key}}</td>
+                                    <td><input type="radio" ng-model="val[0].status" value="Yes">Yes</td>
+                                    <td><input type="radio" ng-model="val[0].status" value="No">No</td>
+                                    <td><select ng-show="val[0].status" ng-model="val[0].solution" ng-options="val for val in ['Solved','Not Yet']" style="width:20%">
+                                            <option value="">SELECT SOLUTION</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </table>            
+                          <!--<div class="form-group" ng-repeat="(key,val) in getServices">
                                 <label class="control-label col-xs-6">{{key}}</label>
                                 <input type="radio" ng-model="val[0].status" value="Yes">Yes
                                 <input type="radio" ng-model="val[0].status" value="No">No
                                 <select ng-show="val[0].status" ng-model="val[0].solution" ng-options="val for val in ['Solved','Not Yet']" style="width:20%">
                                     <option value="">SELECT SOLUTION</option>
                                 </select>
-                          </div>
+                          </div>-->
                     </accordion-group>
                     <accordion-group>
                           <div style="background-color:#F5F5F5 !important;">

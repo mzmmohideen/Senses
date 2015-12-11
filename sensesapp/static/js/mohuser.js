@@ -155,12 +155,24 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             console.log('name',$scope.muhalla_name)
         })
     } 
-    $scope.header_sort = function(val,header,data) {
-        console.log('val',header,data,val)
+    $scope.sort_type = true;
+    $scope.header_sort = function(val,header,data,report) {
+        if($scope.sort_type == true) {
+            $scope.sort_type = false;
+        }
+        else if($scope.sort_type = false) {
+            $scope.sort_type = true;
+        }
+        else {
+            $scope.sort_type = true;
+        }
+        console.log('val',report)
         appBusy.set("Loading....");
         $http.post('/sortReportData/',{
             data : data,
             sort_val : val,
+            sort_type : $scope.sort_type,
+            report_type : report.report_name,
         }).success(function(response) {
             console.log('data response',response.sort_data)
             appBusy.set('Done...');              
