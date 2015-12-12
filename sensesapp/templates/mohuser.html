@@ -747,7 +747,7 @@
                         <td>{{key.familyid}} <br/> {{key.mobile}} </td>
                         <td>{{key.financial_status.split(' ')[0]}} <br/> {{get_jakaath_status(key.financial_status.split(' ')[0])}} </td>
                     </tr>
-                    <tr ng-show="ReportValues.report_name == 'Families Eligible for Jakaath' || report_name == 'Government Voter ID Needers' || ReportValues.report_name == 'Families without toilets' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
+                    <tr ng-show="ReportValues.report_name == 'Families Eligible for Jakaath' || ReportValues.report_name == 'Government Voter ID Needers' || ReportValues.report_name == 'Families without toilets' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td>{{key.family_head}}</td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>
@@ -763,7 +763,7 @@
                         <td>{{key.mobile}} </td>
                         <td> Help for Basic Needs(Food,Dress,Place) </td>
                     </tr>
-                    <tr ng-show="ReportValues.report_name == 'Medical Needs and Guidance Needers Details' || report_name == 'Government Schemes and Guidance Needers Details' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
+                    <tr ng-show="ReportValues.report_name == 'Medical Needs and Guidance Needers Details' || ReportValues.report_name == 'Government Schemes and Guidance Needers Details' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}}</td>
                         <td>{{key.name}} <br/> {{key.address}}</td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>

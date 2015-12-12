@@ -814,6 +814,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 else {
                     var finacial_value = '';
                 }
+                console.log('reports',$scope.getReportData)
                 $http.post('/report_to_pdf/',{
                     header : $scope.ReportHeader,
                     data : pdf_data,
