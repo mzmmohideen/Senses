@@ -322,6 +322,7 @@ def familyData(request):
             family = Family.objects.filter(family_id=data['familyid']).delete()
             return HttpResponse(content=json.dumps({'data':'Family Data Deleted Successfully!'}),content_type='Application/json')
     else:
+        print 'mohalla',request.GET['muhalla_id']
         get_mohalla_id = Masjid.objects.get(mohalla_id=request.GET['muhalla_id'])
         family = sorted(map(lambda x:{'family_id':x.family_id,'date':convert_to_IST(x.report_date).strftime('%Y-%m-%d'),'muhalla':x.muhalla.name,'language':x.language,'taluk':x.muhalla.taluk.taluk_name,'district_name':x.muhalla.taluk.district.district_name,'ration_card':x.ration_card,'address':x.address,'mobile':x.mobile,'house_type':x.house_type,'house_cat':x.house_cat,'donor':x.donor,'volunteer':x.volunteer,'health_insurance':x.health_insurance,'family_needs':x.family_needs,'toilet':x.toilet,'financial_status':x.financial_status},Family.objects.filter(muhalla=get_mohalla_id)),key=itemgetter('family_id'))
         return HttpResponse(content=json.dumps({'data':family}),content_type='Application/json')
@@ -329,7 +330,24 @@ def familyData(request):
 def fetchReportData(request):
     if request.method == 'POST':
         data = json.loads(request.body)['data']
-        print 'data',data
+        sort_val = json.loads(request.body)['sort_val']
+        if sort_val == 'familyid':
+            sort_key = 'familyid'
+        elif 'Family ID' in sort_val:
+            sort_key = 'familyid'
+        elif 'Name' in sort_val:
+            if data['report_type'] == 'Medical Needs and Guidance Needers Details' or data['report_type'] == 'Help for Poor Peoples and Guidance Needers List' or data['report_type'] == 'Government Schemes and Guidance Needers Details' or data['report_type'] == 'Educational Help and Guidance Needers List' or data['report_type'] == 'Help for Discontinued and Guidance Needers List' or data['report_type'] == 'Training/Employment Help and Guidance Needers List' or data['report_type'] == 'Needs Types':
+                sort_key = 'name'
+            else:
+                sort_key = 'family_head'
+        elif 'Age' in sort_val:
+            sort_key = 'age'
+        elif 'Financial Status' in sort_val:
+            sort_key = 'financial_status'
+        else:
+            sort_key = 'familyid'
+        print 'data_date',sort_key,sort_val    
+        sort_reverse = False if json.loads(request.body)['sort_type'] == True else True
         get_mem_medical = []
         get_mem_scheme = []
         get_mem_service = []
@@ -370,7 +388,7 @@ def fetchReportData(request):
                 for m in Member_service.objects.filter(member=i):
                     get_mem_service.append({'name':m.member.name,'qualification':m.member.qualification,'status':m.status,'solution':m.solution,'address':m.member.family.address,'age':m.member.age,'gender':m.member.gender,'financial':m.member.family.financial_status,'familyid':m.member.family.family_id,'mobile':m.member.family.mobile,'needs':m.scheme.name,'needer':'Need Other/NGO Guidance'})    
             member_details = get_mem_medical + get_mem_scheme + get_mem_service
-            get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.all())
+            get_memData = sorted(map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.all()),key=itemgetter(sort_key),reverse=sort_reverse)
             return HttpResponse(content=json.dumps({'member_details':member_details,'get_mem_service':get_mem_service,'get_mem_medical':get_mem_medical,'get_mem_scheme':get_mem_scheme,'get_memData':get_memData}),content_type='Application/json')
         elif data['report_type'] == 'Total Family Details' or data['report_type'] == 'Own House & Rent House families' or data['report_type'] == 'Basic Help Needers List' or data['report_type'] == 'Families Eligible for Jakaath' or data['report_type'] == 'Families without toilets' :
             try:
@@ -411,7 +429,7 @@ def fetchReportData(request):
                 except:
                     family_value = Family.objects.filter(muhalla=muhalla)   
                     finacial_value = 'ALL'            
-            get_family = sorted(map(lambda x:{'familyid':x.family_id,'house_type':x.house_type,'address':x.address,'mobile':x.mobile,'family_head':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].name if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'family_head_occ':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].occupation if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'age':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].age if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'gender':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].gender if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'fam_member':Member.objects.filter(family=Family.objects.get(family_id=x.family_id)).count(),'financial_pdf':x.financial_status.split(' ')[0],'jakath_family': 'Yes' if x.financial_status.split(' ')[0] == 'E' or x.financial_status.split(' ')[0] == 'D' else 'No','financial_status':x.financial_status,'muhalla':x.muhalla.name,'ration_card':x.ration_card,'language':x.language},family_value),key=itemgetter('family_head'),reverse=False)
+            get_family = sorted(map(lambda x:{'familyid':x.family_id,'house_type':x.house_type,'address':x.address,'mobile':x.mobile,'family_head':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].name if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'family_head_occ':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].occupation if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'age':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].age if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'gender':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].gender if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'fam_member':Member.objects.filter(family=Family.objects.get(family_id=x.family_id)).count(),'financial_pdf':x.financial_status.split(' ')[0],'jakath_family': 'Yes' if x.financial_status.split(' ')[0] == 'E' or x.financial_status.split(' ')[0] == 'D' else 'No','financial_status':x.financial_status,'muhalla':x.muhalla.name,'ration_card':x.ration_card,'language':x.language},family_value),key=itemgetter(sort_key),reverse=sort_reverse)
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_family':get_family,'finacial_value':finacial_value}),content_type='Application/json')
         elif data['report_type'] == 'Medical Needs and Guidance Needers Details':
             get_mem_medical = []
@@ -449,7 +467,7 @@ def fetchReportData(request):
                     for i in member_data_med:
                         for j in Medical.objects.filter(member=i):
                             get_mem_medical.append({'name':j.member.name,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})                    
-            return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_medical':sorted(get_mem_medical,key=itemgetter('name'),reverse=False)}),content_type='Application/json')            
+            return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_medical':sorted(get_mem_medical,key=itemgetter(sort_key),reverse=sort_reverse)}),content_type='Application/json')            
         elif data['report_type'] == 'Government Voter ID Needers':
             get_mem_voter = []
             try:
@@ -474,7 +492,7 @@ def fetchReportData(request):
                     get_mem_voter_dt = get_mem_voter_dt.filter(marital_status=data['marital_status'])
                 for i in get_mem_voter_dt:
                     get_mem_voter.append({'family_head':i.name,'qualification':i.qualification,'address':i.family.address,'age':i.age,'gender':i.gender,'financial_status':i.family.financial_status,'financial_pdf':i.family.financial_status.split(' ')[0],'familyid':i.family.family_id,'mobile':i.family.mobile})
-            return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_voter':sorted(get_mem_voter,key=itemgetter('family_head'),reverse=False)}),content_type='Application/json')                
+            return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_voter':sorted(get_mem_voter,key=itemgetter(sort_key),reverse=sort_reverse)}),content_type='Application/json')                
         elif data['report_type'] == 'Help for Poor Peoples and Guidance Needers List':
             get_mem_service = []
             service_list = json.loads(request.body)['serviceid_list']
@@ -516,7 +534,7 @@ def fetchReportData(request):
                     for i in member_data_service:
                             for j in Member_service.objects.filter(member=i):
                                 get_mem_service.append({'name':j.member.name,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'via UNWO'})
-            return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_service':sorted(get_mem_service,key=itemgetter('name'),reverse=False)}),content_type='Application/json')                
+            return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_service':sorted(get_mem_service,key=itemgetter(sort_key),reverse=sort_reverse)}),content_type='Application/json')                
         elif data['report_type'] == 'Government Schemes and Guidance Needers Details' or data['report_type'] == 'Educational Help and Guidance Needers List' or data['report_type'] == 'Help for Discontinued and Guidance Needers List' or data['report_type'] == 'Training/Employment Help and Guidance Needers List':
             get_mem_scheme = []
             scheme_list = json.loads(request.body)['schemeid_list']
@@ -558,7 +576,7 @@ def fetchReportData(request):
                     for i in member_data_scheme:
                         for j in Member_scheme.objects.filter(member=i):
                             get_mem_scheme.append({'name':j.member.name,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'Need Government Scheme Guidance'})
-            return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_scheme':sorted(get_mem_scheme,key=itemgetter('name'),reverse=False)}),content_type='Application/json')                
+            return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_scheme':sorted(get_mem_scheme,key=itemgetter(sort_key),reverse=sort_reverse)}),content_type='Application/json')                
         elif data['report_type'] == 'Women chldrens Need to join Niswan Madarasa' or data['report_type']  == 'Persons Need to join Jumrah Madarasa' or data['report_type']  == 'Childrens Need to join Makthab Madarasa':
             try:
                 if data['muhalla_id']:
@@ -570,11 +588,11 @@ def fetchReportData(request):
             except:
                 muhalla = Masjid.objects.all()[0]
             if data['report_type'] == 'Women chldrens Need to join Niswan Madarasa':
-                get_memData = sorted(map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'financial_pdf':x.family.financial_status.split(' ')[0],'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla,Makthab=True,madarasa_details='Girls For Makthab 4-15')),key=itemgetter('family_head'),reverse=False)
+                get_memData = sorted(map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'financial_pdf':x.family.financial_status.split(' ')[0],'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla,Makthab=True,madarasa_details='Girls For Makthab 4-15')),key=itemgetter(sort_key),reverse=sort_reverse)
             elif data['report_type'] == 'Childrens Need to join Makthab Madarasa':
-                get_memData = sorted(map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'financial_pdf':x.family.financial_status.split(' ')[0],'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla,Makthab=True,madarasa_details='Boys For Makthab 4-15')),key=itemgetter('family_head'),reverse=False)
+                get_memData = sorted(map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'financial_pdf':x.family.financial_status.split(' ')[0],'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla,Makthab=True,madarasa_details='Boys For Makthab 4-15')),key=itemgetter(sort_key),reverse=sort_reverse)
             elif data['report_type'] == 'Persons Need to join Jumrah Madarasa':
-                get_memData = sorted(map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'financial_pdf':x.family.financial_status.split(' ')[0],'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla,Makthab=True,madarasa_details='Jumrah Madarasa for Boys')),key=itemgetter('family_head'),reverse=False)
+                get_memData = sorted(map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'financial_pdf':x.family.financial_status.split(' ')[0],'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla,Makthab=True,madarasa_details='Jumrah Madarasa for Boys')),key=itemgetter(sort_key),reverse=sort_reverse)
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_memData':get_memData}),content_type='Application/json')
         elif data['report_type'] == 'Mohalla Report':
             print 'mohalla report_type'
@@ -636,9 +654,9 @@ def fetchReportData(request):
             pdf_rep_data = {'Taluk':muhalla.taluk.taluk_name,'Daily_Prayer_Observers':daily_prayer,'Observe_Only_Jumma_Prayer':only_jumah,'Able_to_recite_Quran':quran_reading,'deserted_women_pension':deserted_women_pension,'Orphan':orphan,'no_ration_card':no_ration_card,'Taluk_Count':1,'Total_Family':len(get_family),'Families_having_Interest_Loan':interest_loan,'Nikkah_Assistance_Required':marriage_help,'non_voter':non_voter,'voter':voter,'Total_Population':len(get_memData),'Total_Male':tot_men,'Total_Female':tot_women,'Married':married,'Male_age_60':men_age_60,'Female_age_60':women_age_60,'Male_age_between_22to59':men_age_22to59,'Female_age_between_22to59':women_age_22to59,'Male_age_between_11to21':men_age_11to21,'Female_age_between_11to21':women_age_11to21,'Child_upto_11_age':child_upto11,'A_Well_Settled':cat_A,'B_Full_Filled':cat_B,'C_Middle_Class':cat_C,'D_Poor':cat_D,'E_Very_Poor':cat_E,'Widow':widowed,'Divorced':divorced,'Mother_Tongue':{'Tamil':lang_tamil,'Urdu':lang_urdu,'Others':lang_others}}
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'non_voter':non_voter,'voter':voter,'reports':rep_data,'pdf_report':pdf_rep_data}),content_type='Application/json')
         elif data['report_type'] == 'Needs Types':
-            scheme_data = sorted(map(lambda x:{'name':x.name,'need_id':x.subscheme_id,'beneficiaries':len(Member_scheme.objects.filter(scheme=x,status=True,solution='Solved')),'total':len(Member_scheme.objects.filter(scheme=x,status=True))},SubScheme.objects.all()),key=itemgetter('name'),reverse=False)
-            service_data = sorted(map(lambda x:{'name':x.name,'need_id':x.service_id,'beneficiaries':len(Member_service.objects.filter(scheme=x,status=True,solution='Solved')),'total':len(Member_service.objects.filter(scheme=x,status=True))},Service.objects.all()),key=itemgetter('name'),reverse=False)
-            dis_data = sorted(map(lambda x:{'name':x.disease_name,'total':len(Medical.objects.filter(disease=x)),'beneficiaries':0,'need_id':x.disease_id},Disease.objects.all()),key=itemgetter('name'),reverse=False)
+            scheme_data = sorted(map(lambda x:{'name':x.name,'need_id':x.subscheme_id,'beneficiaries':len(Member_scheme.objects.filter(scheme=x,status=True,solution='Solved')),'total':len(Member_scheme.objects.filter(scheme=x,status=True))},SubScheme.objects.all()),key=itemgetter(sort_key),reverse=sort_reverse)
+            service_data = sorted(map(lambda x:{'name':x.name,'need_id':x.service_id,'beneficiaries':len(Member_service.objects.filter(scheme=x,status=True,solution='Solved')),'total':len(Member_service.objects.filter(scheme=x,status=True))},Service.objects.all()),key=itemgetter(sort_key),reverse=sort_reverse)
+            dis_data = sorted(map(lambda x:{'name':x.disease_name,'total':len(Medical.objects.filter(disease=x)),'beneficiaries':0,'need_id':x.disease_id},Disease.objects.all()),key=itemgetter(sort_key),reverse=sort_reverse)
             rep_data = scheme_data + service_data + dis_data
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'reports':rep_data}),content_type='Application/json')
         # return HttpResponse(content=json.dumps({'data':data,'member_details':member_details,'get_mem_service':get_mem_service,'get_mem_medical':get_mem_medical,'get_mem_scheme':get_mem_scheme,'get_memData':get_memData}),content_type='Application/json')

@@ -156,7 +156,8 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
         })
     } 
     $scope.sort_type = true;
-    $scope.header_sort = function(val,header,data,report) {
+    $scope.column_sort = 'familyid';
+    $scope.header_sort = function(val,data,values) {
         if($scope.sort_type == true) {
             $scope.sort_type = false;
         }
@@ -166,22 +167,27 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
         else {
             $scope.sort_type = true;
         }
-        console.log('val',report)
-        appBusy.set("Loading....");
-        $http.post('/sortReportData/',{
-            data : data,
-            sort_val : val,
-            sort_type : $scope.sort_type,
-            report_type : report.report_name,
-        }).success(function(response) {
-            console.log('data response',response.sort_data)
-            appBusy.set('Done...');              
-            $timeout( function() {              
-                appBusy.set(false);
-            }, 1000);
-            $scope.ReportHeader = header;
-            $scope.getReportData = response.sort_data;
-        })
+        $scope.column_sort = val;
+        $scope.fetchReportAPI(data,values)
+        // console.log('val',report)
+        // appBusy.set("Loading....");
+        // $http.post('/sortReportData/',{
+        //     data : data,
+        //     sort_val : val,
+        //     sort_type : $scope.sort_type,
+        //     report_type : report.report_name,
+        // }).success(function(response) {
+        //     console.log('data response',response.sort_data)
+        //     appBusy.set('Done...');              
+        //     $timeout( function() {              
+        //         appBusy.set(false);
+        //     }, 1000);
+        //     $scope.ReportHeader = header;
+        //     $scope.getReportData = response.sort_data;
+        // })
+        // scope - $scope.header_sort = function(val,header,data,report) {
+        // html - header_sort(header,ReportHeader,getReportData,ReportValues)
+
     }
     $scope.fetchReportAPI = function(data,values) {
         if(values.report_name == 'Total Family Details' || values.report_name == 'Own House & Rent House families' || values.report_name == 'Families without toilets') {
@@ -318,6 +324,8 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             appBusy.set("Loading....");
             $http.post('/fetchReportData/',{
                 data : data,
+                sort_val : $scope.column_sort,
+                sort_type : $scope.sort_type,
                 diseaseid_list : $scope.diseaseid_list,
                 schemeid_list : $scope.schemeid_list,
                 serviceid_list : $scope.serviceid_list,
@@ -557,19 +565,14 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
         $scope.FamilyValue.masjid = $scope.muhalla_values.mohalla;
         $scope.FamilyValue.district = $scope.muhalla_values.district;
         $scope.FamilyValue.taluk = $scope.muhalla_values.taluk;
-        console.log('get',$scope.FamilyValue)
-        $http.get('/familyData/', {}).success(function(data) {
-            console.log('varerror',data[2],$scope.FamilyValue.masjid)
-            $scope.familyList = _.filter(data.data,function(data_val) { return data_val.taluk == $scope.FamilyValue.taluk && data_val.district_name == $scope.FamilyValue.district && data_val.muhalla == $scope.FamilyValue.masjid });
-            
-            // console.log('val',$scope.familyList)
+        $http.get('/familyData/?muhalla_id='+$scope.muhalla_values.mohalla_id, {}).success(function(data) {
+            // $scope.familyList = _.filter(data.data,function(data_val) { return data_val.taluk == $scope.FamilyValue.taluk && data_val.district_name == $scope.FamilyValue.district && data_val.muhalla == $scope.FamilyValue.masjid });
+            $scope.familyList = data.data;
         })
     }
     $scope.getFamilyMembers = function(familyid) {
-        console.log('value',familyid)
         $http.get('/FamilyMemberData/?family_id='+ familyid, {}).success(function(data) {
             $scope.FamilyMembersList = data;
-            console.log(data,'voter')
         })
     }
     $scope.FamilyMember = {

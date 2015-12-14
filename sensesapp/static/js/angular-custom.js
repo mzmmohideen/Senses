@@ -604,7 +604,22 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
     $scope.serviceid_list = []
     $scope.filter_service_value = function(serviceid_list) {
         $scope.serviceid_list = serviceid_list
-    }    
+    }
+    $scope.sort_type = true;
+    $scope.column_sort = 'familyid';
+    $scope.header_sort = function(val,data,values) {
+        if($scope.sort_type == true) {
+            $scope.sort_type = false;
+        }
+        else if($scope.sort_type = false) {
+            $scope.sort_type = true;
+        }
+        else {
+            $scope.sort_type = true;
+        }
+        $scope.column_sort = val;
+        $scope.fetchReportAPI(data,values)
+    }
     $scope.fetchReportAPI = function(data,values) {
         if(values.report_name == 'Total Family Details' || values.report_name == 'Own House & Rent House families' || values.report_name == 'Families without toilets') {
             $scope.voter_status_dt = false;
@@ -745,6 +760,8 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             appBusy.set("Loading....");
             $http.post('/fetchReportData/',{
                 data : data,
+                sort_val : $scope.column_sort,
+                sort_type : $scope.sort_type,
                 diseaseid_list : $scope.diseaseid_list,
                 schemeid_list : $scope.schemeid_list,
                 serviceid_list : $scope.serviceid_list,
