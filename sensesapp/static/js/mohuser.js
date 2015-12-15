@@ -18,6 +18,25 @@ app.service('masjid_data', function($rootScope) {
     };
 
 });
+app.filter('limitTocustom', function() {
+    'use strict';
+    return function(input, limit) {
+        if (input) {
+            if (limit > input.length) {
+                return input.slice(0, limit);
+            } else {
+                return input.slice(0, limit) + '...';
+            }
+        }
+    };
+});
+app.filter('SortData', function() {
+    return function(input) {
+        if(input != undefined) {
+            return input.sort();
+        }
+    }
+});
 app.config(function (appBusyProvider) {
     'use strict';
     appBusyProvider.setMsg('Registering ...');
@@ -76,7 +95,6 @@ app.directive('ngConfirmClick', [
 }])
 app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, masjid_data, $location,$modal) {
     $scope.user_logout = function() {
-        console.log('triger')
         window.location.href = '/logout_view/'
     }
     $scope.get_muhallaData = function() {
@@ -85,7 +103,6 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             $scope.getMasjidMember($scope.muhalla_values)
             $scope.getFamilyinfo()
             $scope.getMasjidList($scope.muhalla_values)
-            console.log('scope',$scope.muhalla_values)
         })
     }
     $scope.get_muhallaData()
@@ -124,26 +141,19 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
     }
     $scope.diseaseid_list = []
     $scope.filter_disease_value = function(diseaseid_list) {
-        console.log('val',$scope.diseaseid_list)
         $scope.diseaseid_list = diseaseid_list
-        console.log('value',diseaseid_list,$scope.diseaseid_list)
     }
     $scope.schemeid_list = []
     $scope.filter_scheme_value = function(schemeid_list) {
         $scope.schemeid_list = schemeid_list
-        console.log('value',schemeid_list,$scope.schemeid_list)
     }
     $scope.serviceid_list = []
     $scope.filter_service_value = function(serviceid_list) {
         $scope.serviceid_list = serviceid_list
-        console.log('value',serviceid_list,$scope.serviceid_list)
     }  
     $scope.getMasjidList = function(data) {
         $http.get('/add_masjid/').success(function(response){
-            console.log('response',response)
             $scope.mahallaList = response.data;
-            console.log('mahalla',$scope.mahallaList)
-            console.log('dataMasjid',response.data[0],data)
             // $scope.ReportValues.muhalla = '';
             $scope.tot_mohalla_list = _.pluck($scope.mahallaList,"mohalla_id")
             // $scope.masjidList = _.pluck(_.filter($scope.mahallaList,function(num) {return num.district == data.district && num.taluk == data.taluk}),"mohalla_id")
@@ -152,7 +162,6 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             $scope.ReportValues.taluk = $scope.muhalla_values.taluk;
             $scope.ReportValues.muhalla_id = $scope.muhalla_values.mohalla_id;
             $scope.ReportValues.muhalla = $scope.muhalla_name;
-            console.log('name',$scope.muhalla_name)
         })
     } 
     $scope.sort_type = true;
@@ -330,7 +339,6 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
                 schemeid_list : $scope.schemeid_list,
                 serviceid_list : $scope.serviceid_list,
             }).success(function(response) {
-                console.log('data response',response)
                 appBusy.set('Done...');              
                 $timeout( function() {              
                     appBusy.set(false);
@@ -396,14 +404,12 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
                 else {
                     var finacial_value = '';
                 }
-                console.log('values',$scope.getReportData)
                 $http.post('/report_to_pdf/',{
                     header : $scope.ReportHeader,
                     data : pdf_data,
                     report : $scope.ReportValues,
                     finacial_value : finacial_value,
                 }).success(function(response){
-                    console.log('success',response)
                     $scope.get_pdfname = response.pdfname;
                 })
             })
@@ -415,7 +421,6 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             data : data,
             report : report,
         }).success(function(response){
-            console.log('success',response)
             window.open('/'+response.pdfname)
         })
     }
@@ -434,11 +439,9 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
         }).success(function(response) {
             alert(response.data)
             $scope.getMasjidMember(data)
-            console.log('response',response)
         })
     }
     $scope.UpdateMember = function(mohalla_id,member,name,age,designation,mobile,address) {
-            console.log('valllll',mohalla_id,member,name,age,designation,mobile,address)
             $http.post('/masjid_member/',{
                 mohalla_id: mohalla_id,
                 data: member,
@@ -487,7 +490,6 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
     }
     $scope.get_family = function(family) {
         if(!family) {
-            console.log(family,'family')
             $scope.family_val = 'Type or Select Family ID from the List';
             $scope.FamilyValue.familyid='';
             $scope.FamilyValue.ration_card = '';
@@ -523,7 +525,6 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             var familyid = family;
             var masjid = value.masjid;
         }
-        console.log('value',value,familyid,status)
         var data = {
             mobile_no: value.mobile_no,
             taluk: $scope.muhalla_values.taluk,
@@ -550,7 +551,6 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
         })
     }
     $scope.deleteFamily = function(familyid) {
-        console.log('familyid',familyid)
         $http.post('/familyData/',{
             familyid: familyid,
             status: 'delete',
@@ -599,7 +599,6 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
     $scope.fam_mem_location = ['Local','Outstation','Foreign']
     $scope.FamilyMember.location = $scope.fam_mem_location[0]
     $scope.add_Familymembers = function(data,family,status) {
-        console.log('data',data,family)
         var family_id = family.familyid.family_id;
         $http.post('/FamilyMemberData/',{
             data: data,
@@ -608,14 +607,11 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
         }).success(function(response) {
             alert(response.data)
             $scope.getFamilyMembers(family_id)
-            console.log('response',response)
         })
     }
     $scope.getFamilyMembers = function(familyid) {
-        console.log('value',familyid)
         $http.get('/FamilyMemberData/?family_id='+ familyid, {}).success(function(data) {
             $scope.FamilyMembersList = data;
-            console.log(data,'voter')
         })
     }
     $scope.get_booleanval = function(val) {
@@ -636,7 +632,6 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
         password : '',
     }
     $scope.change_password = function(uname,data_val) {
-        console.log('val',$scope.get_password)
         $http.post('/change_password/',{
             username: uname,
             password: data_val.curr_password,
@@ -647,12 +642,10 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             $scope.get_password.curr_password = ''
             $scope.get_password.re_password = ''
             $scope.get_password.password = ''
-            console.log('val',$scope.get_password)
         })
     }
     $scope.senses_reports = ['Mohalla Report','Total Family Details','Families Eligible for Jakaath','Medical Needs and Guidance Needers Details','Government Schemes and Guidance Needers Details','Government Voter ID Needers','Educational Help and Guidance Needers List','Help for Discontinued and Guidance Needers List','Basic Help Needers List','Help for Poor Peoples and Guidance Needers List','Training/Employment Help and Guidance Needers List','Childrens Need to join Makthab Madarasa','Persons Need to join Jumrah Madarasa','Women chldrens Need to join Niswan Madarasa','Needs Types','Families without toilets','Own House & Rent House families']
     $scope.getFamilyReport = function(fam_data,report_name) {
-        console.log('report_name',fam_data,report_name)
         $http.get('/fetchReportData/?muhalla_id='+fam_data.mohalla_id,{}).success(function(data){
             if(report_name == 'Mohalla Report') {
                 $scope.ReportHeader = ['S.No','Details','Counts']
@@ -671,7 +664,6 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
                     $scope.getReportData = _.filter(data.get_family,function(val){ return val.financial_status.split(' ')[0] == 'E'});
                 }
                 else if(report_name == 'Government Voter ID Needers') {
-                    console.log('voter',data.get_memdata)
                     $scope.getReportData = _.filter(data.get_memdata,function(val){ return val.voter == false && parseInt(val.age) >= 18});
                 }                
             }
@@ -714,7 +706,6 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
 
     // family_update_controller
     $scope.Familymembersupdate = function(data) {
-        console.log('masjid_data',data)
         masjid_data.set_MasjidData(data);
         var modalInstance = $modal.open({
             templateUrl: 'add_Familymembers_modal',
@@ -784,7 +775,6 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             }
         }
         $scope.update_member = function(data,status) {
-            console.log('member_name',status,data,$scope.Mem_ID)
             $http.post('/UpdateFamily_member/',{
                 data: data,
                 mem_id: $scope.Mem_ID,

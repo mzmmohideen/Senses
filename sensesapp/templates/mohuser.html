@@ -220,7 +220,7 @@
                 </td>
                 <td ng-show="new_fam_bt" >
                     <ui-select ng-disabled="!FamilyValue.masjid" style="display: inline-block;height: 34px;width: 65%;float: left;" on-select="familyid=FamilyValue.familyid;get_family(familyid)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="FamilyValue.familyid">
-                        <ui-select-match placeholder="{{family_val}}">{{family_val}}</ui-select-match>
+                        <ui-select-match placeholder="{{family_val| limitTocustom:25}}">{{family_val| limitTocustom:25}}</ui-select-match>
                         <ui-select-choices refresh="familyid=$select.search;get_family(familyid)" repeat="mod in familyList | filter:$select.search">
                             <div ng-bind-html="mod.family_id | highlight: $select.search"></div>
                         </ui-select-choices>
@@ -703,10 +703,10 @@
             <div class=" col-lg-12">
                 <span style="display: inline-block;height: 34px;width: 16.5%;float: left;"> <input class="form-control" type="text" ng-model="ReportValues.district" readonly/></span>
                 <span style="display: inline-block;height: 34px;width: 16.5%;float: left;"> <input class="form-control" type="text" ng-model="ReportValues.taluk" readonly/></span>
-                <span style="display: inline-block;height: 34px;width: 16.5%;float: left;"> <input class="form-control" type="text" ng-model="ReportValues.muhalla.mohalla_id" readonly/></span>
+                <span style="display: inline-block;height: 34px;width: 16.5%;float: left;"> <input class="form-control" type="text" ng-model="ReportValues.muhalla.name" readonly/></span>
                 <span style="display: inline-block;height: 34px;width: 16.5%;float: left;"> <input class="form-control" type="text" ng-model="ReportValues.muhalla_id" readonly/></span>
                 <span style="display: inline-block;height: 34px;width: 16.5%;float: left;"> 
-                    <select ng-model="ReportValues.report_name" ng-change="fetchReportAPI(ReportDatas,ReportValues)" ng-options="gen for gen in senses_reports" class="form-control"><option value="">SELECT REPORT</option>
+                    <select ng-model="ReportValues.report_name" ng-change="fetchReportAPI(ReportDatas,ReportValues)" ng-options="gen for gen in senses_reports|SortData" class="form-control"><option value="">SELECT REPORT</option>
                     </select>
                 </span>    
                 <span style="display: inline-block;height: 34px;width: 16.5%;float: left;"><a download="{{get_pdfname}}" href="/static/pdf/{{get_pdfname}}" target="_blank"><button ng-disabled="!ReportValues.muhalla || !ReportValues.report_name || !get_pdfname" type="submit" style="display: inline-block;height: 34px;width: 98%;border-radius: 2px; float: left;" class="btn-sm btn btn-primary"><i class="fa fa-cloud-download"></i>&nbsp;Export</button></a>
