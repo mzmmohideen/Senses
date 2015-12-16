@@ -16,6 +16,7 @@
     <link href="{{STATIC_URL}}font-awesome/css/font-awesome.css" rel="stylesheet">
     <link href="{{STATIC_URL}}css/select.css" rel="stylesheet">
     <link href="{{STATIC_URL}}css/select2.css" rel="stylesheet">
+    <link href="{{STATIC_URL}}css/plugins/morris.css" rel="stylesheet">
     <link href="{{STATIC_URL}}js/angular/angular-csp.css" rel="stylesheet">
     <link href="{{STATIC_URL}}bootstrap/dashboard/css/sb-admin-2.css" rel="stylesheet">
     <link href="{{STATIC_URL}}bootstrap/dashboard/css/timeline.css" rel="stylesheet">
@@ -1511,84 +1512,6 @@
                     </div>
                     <div class="panel-body">
                         <div id="morris-area-chart" style="position: relative; -webkit-tap-highlight-color: rgba(0, 0, 0, 0);">
-                            <svg height="342" style="margin-left:-11px;width:100%;"version="1.1" width="701" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="overflow: hidden; position: relative;">
-                                <desc style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Created with Raphaël 2.1.2</desc>
-                                <defs style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></defs>
-                                <text x="49.21875" y="308" text-anchor="end" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal">
-                                    <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">0</tspan>
-                                </text>
-                                <path fill="none" stroke="#aaaaaa" d="M61.71875,308H676" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
-                                <text x="49.21875" y="237.25" text-anchor="end" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal">
-                                    <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">7,500</tspan>
-                                </text>
-                                <path fill="none" stroke="#aaaaaa" d="M61.71875,237.25H676" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
-                                <text x="49.21875" y="166.5" text-anchor="end" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal">
-                                    <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">15,000</tspan>
-                                </text>
-                                <path fill="none" stroke="#aaaaaa" d="M61.71875,166.5H676" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
-                                <text x="49.21875" y="95.75" text-anchor="end" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal">
-                                    <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">22,500</tspan>
-                                </text>
-                                <path fill="none" stroke="#aaaaaa" d="M61.71875,95.75H676" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
-                                <text x="49.21875" y="25" text-anchor="end" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: end; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal">
-                                    <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">30,000</tspan>
-                                </text>
-                                <path fill="none" stroke="#aaaaaa" d="M61.71875,25H676" stroke-width="0.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
-                                <text x="562.5482989064399" y="320.5" text-anchor="middle" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal" transform="matrix(1,0,0,1,0,7)">
-                                    <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2012</tspan>
-                                </text>
-                                <text x="290.114937727825" y="320.5" text-anchor="middle" font-family="sans-serif" font-size="12px" stroke="none" fill="#888888" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: sans-serif; font-size: 12px; font-weight: normal;" font-weight="normal" transform="matrix(1,0,0,1,0,7)">
-                                    <tspan dy="4" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">2011</tspan>
-                                </text>
-                                <path fill="#7cb47c" stroke="none" d="M61.71875,257.8807C78.88578371810449,252.69236666666666,113.21985115431347,241.9253958333333,130.38688487241797,237.12736666666666C147.55391859052247,232.32933749999998,181.88798602673145,226.06474717668488,199.05501974483596,219.49646666666666C216.03545527035237,212.9995805100182,249.99632632138517,186.80528908839776,266.9767618469016,184.86669999999998C283.7705991798299,182.94941408839776,317.3582738456865,202.66302023809524,334.1521111786148,204.07296666666667C351.3191448967193,205.51424523809524,385.6532123329283,195.3117583333333,402.8202460510328,196.27159999999998C419.98727976913733,197.23144166666665,454.3213472053463,228.79010418943534,471.4883809234508,211.7517C488.46881644896723,194.898495856102,522.4296875,68.92631666666666,539.4101230255164,60.705166666666656C556.3905585510329,52.48401666666666,590.3514296020655,133.9280789162113,607.331865127582,145.9825C624.4988988456864,158.16938724954463,658.8329662818956,154.748425,676,157.6704L676,308L61.71875,308Z" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></path>
-                                <path fill="none" stroke="#4da74d" d="M61.71875,257.8807C78.88578371810449,252.69236666666666,113.21985115431347,241.9253958333333,130.38688487241797,237.12736666666666C147.55391859052247,232.32933749999998,181.88798602673145,226.06474717668488,199.05501974483596,219.49646666666666C216.03545527035237,212.9995805100182,249.99632632138517,186.80528908839776,266.9767618469016,184.86669999999998C283.7705991798299,182.94941408839776,317.3582738456865,202.66302023809524,334.1521111786148,204.07296666666667C351.3191448967193,205.51424523809524,385.6532123329283,195.3117583333333,402.8202460510328,196.27159999999998C419.98727976913733,197.23144166666665,454.3213472053463,228.79010418943534,471.4883809234508,211.7517C488.46881644896723,194.898495856102,522.4296875,68.92631666666666,539.4101230255164,60.705166666666656C556.3905585510329,52.48401666666666,590.3514296020655,133.9280789162113,607.331865127582,145.9825C624.4988988456864,158.16938724954463,658.8329662818956,154.748425,676,157.6704" stroke-width="3" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
-                                <circle cx="61.71875" cy="257.8807" r="2" fill="#4da74d" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="130.38688487241797" cy="237.12736666666666" r="2" fill="#4da74d" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="199.05501974483596" cy="219.49646666666666" r="2" fill="#4da74d" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="266.9767618469016" cy="184.86669999999998" r="2" fill="#4da74d" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="334.1521111786148" cy="204.07296666666667" r="2" fill="#4da74d" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="402.8202460510328" cy="196.27159999999998" r="2" fill="#4da74d" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="471.4883809234508" cy="211.7517" r="2" fill="#4da74d" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="539.4101230255164" cy="60.705166666666656" r="2" fill="#4da74d" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="607.331865127582" cy="145.9825" r="2" fill="#4da74d" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="676" cy="157.6704" r="2" fill="#4da74d" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <path fill="#a7b3bc" stroke="none" d="M61.71875,282.8507333333333C78.88578371810449,277.1765833333333,113.21985115431347,265.12432083333334,130.38688487241797,260.15413333333333C147.55391859052247,255.18394583333333,181.88798602673145,245.80665191256827,199.05501974483596,243.0892333333333C216.03545527035237,240.4013519125683,249.99632632138517,240.71814415285453,266.9767618469016,238.53293333333335C283.7705991798299,236.3717358195212,317.3582738456865,228.73457664835163,334.1521111786148,225.7036C351.3191448967193,222.6052683150183,385.6532123329283,213.8871708333333,402.8202460510328,214.01569999999998C419.98727976913733,214.14422916666663,454.3213472053463,239.86483752276865,471.4883809234508,226.73183333333333C488.46881644896723,213.74157918943533,522.4296875,117.22498333333333,539.4101230255164,109.52266666666665C556.3905585510329,101.82034999999999,590.3514296020655,157.02737399817852,607.331865127582,165.1133C624.4988988456864,173.28808233151184,658.8329662818956,172.20245,676,174.5655L676,308L61.71875,308Z" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></path>
-                                <path fill="none" stroke="#7a92a3" d="M61.71875,282.8507333333333C78.88578371810449,277.1765833333333,113.21985115431347,265.12432083333334,130.38688487241797,260.15413333333333C147.55391859052247,255.18394583333333,181.88798602673145,245.80665191256827,199.05501974483596,243.0892333333333C216.03545527035237,240.4013519125683,249.99632632138517,240.71814415285453,266.9767618469016,238.53293333333335C283.7705991798299,236.3717358195212,317.3582738456865,228.73457664835163,334.1521111786148,225.7036C351.3191448967193,222.6052683150183,385.6532123329283,213.8871708333333,402.8202460510328,214.01569999999998C419.98727976913733,214.14422916666663,454.3213472053463,239.86483752276865,471.4883809234508,226.73183333333333C488.46881644896723,213.74157918943533,522.4296875,117.22498333333333,539.4101230255164,109.52266666666665C556.3905585510329,101.82034999999999,590.3514296020655,157.02737399817852,607.331865127582,165.1133C624.4988988456864,173.28808233151184,658.8329662818956,172.20245,676,174.5655" stroke-width="3" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
-                                <circle cx="61.71875" cy="282.8507333333333" r="2" fill="#7a92a3" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="130.38688487241797" cy="260.15413333333333" r="2" fill="#7a92a3" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="199.05501974483596" cy="243.0892333333333" r="2" fill="#7a92a3" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="266.9767618469016" cy="238.53293333333335" r="2" fill="#7a92a3" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="334.1521111786148" cy="225.7036" r="2" fill="#7a92a3" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="402.8202460510328" cy="214.01569999999998" r="2" fill="#7a92a3" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="471.4883809234508" cy="226.73183333333333" r="2" fill="#7a92a3" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="539.4101230255164" cy="109.52266666666665" r="2" fill="#7a92a3" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="607.331865127582" cy="165.1133" r="2" fill="#7a92a3" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="676" cy="174.5655" r="2" fill="#7a92a3" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <path fill="#2577b5" stroke="none" d="M61.71875,282.8507333333333C78.88578371810449,282.5866,113.21985115431347,284.44260833333334,130.38688487241797,281.7942C147.55391859052247,279.14579166666664,181.88798602673145,262.8360351548269,199.05501974483596,261.66346666666664C216.03545527035237,260.50364348816026,249.99632632138517,274.71505662983424,266.9767618469016,272.4646333333333C283.7705991798299,270.2389399631676,317.3582738456865,245.97829532967035,334.1521111786148,243.75900000000001C351.3191448967193,241.490386996337,385.6532123329283,252.16645833333334,402.8202460510328,254.513C419.98727976913733,256.85954166666664,454.3213472053463,273.67962604735885,471.4883809234508,262.53133333333335C488.46881644896723,251.50421771402551,522.4296875,172.7295375,539.4101230255164,165.81136666666666C556.3905585510329,158.89319583333332,590.3514296020655,199.3979123406193,607.331865127582,207.18596666666667C624.4988988456864,215.059604007286,658.8329662818956,223.14009166666668,676,228.45813333333334L676,308L61.71875,308Z" fill-opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); fill-opacity: 1;"></path>
-                                <path fill="none" stroke="#0b62a4" d="M61.71875,282.8507333333333C78.88578371810449,282.5866,113.21985115431347,284.44260833333334,130.38688487241797,281.7942C147.55391859052247,279.14579166666664,181.88798602673145,262.8360351548269,199.05501974483596,261.66346666666664C216.03545527035237,260.50364348816026,249.99632632138517,274.71505662983424,266.9767618469016,272.4646333333333C283.7705991798299,270.2389399631676,317.3582738456865,245.97829532967035,334.1521111786148,243.75900000000001C351.3191448967193,241.490386996337,385.6532123329283,252.16645833333334,402.8202460510328,254.513C419.98727976913733,256.85954166666664,454.3213472053463,273.67962604735885,471.4883809234508,262.53133333333335C488.46881644896723,251.50421771402551,522.4296875,172.7295375,539.4101230255164,165.81136666666666C556.3905585510329,158.89319583333332,590.3514296020655,199.3979123406193,607.331865127582,207.18596666666667C624.4988988456864,215.059604007286,658.8329662818956,223.14009166666668,676,228.45813333333334" stroke-width="3" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
-                                <circle cx="61.71875" cy="282.8507333333333" r="2" fill="#0b62a4" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="130.38688487241797" cy="281.7942" r="2" fill="#0b62a4" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="199.05501974483596" cy="261.66346666666664" r="2" fill="#0b62a4" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="266.9767618469016" cy="272.4646333333333" r="2" fill="#0b62a4" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="334.1521111786148" cy="243.75900000000001" r="2" fill="#0b62a4" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="402.8202460510328" cy="254.513" r="2" fill="#0b62a4" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="471.4883809234508" cy="262.53133333333335" r="2" fill="#0b62a4" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="539.4101230255164" cy="165.81136666666666" r="2" fill="#0b62a4" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="607.331865127582" cy="207.18596666666667" r="2" fill="#0b62a4" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                                <circle cx="676" cy="228.45813333333334" r="2" fill="#0b62a4" stroke="#ffffff" stroke-width="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></circle>
-                            </svg>
-                            <div class="morris-hover morris-default-style" style="left: 210.476761846902px; top: 168px; display: none;">
-                                <div class="morris-hover-row-label">2010 Q4</div>
-                                <div class="morris-hover-point" style="color: #0b62a4">
-                                    iPhone: 3,767
-                                </div>
-                                <div class="morris-hover-point" style="color: #7A92A3">
-                                    iPad: 3,597
-                                </div>
-                                <div class="morris-hover-point" style="color: #4da74d">
-                                    iPod Touch: 5,689
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </div>
@@ -1601,24 +1524,7 @@
                         <i class="fa fa-bar-chart-o fa-fw"></i> Mahallas Chart
                     </div>
                     <div class="panel-body">
-                        <div id="morris-donut-chart">
-                            <svg height="342" version="1.1" width="319" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" style="overflow: hidden; position: relative; left: -25px;">
-                                <desc style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Created with Raphaël 2.1.2</desc>
-                                <defs style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></defs>
-                                <path fill="none" stroke="#0b62a4" d="M159.5,273.1666666666667A99.66666666666667,99.66666666666667,0,0,0,253.6681290975732,206.1467135667165" stroke-width="2" opacity="0" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); opacity: 0;"></path>
-                                <path fill="#0b62a4" stroke="#ffffff" d="M159.5,276.1666666666667A102.66666666666667,102.66666666666667,0,0,0,256.50262127776773,207.12939056370797L296.02804001270226,220.83227535508897A144.5,144.5,0,0,1,159.5,318Z" stroke-width="3" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
-                                <path fill="none" stroke="#3980b5" d="M253.6681290975732,206.1467135667165A99.66666666666667,99.66666666666667,0,0,0,70.09933662699727,129.4436062198517" stroke-width="2" opacity="1" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); opacity: 1;"></path>
-                                <path fill="#3980b5" stroke="#ffffff" d="M256.50262127776773,207.12939056370797A102.66666666666667,102.66666666666667,0,0,0,67.40834675958247,128.11749403248933L25.3990049404959,107.41540932977752A149.5,149.5,0,0,1,300.75219364635984,222.47007035007476Z" stroke-width="3" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
-                                <path fill="none" stroke="#679dc6" d="M70.09933662699727,129.4436062198517A99.66666666666667,99.66666666666667,0,0,0,159.4686887937342,273.16666174831386" stroke-width="2" opacity="0" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); opacity: 0;"></path>
-                                <path fill="#679dc6" stroke="#ffffff" d="M67.40834675958247,128.11749403248933A102.66666666666667,102.66666666666667,0,0,0,159.4677463159536,276.1666616002698L159.45460398690224,317.99999286921087A144.5,144.5,0,0,1,29.88398805285391,109.62559630871472Z" stroke-width="3" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);"></path>
-                                <text x="159.5" y="163.5" text-anchor="middle" font-family="&quot;Arial&quot;" font-size="15px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: Arial; font-size: 15px; font-weight: 800;" font-weight="800" transform="matrix(1.7929,0,0,1.7929,-126.4643,-136.3753)" stroke-width="0.5577619843924192">
-                                    <tspan dy="5.5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">Mahallas Present</tspan>
-                                </text>
-                                <text x="159.5" y="183.5" text-anchor="middle" font-family="&quot;Arial&quot;" font-size="14px" stroke="none" fill="#000000" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0); text-anchor: middle; font-family: Arial; font-size: 14px;" transform="matrix(2.0764,0,0,2.0764,-171.684,-188.9063)" stroke-width="0.4816053511705686">
-                                    <tspan dy="5" style="-webkit-tap-highlight-color: rgba(0, 0, 0, 0);">{{dashboard_data.muhalla}}</tspan>
-                                </text>
-                            </svg>
-                        </div>
+                        <div id="morris-donut-chart"></div>
                     </div>
                 </div>
             </div>
@@ -1735,6 +1641,9 @@
     <!--<script data-require="select2@3.5.1" data-semver="3.5.1" src="//cdn.jsdelivr.net/select2/3.4.8/select2.min.js"></script>-->
     <script data-require="angular-ui@0.4.0" data-semver="0.4.0" src="http://rawgithub.com/angular-ui/angular-ui/master/build/angular-ui.js"></script>
     <script src="{{STATIC_URL}}js/angular-custom.js"></script>
+    <script src="{{STATIC_URL}}js/plugins/morris/raphael.min.js"></script>
+    <script src="{{STATIC_URL}}js/plugins/morris/morris.min.js"></script>
+    <script src="{{STATIC_URL}}js/plugins/morris/morris-data.js"></script>
     <script src="{{STATIC_URL}}metisMenu/metisMenu.min.js"></script>
     <script src="{{STATIC_URL}}bootstrap/dashboard/js/sb-admin-2.js"></script>
     <script src="{{STATIC_URL}}js/moment.js"></script>

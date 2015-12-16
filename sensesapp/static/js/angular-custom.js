@@ -244,6 +244,20 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
     $scope.fetch_dashboard_data = function() {
         $http.get('/dashboard_api/',{}).success(function(response){
             $scope.dashboard_data = response;
+            Morris.Donut({
+                element: 'morris-donut-chart',
+                data: [{
+                    label: "Mahallas Present",
+                    value: $scope.dashboard_data.muhalla,
+                }, {
+                    label: "Total Families",
+                    value: $scope.dashboard_data.tot_family,
+                }, {
+                    label: "Total Members",
+                    value: $scope.dashboard_data.fam_member,
+                }],
+                resize: true
+            });
         })
     }
     $scope.fetch_dashboard_data()
