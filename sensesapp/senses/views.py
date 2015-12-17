@@ -1022,11 +1022,19 @@ def change_password(request):
 def dashboard_api(request):
     if request.method == 'GET':
         muhalla = len(Masjid.objects.all())
+        count_dict = {}
+        fam_dict = {}
+        item_list = [dic.district.district_name for dic in Masjid.objects.all()]
+        for i in item_list:
+            count_dict[i] = count_dict.setdefault(i,0) + 1
         fam_member = len(Member.objects.all())
         tot_family = len(Family.objects.all())
+        fam_list = [dic.muhalla.district.district_name for dic in Family.objects.all()]
+        for j in fam_list:
+            fam_dict[j] = fam_dict.setdefault(j,0) + 1
         volunteer_interest = len(Member.objects.filter(volunteer=True))
         donor_interest = len(Member.objects.filter(donor=True))
-        return HttpResponse(content=json.dumps({'muhalla':muhalla,'fam_member':fam_member,'tot_family':tot_family,'volunteer_interest':volunteer_interest,'donor_interest':donor_interest}),content_type='Application/json')
+        return HttpResponse(content=json.dumps({'muhalla':muhalla,'fam_count':fam_dict,'muhalla_total':count_dict,'fam_member':fam_member,'tot_family':tot_family,'volunteer_interest':volunteer_interest,'donor_interest':donor_interest}),content_type='Application/json')
 
 #convert xls to csv
 # def csv_from_excel(xlsfile):

@@ -241,26 +241,51 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             }    
         }
     }
+    $scope.dashboard_data_mohalla = []
+    $scope.dashboard_data_family = []
     $scope.fetch_dashboard_data = function() {
         $http.get('/dashboard_api/',{}).success(function(response){
             $scope.dashboard_data = response;
+            for (var i in $scope.dashboard_data.muhalla_total) {
+                var val = {
+                   label: i,
+                   value: $scope.dashboard_data.muhalla_total[i], 
+                }
+                $scope.dashboard_data_mohalla.push(val)
+            }
+            for (var j in $scope.dashboard_data.fam_count) {
+                var values = {
+                   district: j,
+                   value: $scope.dashboard_data.fam_count[j], 
+                }
+                $scope.dashboard_data_family.push(values)
+            }
+            // Morris.Area({
+            //     element: 'morris-area-chart',
+            //     data: $scope.dashboard_data_family,
+            //     xkey: 'district',
+            //     ykeys: ['value'],
+            //     labels: ['Total'],
+            //     pointSize: 2,
+            //     hideHover: 'auto',
+            //     resize: true
+            // });
+            Morris.Line({
+                element: 'line-example',
+                data: $scope.dashboard_data_family,
+                xkey: 'district',
+                ykeys: ['value'],
+                labels: ['Families']
+            });
+            console.log('i',response,$scope.dashboard_data_family)
             Morris.Donut({
                 element: 'morris-donut-chart',
-                data: [{
-                    label: "Mahallas Present",
-                    value: $scope.dashboard_data.muhalla,
-                }, {
-                    label: "Total Families",
-                    value: $scope.dashboard_data.tot_family,
-                }, {
-                    label: "Total Members",
-                    value: $scope.dashboard_data.fam_member,
-                }],
+                data: $scope.dashboard_data_mohalla,
                 resize: true
             });
         })
     }
-    $scope.fetch_dashboard_data()
+    // $scope.fetch_dashboard_data()
     $scope.scheme_val = 'SELECT or ADD SCHEMES';
     $scope.get_scheme = function(scheme) {
         if(!scheme) {
