@@ -28,6 +28,9 @@
         /* Because of the inclusion of Bootstrap */
         height: 29px;
     }
+    svg {
+      width: 100% !important
+    }
     
     .selectize-control > .selectize-dropdown {
         top: 36px;
@@ -1511,7 +1514,7 @@
                         </div>
                     </div>
                     <div class="panel-body">
-                        <div id="line-example"></div>
+                        <div id="morris-area-chart"></div>
                     </div>
                 </div>
                 <!-- /.panel -->
@@ -1523,7 +1526,7 @@
                         <i class="fa fa-bar-chart-o fa-fw"></i> Mahallas Present in District
                     </div>
                     <div class="panel-body">
-                        <div id="morris-donut-chart"></div>
+                        <div style="width:100% !important;" id="morris-donut-chart"></div>
                     </div>
                 </div>
             </div>
@@ -1533,7 +1536,7 @@
                         <i class="fa fa-bar-chart-o fa-fw"></i> Mahallas
                     </div>
                     <div class="panel-body">
-                        <div id="morris-bar-chart"></div>
+                        <div style="width:100% !important;" id="morris-bar-chart"></div>
                     </div>
                 </div>
             </div>
@@ -1558,7 +1561,7 @@
     <script data-require="angular-ui@0.4.0" data-semver="0.4.0" src="http://rawgithub.com/angular-ui/angular-ui/master/build/angular-ui.js"></script>
     <script src="{{STATIC_URL}}js/plugins/morris/raphael.min.js"></script>
     <script src="{{STATIC_URL}}js/plugins/morris/morris.min.js"></script>
-    <script src="{{STATIC_URL}}js/plugins/morris/morris-data.js"></script>
+    <!--<script src="{{STATIC_URL}}js/plugins/morris/morris-data.js"></script>-->
     <script src="{{STATIC_URL}}js/angular-custom.js"></script>
     <script src="{{STATIC_URL}}metisMenu/metisMenu.min.js"></script>
     <script src="{{STATIC_URL}}bootstrap/dashboard/js/sb-admin-2.js"></script>

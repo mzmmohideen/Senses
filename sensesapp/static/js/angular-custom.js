@@ -260,16 +260,16 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 }
                 $scope.dashboard_data_family.push(values)
             }
-            // Morris.Area({
-            //     element: 'morris-area-chart',
-            //     data: $scope.dashboard_data_family,
-            //     xkey: 'district',
-            //     ykeys: ['value'],
-            //     labels: ['Total'],
-            //     pointSize: 2,
-            //     hideHover: 'auto',
-            //     resize: true
-            // });
+            Morris.Area({
+                element: 'morris-area-chart',
+                data: $scope.dashboard_data_family,
+                xkey: 'district',
+                ykeys: ['value'],
+                labels: ['Total'],
+                pointSize: 2,
+                hideHover: 'auto',
+                resize: true
+            });
             Morris.Line({
                 element: 'line-example',
                 data: $scope.dashboard_data_family,
@@ -281,6 +281,17 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             Morris.Donut({
                 element: 'morris-donut-chart',
                 data: $scope.dashboard_data_mohalla,
+                resize: true
+            });
+            Morris.Bar({
+                element: 'morris-bar-chart',
+                data: $scope.dashboard_data_family,
+                xkey: 'district',
+                ykeys: ['value'],
+                labels: ['Values'],
+                barRatio: 0.4,
+                xLabelAngle: 35,
+                hideHover: 'auto',
                 resize: true
             });
         })
