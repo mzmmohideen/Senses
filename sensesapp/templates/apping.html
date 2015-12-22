@@ -1435,7 +1435,13 @@
                                 <i class="fa fa-sitemap fa-5x"></i>
                             </div>
                             <div class="col-xs-9 text-right">
-                                <div class="huge">{{dashboard_data.volunteer_interest}}</div>
+                                <div class="huge">
+                                    <span ng-show="!loading_gif"_>
+                                        <img width="5px" src="../static/images/load_icon.gif"/>
+                                    </span>
+                                    <span ng-show="loading_gif">{{dashboard_data.volunteer_interest}}
+                                    </span>
+                                </div>
                                 <div>New Volunteers!</div>
                             </div>
                         </div>
@@ -1514,7 +1520,7 @@
                         </div>
                     </div>
                     <div ng-show="!loading_gif" class="panel-body">
-                        <img width="100%" height="205px" src="../static/images/loading_horizontal.gif" alt="Loading..."/>
+                        <img width="100%" src="../static/images/loading.gif" alt="Loading..."/>
                     </div>
                     <div class="panel-body">
                         <div id="morris-bar-chart"></div>
