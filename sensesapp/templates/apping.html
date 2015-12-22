@@ -71,34 +71,34 @@
                         
                         <!-- dashboard -->
                         <li>
-                            <a ng-click="reportbt=false" href="#/dashboard">Dashboard</a>
+                            <a ng-click="reportbt=false;loading_gif=false;" href="#/dashboard">Dashboard</a>
                         </li>
                         <li>
-                            <a ng-click="reportbt=false" href="#/location">Locations</a>
+                            <a ng-click="reportbt=false;loading_gif=false;" href="#/location">Locations</a>
                         </li>
                         <li>
-                            <a ng-click="reportbt=false" href="#/masjid">Muhallas</a>
+                            <a ng-click="reportbt=false;loading_gif=false;" href="#/masjid">Muhallas</a>
                         </li>
                         <li>
-                            <a ng-click="reportbt=false" href="#/member">Muhalla Users</a>
+                            <a ng-click="reportbt=false;loading_gif=false;" href="#/member">Muhalla Users</a>
                         </li>
                         <li>
-                            <a ng-click="reportbt=false" href="#/schemes">Schemes</a>
+                            <a ng-click="reportbt=false;loading_gif=false;" href="#/schemes">Schemes</a>
                         </li>
                         <li>
-                            <a ng-click="reportbt=false" href="#/services">Services</a>
+                            <a ng-click="reportbt=false;loading_gif=false;" href="#/services">Services</a>
                         </li>
                         <li>
-                            <a ng-click="reportbt=false" href="#/diseases">Diseases</a>
+                            <a ng-click="reportbt=false;loading_gif=false;" href="#/diseases">Diseases</a>
                         </li>
                         <li>
-                            <a ng-click="reportbt=false" href="#/family">Families</a>
+                            <a ng-click="reportbt=false;loading_gif=false;" href="#/family">Families</a>
                         </li>
                         <li>
-                            <a ng-click="reportbt=false" href="#/import">Import CSV & XLS</a>
+                            <a ng-click="reportbt=false;loading_gif=false;" href="#/import">Import CSV & XLS</a>
                         </li>
                         <li>
-                            <a ng-click="reportbt=true" href="#/reports">Reports</a>
+                            <a ng-click="reportbt=true;loading_gif=false;" href="#/reports">Reports</a>
                             <!-- <button class="btn-sm btn btn-primary" ng-disabled="!reportbt" style="float:right;margin: -5px;"><i class="fa fa-filter"></i> Filter</button></a> -->
                             <!-- <span class="fa arrow"></span></a>
                             <ul class="nav nav-second-level">
@@ -1048,7 +1048,7 @@
                             <div ng-bind-html="mod.family_id | highlight: $select.search"></div>
                         </ui-select-choices>
                     </ui-select>
-                    <button ng-disabled="!FamilyValue.masjid" type="submit" style="background-color: #d9534f;border-color: #d9534f;width: 30%;height: 34px;float: left;border-radius: 2px;margin-left:5px;" ng-click="new_fam_bt=false;get_family();" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New Family</button>
+                    <button ng-disabled="!FamilyValue.masjid" type="submit" style="background-color: #d9534f;border-color: #d9534f;width: 33%;height: 34px;float: left;border-radius: 2px;margin-left:5px;" ng-click="new_fam_bt=false;get_family();" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New Family</button>
                 </td>
             </tr>
             </table>
@@ -1513,8 +1513,11 @@
                             </div>
                         </div>
                     </div>
+                    <div ng-show="!loading_gif" class="panel-body">
+                        <img width="100%" height="205px" src="../static/images/loading_horizontal.gif" alt="Loading..."/>
+                    </div>
                     <div class="panel-body">
-                        <div id="morris-area-chart"></div>
+                        <div id="morris-bar-chart"></div>
                     </div>
                 </div>
                 <!-- /.panel -->
@@ -1525,21 +1528,24 @@
                     <div class="panel-heading">
                         <i class="fa fa-bar-chart-o fa-fw"></i> Mahallas Present in District
                     </div>
+                    <div ng-show="!loading_gif" class="panel-body">
+                        <img width="100%" src="../static/images/spin.gif" alt="Loading..."/>
+                    </div>
                     <div class="panel-body">
                         <div style="width:100% !important;" id="morris-donut-chart"></div>
                     </div>
                 </div>
             </div>
-            <div class="col-lg-12">
+            <!--<div class="col-lg-12">
                 <div class="panel panel-default" style="border-radius: 2px;">
                     <div class="panel-heading">
                         <i class="fa fa-bar-chart-o fa-fw"></i> Mahallas
                     </div>
                     <div class="panel-body">
-                        <div style="width:100% !important;" id="morris-bar-chart"></div>
+                        <div style="width:100% !important;" id="morris-area-chart"></div>
                     </div>
                 </div>
-            </div>
+            </div>-->
         </div>
     </script>
     {% endverbatim %}

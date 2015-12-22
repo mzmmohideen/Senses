@@ -243,6 +243,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
     }
     $scope.dashboard_data_mohalla = []
     $scope.dashboard_data_family = []
+    $scope.loading_gif = false;
     $scope.fetch_dashboard_data = function() {
         $http.get('/dashboard_api/',{}).success(function(response){
             $scope.dashboard_data = response;
@@ -260,29 +261,6 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 }
                 $scope.dashboard_data_family.push(values)
             }
-            Morris.Area({
-                element: 'morris-area-chart',
-                data: $scope.dashboard_data_family,
-                xkey: 'district',
-                ykeys: ['value'],
-                labels: ['Total'],
-                pointSize: 2,
-                hideHover: 'auto',
-                resize: true
-            });
-            Morris.Line({
-                element: 'line-example',
-                data: $scope.dashboard_data_family,
-                xkey: 'district',
-                ykeys: ['value'],
-                labels: ['Families']
-            });
-            console.log('i',response,$scope.dashboard_data_family)
-            Morris.Donut({
-                element: 'morris-donut-chart',
-                data: $scope.dashboard_data_mohalla,
-                resize: true
-            });
             Morris.Bar({
                 element: 'morris-bar-chart',
                 data: $scope.dashboard_data_family,
@@ -294,6 +272,22 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 hideHover: 'auto',
                 resize: true
             });
+            Morris.Donut({
+                element: 'morris-donut-chart',
+                data: $scope.dashboard_data_mohalla,
+                resize: true
+            });
+            $scope.loading_gif = true;
+            // Morris.Area({
+            //     element: 'morris-area-chart',
+            //     data: $scope.dashboard_data_family,
+            //     xkey: 'district',
+            //     ykeys: ['value'],
+            //     labels: ['Total'],
+            //     pointSize: 2,
+            //     hideHover: 'auto',
+            //     resize: true
+            // });
         })
     }
     // $scope.fetch_dashboard_data()
