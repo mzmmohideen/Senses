@@ -1426,7 +1426,7 @@
                 <h1 class="page-header">Dashboard</h1>
             </div>
         </div>
-        <div class="row" ng-init="fetch_dashboard_data()">
+        <div class="row">
             <div class="col-lg-3 col-md-6">
                 <div class="panel panel-primary" style="border-radius: 2px;">
                     <div class="panel-heading">
@@ -1456,7 +1456,13 @@
                                 <i class="fa fa-heart fa-5x"></i>
                             </div>
                             <div class="col-xs-9 text-right">
-                                <div class="huge">{{dashboard_data.donor_interest}}</div>
+                                <div class="huge">
+                                    <span ng-show="!loading_gif"_>
+                                        <img width="5px" src="../static/images/load_icon.gif"/>
+                                    </span>
+                                    <span ng-show="loading_gif">{{dashboard_data.donor_interest}}
+                                    </span>
+                                </div>
                                 <div>New Donors!</div>
                             </div>
                         </div>
@@ -1471,7 +1477,13 @@
                                 <i class="fa fa-users fa-5x"></i>
                             </div>
                             <div class="col-xs-9 text-right">
-                                <div class="huge">{{dashboard_data.tot_family}}</div>
+                                <div class="huge">
+                                    <span ng-show="!loading_gif"_>
+                                        <img width="5px" src="../static/images/load_icon.gif"/>
+                                    </span>
+                                    <span ng-show="loading_gif">{{dashboard_data.tot_family}}
+                                    </span>
+                                </div>
                                 <div>Total Families!</div>
                             </div>
                         </div>
@@ -1486,7 +1498,13 @@
                                 <i class="fa fa-users fa-5x"></i>
                             </div>
                             <div class="col-xs-9 text-right">
-                                <div class="huge">{{dashboard_data.fam_member}}</div>
+                                <div class="huge">
+                                    <span ng-show="!loading_gif"_>
+                                        <img width="5px" src="../static/images/load_icon.gif"/>
+                                    </span>
+                                    <span ng-show="loading_gif">{{dashboard_data.fam_member}}
+                                    </span>
+                                </div>
                                 <div>Total Members!</div>
                             </div>
                         </div>

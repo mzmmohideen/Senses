@@ -290,7 +290,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             // });
         })
     }
-    // $scope.fetch_dashboard_data()
+    $scope.fetch_dashboard_data()
     $scope.scheme_val = 'SELECT or ADD SCHEMES';
     $scope.get_scheme = function(scheme) {
         if(!scheme) {
