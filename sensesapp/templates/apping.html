@@ -388,7 +388,12 @@
     <script type="text/ng-template" id="masjid.html">
         <div class="row" ng-init="getMasjidData();getLocation();muhalla_val=true">
             <div class="col-lg-12" style="width: 100%;">
-                <h1 class="page-header">Muhallas <!--<button ng-disabled="!MasjidAddValue.taluk" type="submit" style="width: 100px;height: 34px;float: right;border-radius: 2px;margin-top: -5px;" ng-click="add_new_muhalla(MasjidAddValue)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New Muhalla</button>-->
+                <h1 class="page-header">Muhallas 
+                <button ng-show="muhalla_val" type="submit" style="margin-left:5px; float:right;width:12.5%;background-color: #f0ad4e;border-color: #f0ad4e;height: 34px;" ng-click="muhalla_val=false;" class="btn-sm btn btn-primary">Update Muhalla
+                </button>
+                <button ng-show="!muhalla_val" type="submit" style="margin-left:5px; width:12%;height:34px;float: right;border-radius: 2px;" ng-click="muhalla_val=true;MasjidAddValue.masjid_name='';MasjidAddValue.musallas='';MasjidAddValue.address='';MasjidAddValue.mohalla_id='';" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New Muhalla
+                </button>
+                <!--<button ng-disabled="!MasjidAddValue.taluk" type="submit" style="width: 100px;height: 34px;float: right;border-radius: 2px;margin-top: -5px;" ng-click="add_new_muhalla(MasjidAddValue)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New Muhalla</button>-->
                 </h1>
             </div>
             <div class=" col-lg-12">
@@ -396,7 +401,7 @@
                 <tr>
                     <td> <label for="male">DISTRICT *</label> </td>
                     <td> <label for="male">TALUK *</label> </td>
-                    <td> <label for="male">SELECT MUHALLAH ID: *</label> </td>
+                    <td ng-show="!muhalla_val && MasjidAddValue.taluk"> <label for="male">SELECT MUHALLAH ID: *</label> </td>
                 </tr>
                 <tr>
                     <td><select style="display: inline-block;height: 34px;width: 100%;float: left;margin-right: 10%;border-radius: 2px;" ng-model="MasjidAddValue.district" ng-options="gen for gen in district_list |SortData" class="form-control">
@@ -407,14 +412,13 @@
                     </select></td>
                     <td ng-show="!muhalla_val && MasjidAddValue.taluk"><ui-select ng-show="!new_masjid" style="display: inline-block;height: 34px;width: 100%;float: left;" on-select="getmasjid=MasjidAddValue.mohalla_id;get_masjid(getmasjid)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="MasjidAddValue.mohalla_id">
                             <ui-select-match placeholder="{{masjid_val}}">{{masjid_val}}</ui-select-match>
-                            <ui-select-choices refresh="getmasjid=$select.search;get_masjid(getmasjid)" repeat="mod in masjidList |SortData | filter:$select.search">
-                                <div ng-bind-html="mod | highlight: $select.search"></div>
+                            <ui-select-choices refresh="getmasjid=$select.search;get_masjid(getmasjid)" repeat="mod in muhallaList |SortData | filter:$select.search">
+                                <div ng-bind-html="mod.name | highlight: $select.search"></div>
                             </ui-select-choices>
                         </ui-select></td>
                     <td>
-                        <button ng-show="!muhalla_val" ng-disabled="!MasjidAddValue.taluk" type="submit" style="margin-left:5px; width:94%;height:34px;float: left;border-radius: 2px;" ng-click="muhalla_val=true;MasjidAddValue.masjid_name='';MasjidAddValue.musallas='';MasjidAddValue.address='';MasjidAddValue.mohalla_id='';" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New Muhalla</button>
-                        <button ng-show="muhalla_val" ng-disabled="!MasjidAddValue.taluk || muhalla_val" type="submit" style="margin-left:5px; width:45%;height:34px;float: left;border-radius: 2px;" ng-click="muhalla_val=true;MasjidAddValue.masjid_name='';MasjidAddValue.musallas='';MasjidAddValue.address='';MasjidAddValue.mohalla_id='';" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New Muhalla</button>
-                        <button ng-show="muhalla_val" ng-disabled="!MasjidAddValue.taluk" type="submit" style="margin-left:5px; float:left;width:45%;background-color: #f0ad4e;border-color: #f0ad4e;height: 34px;" ng-click="muhalla_val=false;" class="btn-sm btn btn-primary">Update Muhalla</button>
+                        <!--<button ng-show="muhalla_val" ng-disabled="!MasjidAddValue.taluk || muhalla_val" type="submit" style="margin-left:5px; width:45%;height:34px;float: left;border-radius: 2px;" ng-click="muhalla_val=true;MasjidAddValue.masjid_name='';MasjidAddValue.musallas='';MasjidAddValue.address='';MasjidAddValue.mohalla_id='';" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New Muhalla</button>-->
+                        <!--move to upward <button ng-show="muhalla_val" ng-disabled="!MasjidAddValue.taluk" type="submit" style="margin-left:5px; float:left;width:45%;background-color: #f0ad4e;border-color: #f0ad4e;height: 34px;" ng-click="muhalla_val=false;" class="btn-sm btn btn-primary">Update Muhalla</button>-->
                     </td>    
                 </tr>
                 </table>
@@ -447,7 +451,7 @@
         </div>-->    
         <div class="row">
             <div class="col-lg-12">
-                <h1 style="width: 96%; margin-left: 1%;" class="page-header">Muhalla Committee Members <button ng-disabled="masjidList.indexOf(masjid_val)==-1 || !MasjidAddValue.taluk" type="submit" style="width: 100px;height: 34px;float: right;border-radius: 2px;margin-top: -5px;" ng-click="add_members(MasjidAddValue)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New</button></h1>
+                <h1 style="width: 96%; margin-left: 1%;" class="page-header">Muhalla Committee Members <button ng-disabled="!MasjidAddValue.mohalla_id || !MasjidAddValue.masjid_name || !masjid_member_list" type="submit" style="width: 100px;height: 34px;float: right;border-radius: 2px;margin-top: -5px;" ng-click="add_members(MasjidAddValue)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New</button></h1>
             </div>
             <table style="width: 94%; margin-left: 2%;" class="table table-striped table-bordered table-hover ng-scope">
                 <thead>
@@ -780,7 +784,7 @@
                         <td>{{$index+1}}</td>
                         <td>{{key.family_head}} <br/> {{key.address}}</td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>
-                        <td>{{key.financial.split(' ')[0]}} <br/> {{key.familyid}} </td>
+                        <td>{{key.financial_status.split(' ')[0]}} <br/> {{key.familyid}} </td>
                         <td>{{key.mobile}} </td>
                         <td> Help for Basic Needs(Food,Dress,Place) </td>
                     </tr>

@@ -197,10 +197,10 @@ def add_masjid(request):
                 mohalla_id = '%s / %s'%(district_val.district_code,muhalla_dis_val)
                 if Masjid.objects.filter(mohalla_id=mohalla_id):
                     masjid = Masjid.objects.filter(mohalla_id=mohalla_id,taluk=taluk).update(name=data['masjid_name'],musallas=data['musallas'],location=data['address'],district=district_val)
-                    return HttpResponse(content=json.dumps({'data':'updated!'}),content_type='Application/json')
+                    return HttpResponse(content=json.dumps({'data':'updated!','mohalla_id':mohalla_id}),content_type='Application/json')
                 else:
                     masjid = Masjid.objects.create(mohalla_id=mohalla_id,taluk=taluk,district=district_val,name=data['masjid_name'],musallas=data['musallas'],location=data['address'])
-                    return HttpResponse(content=json.dumps({'data':'Mohalla Created Successfully!'}),content_type='Application/json')
+                    return HttpResponse(content=json.dumps({'data':'Mohalla Created Successfully!','mohalla_id':mohalla_id}),content_type='Application/json')
         elif data['status'] == 'delete':
             masjid = Masjid.objects.filter(mohalla_id=data['mohalla_id']).delete()
             return HttpResponse(content=json.dumps({'data':'Deleted Successfully!'}),content_type='Application/json')
@@ -1132,23 +1132,22 @@ def report_to_pdf(request):
         pdf_filepath = '%s/static/pdf/%s'%(file_path,pdf_filename)
         options = {
             'page-size': 'Letter',
-            'margin-top': '0.75in',
+            'margin-top': '0.1in',
             'margin-right': '0.75in',
-            'margin-bottom': '0.7in',
+            'margin-bottom': '0.1in',
             'margin-left': '0.75in',
-        }    
+        }
+        f = open('myfile.html','w')    
         html_content = render_to_string(html_filename,{'header':data['header'],'data':data['data'],'report':data['report'],'total':len(data['data']),'finacial_value':data['finacial_value']})
+        f.write(html_content)
+        f.close()
         response = pdfkit.from_string(html_content, pdf_filepath,options=options)
         return HttpResponse(content=json.dumps({'data':data,'pdfname':pdf_filename}),content_type='Application/json')
     else:
         file_path = os.path.dirname(os.path.dirname(__file__))
-        # print 's',request
         pdf_filename = 'reports_gen.pdf'
         html_filename = '%s/templates/report_to_pdf.html'%file_path
         html_content = render_to_string(html_filename,{'name':'name'})
-        print 'html_filename',html_content
-        # exit()    
-        # response = pdfkit.from_file(html_filename,pdf_filename)
         response = pdfkit.from_string(html_content, pdf_filename)
         open_pdf = '%s/%s'%(file_path,pdf_filename)
         f = open(open_pdf,'r')
@@ -1160,7 +1159,6 @@ def matrix_taluk_api(request):
     if request.method == 'GET':
         district = request.GET['district']
         count_dict = {}
-        # try:            
         if request.GET['service_id'] != 'none':
             service = Service.objects.get(service_id=request.GET['service_id'])
             data = map(lambda x:{'service_name':x.scheme.name,'service_id':x.scheme.service_id,'taluk':x.member.muhalla.taluk.taluk_name,'district':x.member.muhalla.taluk.district.district_name},Member_service.objects.filter(scheme=service,status=True,solution='Not Yet'))

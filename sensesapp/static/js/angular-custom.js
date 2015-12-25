@@ -486,8 +486,10 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.masjid_val = 'Select mahalla ID from the List';
         }
         else {
-            $scope.masjid_val = masjid;
-            $scope.getMasjidData($scope.masjid_val);
+            // $scope.masjid_val = masjid;
+            // $scope.getMasjidData($scope.masjid_val);
+            $scope.masjid_val = masjid.name;
+            $scope.getMasjidData(masjid.mohalla_id);
         }
     }
     $scope.value = '';
@@ -1036,6 +1038,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         else {
             var masjid_val = data.mohalla_id
         }
+        console.log('masjid_val',masjid_val)
         appBusy.set("Adding....");
         $http.post('/add_masjid/',{
             data: data,
@@ -1058,9 +1061,13 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 $scope.get_masjid()
                 $scope.getMasjidData()
             }
-            else {
+            else if(response.data == 'updated!') {
                 $scope.get_masjid(masjid_val)
                 $scope.getMasjidData(masjid_val)
+            }
+            else {
+                $scope.get_masjid(masjid_val)
+                $scope.getMasjidData(response.mohalla_id)
             }
         })
     }

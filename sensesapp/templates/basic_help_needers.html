@@ -1,6 +1,9 @@
 <html>
     <head>
     <style type="text/css">
+    table, tr, td, th, tbody, thead, tfoot {
+        page-break-inside: avoid !important;
+    }
     .tg  {border-collapse:collapse;border-spacing:0;border-color:#aabcfe;}
     .tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#669;background-color:#e8edff;}
     .tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#039;background-color:#b9c9fe;}
@@ -16,51 +19,54 @@
     .tg .tg-kixb{background-color:#ffffff;color:#000000;vertical-align:top}
     .tg .tg-scrz{font-weight:bold;background-color:#ffffff;color:#000000;text-align:center;vertical-align:top}
     </style>
+    <script type="text/javascript" src="static/js/wkhtmltopdf_tableSplitHack.js"></script>
     </head>
     <body>
-      <table class="tg" style="width:100%">
-        <tr>
-          <th class="tg-to58" colspan="2" rowspan="3"><br>UNWO<br>Needers Details</th>
-          <th class="tg-92io" colspan="3">DISTRICT</th>
-          <th class="tg-7x8i" colspan="4">{{report.district}}</th>
-        </tr>
-        <tr>
-          <td class="tg-uq5v" colspan="3">TALUK</td>
-          <td class="tg-mo1d" colspan="4">{{report.taluk}}</td>
-        </tr>
-        <tr>
-          <td class="tg-92io" colspan="3">MAHALLA</td>
-          <td class="tg-7x8i" colspan="4">{{report.muhalla.name}}</td>
-        </tr>
-        <tr>
-          <td class="tg-8xgs" colspan="5">Basic Help Needers (Food,Dress,Accomodation) </td>
-          <td class="tg-eub6">NEEDY</td>
-          <td class="tg-kixb">{{total}}</td>
-          <td class="tg-eub6">PAGE</td>
-          <td class="tg-kixb">1</td>
-        </tr>
-        <tr>
-          <td class="tg-scrz">S.No</td>
-          <td class="tg-scrz">NEEDY NAME &amp; ADDRESS</td>
-          <td class="tg-scrz" colspan="3">Age, Gender, Financial,<br>Family ID, <br>Contact Number</td>
-          <td class="tg-scrz" colspan="4">Details of Needy</td>
-        </tr>
-        {% for val in data %}
-        <tr>
-          <td class="tg-83xr" rowspan="3">{{forloop.counter}}</td>
-          <td class="tg-kixb" rowspan="3">{{val.name}} <br/> {{val.address}}</td>
-          <td class="tg-83xr">{{val.age}}</td>
-          <td class="tg-83xr">{{val.gender}}</td>
-          <td class="tg-83xr">{{val.financial_pdf}}</td>
-          <td class="tg-83xr" colspan="4" rowspan="3">Help For Basic Needs (Food,Dress,Accomodation)</td>
-        </tr>
-        <tr>
-          <td class="tg-7un6" colspan="3">{{val.familyid}}</td>
-        </tr>
-        <tr>
-          <td class="tg-83xr" colspan="3">{{val.mobile}}</td>
-        </tr>
-        {% endfor %}
-      </table>
+      <div class="report_data">
+        <table class="tg" style="width:100%">
+          <tr>
+            <th class="tg-to58" colspan="2" rowspan="3"><br>UNWO<br>Needers Details</th>
+            <th class="tg-92io" colspan="3">DISTRICT</th>
+            <th class="tg-7x8i" colspan="4">{{report.district}}</th>
+          </tr>
+          <tr>
+            <td class="tg-uq5v" colspan="3">TALUK</td>
+            <td class="tg-mo1d" colspan="4">{{report.taluk}}</td>
+          </tr>
+          <tr>
+            <td class="tg-92io" colspan="3">MAHALLA</td>
+            <td class="tg-7x8i" colspan="4">{{report.muhalla.name}}</td>
+          </tr>
+          <tr>
+            <td class="tg-8xgs" colspan="5">Basic Help Needers (Food,Dress,Accomodation) </td>
+            <td class="tg-eub6">NEEDY</td>
+            <td class="tg-kixb">{{total}}</td>
+            <td class="tg-eub6">PAGE</td>
+            <td class="tg-kixb">1</td>
+          </tr>
+          <tr>
+            <td class="tg-scrz">S.No</td>
+            <td class="tg-scrz">NEEDY NAME &amp; ADDRESS</td>
+            <td class="tg-scrz" colspan="3">Age, Gender, Financial,<br>Family ID, <br>Contact Number</td>
+            <td class="tg-scrz" colspan="4">Details of Needy</td>
+          </tr>
+          {% for val in data %}
+          <tr class="page-split">
+            <td class="tg-83xr" rowspan="3">{{forloop.counter}}</td>
+            <td class="tg-kixb" rowspan="3">{{val.family_head}} <br/> {{val.address}}</td>
+            <td class="tg-83xr">{{val.age}}</td>
+            <td class="tg-83xr">{{val.gender}}</td>
+            <td class="tg-83xr">{{val.financial_pdf}}</td>
+            <td class="tg-83xr" colspan="4" rowspan="3">Help For Basic Needs (Food,Dress,Accomodation)</td>
+          </tr>
+          <tr>
+            <td class="tg-7un6" colspan="3">{{val.familyid}}</td>
+          </tr>
+          <tr>
+            <td class="tg-83xr" colspan="3">{{val.mobile}}</td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>  
 </body>
 </html>
