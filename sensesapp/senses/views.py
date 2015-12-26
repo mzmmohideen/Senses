@@ -21,6 +21,10 @@ from itertools import groupby
 from operator import itemgetter
 from django.db.models import Q
 from py_script.import_csv_data import importcsvdata
+from py_script.data_to_pdf import *
+
+from reportlab.platypus import *
+from reportlab.platypus.tables import Table
 
 def login_check(request):
     if request.user.is_authenticated():
@@ -230,14 +234,18 @@ def masjid_member(request):
             masjid_val = Masjid.objects.get(mohalla_id=data['data']['mohalla_id'])
             coordinator = True if data['coordinator'] == 'Yes' else False
             if coordinator:
+                print 'coordinator',coordinator
                 moh_user = str(masjid_val.mohalla_id.replace(' ','').replace('/',''))
                 if not User.objects.filter(username=moh_user):
+                    print '1'
                     if SensesMembers.objects.filter(member_type='Mohalla User',masjid=masjid_val):
+                        print '2'
                         return HttpResponse(content=json.dumps({'data':'Mohalla User Exist!'}),content_type='Application/json')    
-                    elif data['email'] != '':
-                        if User.objects.filter(email=data['email']):
-                            return HttpResponse(content=json.dumps({'data':'Email ID Exist!'}),content_type='Application/json')    
+                    elif User.objects.filter(email=data['email']):
+                        print '3'
+                        return HttpResponse(content=json.dumps({'data':'Email ID Exist!'}),content_type='Application/json')
                     else:
+                        print 'working',data['coordinator']
                         password = '%s123'%moh_user
                         create_moh_user = User.objects.create(username=moh_user,email=data['email'],last_name=password)
                         create_moh_user.set_password(password)
@@ -704,7 +712,7 @@ def ServiceData(request):
         data = json.loads(request.body)['data']
         if Service.objects.filter(service_id=data['service_id']):
             if Service.objects.filter(name=data['service']):
-                return HttpResponse(content=json.dumps({'data':'Disease Name Exist!'}),content_type='Application/json')
+                return HttpResponse(content=json.dumps({'data':'Service Name Exist!'}),content_type='Application/json')
             else:
                 service = Service.objects.filter(service_id=data['service_id']).update(name=data['service'])
                 return HttpResponse(content=json.dumps({'data':'Service Name Updated!'}),content_type='Application/json')
@@ -1141,7 +1149,9 @@ def report_to_pdf(request):
         html_content = render_to_string(html_filename,{'header':data['header'],'data':data['data'],'report':data['report'],'total':len(data['data']),'finacial_value':data['finacial_value']})
         f.write(html_content)
         f.close()
-        response = pdfkit.from_string(html_content, pdf_filepath,options=options)
+        print 'data',data['header']
+        print_pdf(data,pdf_filename,pdf_filepath)
+        # response = pdfkit.from_string(html_content, pdf_filepath,options=options)
         return HttpResponse(content=json.dumps({'data':data,'pdfname':pdf_filename}),content_type='Application/json')
     else:
         file_path = os.path.dirname(os.path.dirname(__file__))
@@ -1284,3 +1294,35 @@ def sortReportData(request):
     sort_reverse = False if sort_reverse == True else True
     sort_data = sorted(json.loads(request.body)['data'],key=itemgetter(sort_key),reverse=sort_reverse)
     return HttpResponse(json.dumps({'sort_data':sort_data}),content_type='Application/json')
+
+def print_pdf(data,name,path):
+    from reportlab.lib import *
+    response = HttpResponse(mimetype='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename=somefilename.pdf'
+
+    elements = []
+    # data=[(1,2),(3,4)]
+    print 'data',name
+    # doc = SimpleDocTemplate(response, rightMargin=0, leftMargin=0, topMargin=0, bottomMargin=0)
+    # data= [['Top\nLeft', '', '02', '03', '04'],
+    #  ['', '', '12', '13', '14'],
+    #  ['20', '21', '22', 'Bottom\nRight', ''],
+    #  ['30', '31', '32', '', '']]
+    fields = tuple(zip(data['data'][0].keys(),data['data'][0].keys()))
+    data = data['data']
+    doc = DataToPdf(fields, data)
+    doc.export(name)
+    # doc.export('LogFiles.pdf')
+    # table=Table(data,style=[
+    #  ('GRID',(0,0),(-1,-1),0.5,colors.grey),
+    #  ('BACKGROUND',(0,0),(1,1),colors.palegreen),
+    #  ('SPAN',(0,0),(1,1)),
+    #  ('BACKGROUND',(-2,-2),(-1,-1), colors.pink),
+    #  ('SPAN',(-2,-2),(-1,-1)),
+    #  ])
+
+    # table = Table(data, colWidths=270, rowHeights=79)
+    # elements.append(table)
+    # doc.build(elements)
+    print 'doc',doc 
+    return response

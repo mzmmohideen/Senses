@@ -192,7 +192,7 @@ def importcsvdata(value):
                 if Family.objects.filter(family_id=familyid):
                       family_update = Family.objects.filter(family_id=familyid).update(muhalla=masjid,report_date=data_date,language=language,ration_card=ration_card,address=fam_address,mobile=mobile_no,house_type=fam_house,toilet=toilet,house_cat=house_cat,financial_status=financial_status,health_insurance=insurance,volunteer=volunteer,donor=donor,family_needs=family_needs)
                       family = Family.objects.get(family_id=familyid)
-                      print 'family updated'
+                      print 'family updated',familyid
                 else:
                       family = Family.objects.create(family_id=familyid,muhalla=masjid,report_date=data_date,language=language,ration_card=ration_card,address=fam_address,mobile=mobile_no,house_type=fam_house,toilet=toilet,house_cat=house_cat,financial_status=financial_status,health_insurance=insurance,volunteer=volunteer,donor=donor,family_needs=family_needs)
                 # member add
@@ -227,9 +227,11 @@ def importcsvdata(value):
                       elif val[23] == 'W':
                            marital_status = 'Widow'
                       elif val[23] == 'D':
-                           marital_status = 'Devorced'     
-                      else:
+                           marital_status = 'Devorced'
+                      elif val[23] == 'A':
                            marital_status = 'Aged Unmarried Woman'
+                      else:
+                           marital_status = 'Unknown'
                 else:
                       marital_status = 'Single'                     
                 if val[20]:

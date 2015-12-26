@@ -81,7 +81,7 @@ class Member(models.Model):
     muhalla = models.ForeignKey(Masjid)
     taluk = models.ForeignKey(Taluk)
     district = models.ForeignKey(District)
-    mem_id = models.CharField(max_length=20,unique=True)
+    mem_id = models.CharField(max_length=30,unique=True)
     name = models.CharField(max_length=50)
     gender = models.CharField(max_length=10,choices=GENDER)
     dateofbirth = models.DateTimeField(default=timezone.now)
