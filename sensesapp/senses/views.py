@@ -1146,7 +1146,7 @@ def report_to_pdf(request):
         html_content = render_to_string(html_filename,{'header':data['header'],'data':data['data'],'report':data['report'],'total':len(data['data']),'finacial_value':data['finacial_value']})
         f.write(html_content)
         f.close()
-        print_pdf(data,pdf_filename,pdf_filepath)
+        # print_pdf(data,pdf_filename,pdf_filepath)
         response = pdfkit.from_string(html_content, pdf_filepath,options=options)
         return HttpResponse(content=json.dumps({'data':data,'pdfname':pdf_filename}),content_type='Application/json')
     else:
@@ -1292,7 +1292,7 @@ def sortReportData(request):
     return HttpResponse(json.dumps({'sort_data':sort_data}),content_type='Application/json')
 
 def print_pdf(data,name,path):
-    from reportlab.lib import *
+    # from reportlab.lib import *
     response = HttpResponse(mimetype='application/pdf')
     response['Content-Disposition'] = 'attachment; filename=somefilename.pdf'
 
