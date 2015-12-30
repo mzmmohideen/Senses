@@ -336,7 +336,18 @@ def fetchReportData(request):
     if request.method == 'POST':
         data = json.loads(request.body)['data']
         sort_val = json.loads(request.body)['sort_val']
-        if sort_val == 'familyid':
+        if data['report_type'] == 'Needs Types':
+            if sort_val == 'Needs Type':
+                sort_key = 'name'
+            elif sort_val == 'Needs ID':
+                sort_key = 'need_id'
+            if sort_val == 'Total':
+                sort_key = 'total'
+            elif sort_val == 'beneficiaries':
+                sort_key = 'beneficiaries'
+            else:
+                sort_key = 'name'                    
+        elif sort_val == 'familyid':
             sort_key = 'familyid'
         elif 'Family ID' in sort_val:
             sort_key = 'familyid'
@@ -348,7 +359,7 @@ def fetchReportData(request):
         elif 'Age' in sort_val:
             sort_key = 'age'
         elif 'Financial Status' in sort_val:
-            sort_key = 'financial_status'
+            sort_key = 'financial_status'    
         else:
             sort_key = 'familyid'
         print 'data_date',sort_key,sort_val    

@@ -843,6 +843,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.ReportHeader = true;
             $scope.getReportData = false;
             appBusy.set("Loading....");
+            console.log('val',$scope.column_sort)
             $http.post('/fetchReportData/',{
                 data : data,
                 sort_val : $scope.column_sort,
