@@ -5,7 +5,7 @@ from django.contrib.auth.models import User
 GENDER = (('MALE','MALE'), ('FEMALE','FEMALE'))
 STATUS = (('Own', 'Own'), ('Rent', 'Rent'))
 FINANCIAL = (('A - Well Settled', 'A - Well Settled'), ('B - Full Filled', 'B - Full Filled'), ('C - Middle Class', 'C - Middle Class'), ('D - Poor', 'D - Poor'), ('E - Very Poor', 'E - Very Poor'))
-MARITAL = (('Married','Married'), ('Single','Single'), ('Widow','Widow'),('Devorced','Devorced'),('Aged Unmarried Woman','Aged Unmarried Woman'))
+MARITAL = (('Married','Married'), ('Single','Single'), ('Widow','Widow'),('Devorced','Devorced'),('Aged Unmarried Woman','Aged Unmarried Woman'),('Unknown','Unknown'))
 LOCATION = (('Local','Local'), ('Outstation','Outstation'), ('Foreign','Foreign'))
 MADARASA = (('Boys For Makthab 4-15','Boys For Makthab 4-15'), ('Girls For Makthab 4-15','Girls For Makthab 4-15'), ('Adult Makthab','Adult Makthab'), ('Interest in Aalim/Hifz','Interest in Aalim/Hifz'), ('Interest in Niswan','Interest in Niswan'), ('Interest in 1yr Muallim','Interest in 1yr Muallim'), ('Jumrah Madarasa for Boys','Jumrah Madarasa for Boys'))
 SYMPTOMTYPE = (('DISEASE','DISEASE'),('DISORDER','DISORDER'))

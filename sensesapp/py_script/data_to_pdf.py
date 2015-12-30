@@ -61,7 +61,13 @@ class DataToPdf():
                                reverse=reverse_order)
 
         converted_data = self.__convert_data()
-        table = Table(converted_data, hAlign=table_halign)
+        table = Table(converted_data, hAlign=table_halign,style=[
+         ('GRID',(0,0),(-1,-1),0.5,colors.grey),
+         ('BACKGROUND',(0,0),(1,1),colors.palegreen),
+         ('SPAN',(0,0),(1,1)),
+         ('BACKGROUND',(-2,-2),(-1,-1), colors.pink),
+         ('SPAN',(-2,-2),(-1,-1)),
+         ])
         table.setStyle(TableStyle([
             ('FONT', (0, 0), (-1, 0), 'Helvetica-Bold'),
             ('ALIGN', (0, 0), (-1, 0), 'CENTER'),

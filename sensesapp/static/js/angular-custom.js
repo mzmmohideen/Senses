@@ -371,6 +371,41 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
 
         }
     }
+    $scope.list_familyid = []
+    $scope.checkboxval = '0';
+    $scope.dosomething = function(value,data) {
+        console.log('value',data.familyid,value,typeof(value))
+        if(value == '0') {
+            $scope.list_familyid.push(data)
+        }
+        else if(value == '1') {
+            console.log($scope.list_familyid.indexOf(data))
+            $scope.list_familyid.splice($scope.list_familyid.indexOf(data),1)
+        }
+        console.log('value',$scope.list_familyid)
+
+    }
+    $scope.performaction = function(action,reportdata,reportval) {
+        console.log('val',action,reportdata,reportval)
+        if(action == 'delete') {
+            appBusy.set("Removing....");
+        }
+        else {
+            appBusy.set("Updating....");
+        }
+        $http.post('/reportdatafunc/',{
+            data:$scope.list_familyid,
+            action:action,
+            report:reportdata.report_type,
+        }).success(function(response) {
+            appBusy.set(response.data);              
+                $timeout( function() {              
+                    appBusy.set(false);
+                }, 1000);
+            $scope.fetchReportAPI(reportdata,reportval)
+            console.log('val',response)
+        })
+    }
     $scope.editTaluk = function(district_val,taluk,tot_taluk,index,status) {
         appBusy.set("Updating....");
         $http.post('/addLocation/',{
@@ -667,6 +702,10 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         $scope.fetchReportAPI(data,values)
     }
     $scope.fetchReportAPI = function(data,values) {
+        $scope.list_familyid = []
+        $scope.diseaseid_list = []
+        $scope.schemeid_list = []
+        $scope.serviceid_list = []
         if(values.report_name == 'Total Family Details' || values.report_name == 'Own House & Rent House families' || values.report_name == 'Families without toilets') {
             $scope.voter_status_dt = false;
             $scope.tot_fam_dt = true;

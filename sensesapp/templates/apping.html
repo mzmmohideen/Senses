@@ -70,7 +70,7 @@
                         <!-- </li> -->
                         
                         <!-- dashboard -->
-                        <li>
+                        <li class="active">
                             <a ng-click="reportbt=false;loading_gif=false;" href="#/dashboard">Dashboard</a>
                         </li>
                         <li>
@@ -296,7 +296,7 @@
         </div>
     </script>
     <script type="text/ng-template" id="member.html">
-        <div class="row" ng-init="getLocation();getMasjidData();report_value_change()">
+        <div class="row" ng-init="getLocation();getMasjidData();">
             <div class="col-lg-12" style="width: 100%">
                 <h1 class="page-header">Muhalla Members 
                 <!--<select style="display: inline-block;border-radius: 2px;height: 34px;width: 20%;float: right;" ng-model="moh_user.member_type" ng-change="report_value_change()" ng-options="gen for gen in ['Mohalla User','End Users & Donors']" class="form-control">
@@ -707,7 +707,10 @@
                 <td><select ng-disabled="!ReportValues.district" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;border-radius: 2px; float: left;" ng-change="getMasjidList(ReportValues)" ng-model="ReportValues.taluk" ng-options="gen for gen in getTaluk[ReportValues.district] | SortData" class="form-control">
                     <option value="">SELECT TALUK</option>
                 </select></td>
-                <td><select ng-disabled="!ReportValues.taluk" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;float: left;border-radius: 2px;" ng-model="ReportValues.muhalla" ng-options="gen.name for gen in muhallaList | SortData" class="form-control">
+                <td ng-show="!ReportValues.report_name"><select ng-disabled="!ReportValues.taluk" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;float: left;border-radius: 2px;" ng-model="ReportValues.muhalla" ng-options="gen.name for gen in muhallaList | SortData" class="form-control">
+                    <option value="">SELECT MUHALLAH</option>
+                </select></td>
+                <td ng-show="ReportValues.report_name"><select ng-disabled="!ReportValues.taluk" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;float: left;border-radius: 2px;" ng-model="ReportValues.muhalla" ng-change="fetchReportAPI(ReportDatas,ReportValues)" ng-options="gen.name for gen in muhallaList | SortData" class="form-control">
                     <option value="">SELECT MUHALLAH</option>
                 </select></td>
                 <td><input style="display: inline-block;height: 34px;border-radius: 2px; width: 100%;float: left;" class="form-control" type="text" ng-model="ReportValues.muhalla.mohalla_id" valid-number ng-change="clear_error()" placeholder="Muhalla ID" readonly/></td>
@@ -720,6 +723,10 @@
             </tr>
             </table>
             </div>
+            <div ng-show="list_familyid.length>0">
+                <button ng-show="ReportValues.report_name == 'Basic Help Needers List' || ReportValues.report_name == 'Total Family Details' || ReportValues.report_name == 'Own House & Rent House families' || ReportValues.report_name == 'Families Eligible for Jakaath' || ReportValues.report_name == 'Families without toilets'" style="background-color:red;margin-left: 35%;margin-top:-2%;position: relative;" ng-click="performaction('delete',ReportDatas,ReportValues)" class="btn btn-primary"><i class="glyphicon glyphicon-trash"></i> Delete Selected</button>
+                <button ng-show="ReportValues.report_name == 'Training/Employment Help and Guidance Needers List' || ReportValues.report_name == 'Educational Help and Guidance Needers List' || ReportValues.report_name == 'Help for Discontinued and Guidance Needers List' || ReportValues.report_name == 'Help for Poor People and Guidance Needers List' || ReportValues.report_name == 'Government Schemes and Guidance Needers Details' || ReportValues.report_name == 'Government Voter ID Needers'" style="background-color:green;position: relative;margin-left:35%;margin-top:-2%;" ng-click="performaction('make_sol',ReportDatas,ReportValues)" class="btn btn-primary"><i class="fa fa-check"></i> Make it solved</button>
+            </div>    
             <!--<div class="form-group" style="padding-bottom: 34px;">
                 <button  ng-disabled="scheme_val=='' || scheme_val=='SELECT SCHEMES' || sub_scheme_val=='' || sub_scheme_val=='SELECT SUB SCHEME'" type="submit" style="width:25%;height: 34px;float:right;" ng-click="add_schemes(scheme_val,sub_scheme_val,scheme_values)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
             </div>-->
@@ -730,13 +737,13 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr ng-show="ReportValues.report_name == 'Mohalla Report'" ng-repeat="(key,val) in getReportData" class="ng-scope">
+                    <tr ng-show="ReportValues.report_name == 'Mohalla Report'" ng-repeat="(k,val) in getReportData" class="ng-scope">
                         <td>{{$index+1}}</td>
-                        <td ng-show="key!='Mother Tongue'" class="ng-binding">{{key}} {{getReportData.length}}</td>
-                        <!--<td ng-show="key=='Mother Tongue'" class="ng-binding">
+                        <td ng-show="k!='Mother Tongue'" class="ng-binding">{{k}} {{getReportData.length}}</td>
+                        <!--<td ng-show="k=='Mother Tongue'" class="ng-binding">
                             <table>
                                 <tr>
-                                 <td rowspan="3" style="border:1px solid #ccc">{{key}}</td>
+                                 <td rowspan="3" style="border:1px solid #ccc">{{k}}</td>
                                  <td>
                                  <td style="border:1px solid #ccc">a</td>
                                  <td style="border:1px solid #ccc">b</td>
@@ -758,7 +765,7 @@
                         <td colspan="7">No Data Found!</td>
                     </tr>
                     <tr ng-show="ReportValues.report_name == 'New filter' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
-                        <td>{{$index+1}}</td>
+                        <td>{{$index+1}} <input type="checkbox" ng-model="checkboxval" ng-true-value="1" ng-false-value="0" ng-checked="checkboxval == 1" ng-click="dosomething(checkboxval,key)"></td>
                         <td>{{key.name}} <br/> {{key.address}}</td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>
                         <td>{{key.financial.split(' ')[0]}} <br/> {{key.familyid}} </td>
@@ -766,14 +773,14 @@
                         <td> {{key.needs}}</td>
                     </tr>
                     <tr ng-show="ReportValues.report_name == 'Total Family Details' || ReportValues.report_name == 'Own House & Rent House families' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
-                        <td>{{$index+1}}</td>
+                        <td>{{$index+1}} <input type="checkbox" ng-model="checkboxval" ng-true-value="1" ng-false-value="0" ng-checked="checkboxval == 1" ng-click="dosomething(checkboxval,key)"></td>
                         <td>{{key.family_head}} <br/> {{key.address}} </td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>
                         <td>{{key.familyid}} <br/> {{key.mobile}} </td>
                         <td>{{key.financial_status.split(' ')[0]}} <br/> {{get_jakaath_status(key.financial_status.split(' ')[0])}} </td>
                     </tr>
                     <tr ng-show="ReportValues.report_name == 'Families Eligible for Jakaath' || ReportValues.report_name == 'Government Voter ID Needers' || ReportValues.report_name == 'Families without toilets' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
-                        <td>{{$index+1}}</td>
+                        <td>{{$index+1}} <input type="checkbox" ng-model="checkboxval" ng-true-value="1" ng-false-value="0" ng-checked="checkboxval == 1" ng-click="dosomething(checkboxval,key)"></td>
                         <td>{{key.family_head}}</td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>
                         <td>{{key.financial_status.split(' ')[0]}} <br/> {{key.familyid}} </td>
@@ -781,7 +788,7 @@
                         <td> {{key.address}} </td>
                     </tr>
                     <tr ng-show="ReportValues.report_name == 'Basic Help Needers List' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
-                        <td>{{$index+1}}</td>
+                        <td>{{$index+1}} <input type="checkbox" ng-model="checkboxval" ng-true-value="1" ng-false-value="0" ng-checked="checkboxval == 1" ng-click="dosomething(checkboxval,key)"></td>
                         <td>{{key.family_head}} <br/> {{key.address}}</td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>
                         <td>{{key.financial_status.split(' ')[0]}} <br/> {{key.familyid}} </td>
@@ -789,7 +796,7 @@
                         <td> Help for Basic Needs(Food,Dress,Place) </td>
                     </tr>
                     <tr ng-show="ReportValues.report_name == 'Help for Poor People and Guidance Needers List' ||  ReportValues.report_name == 'Medical Needs and Guidance Needers Details' || ReportValues.report_name == 'Government Schemes and Guidance Needers Details' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
-                        <td>{{$index+1}}</td>
+                        <td>{{$index+1}} <input type="checkbox" ng-model="checkboxval" ng-true-value="1" ng-false-value="0" ng-checked="checkboxval == 1" ng-click="dosomething(checkboxval,key)"></td>
                         <td>{{key.name}} <br/> {{key.address}}</td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>
                         <td>{{key.financial.split(' ')[0]}} <br/> {{key.familyid}} </td>
@@ -797,7 +804,7 @@
                         <td> {{key.needer}} for<br/>{{key.needs}} </td>
                     </tr>
                     <tr ng-show="ReportValues.report_name == 'Training/Employment Help and Guidance Needers List' || ReportValues.report_name == 'Educational Help and Guidance Needers List' || ReportValues.report_name == 'Help for Discontinued and Guidance Needers List' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
-                        <td>{{$index+1}}</td>
+                        <td>{{$index+1}} <input type="checkbox" ng-model="checkboxval" ng-true-value="1" ng-false-value="0" ng-checked="checkboxval == 1" ng-click="dosomething(checkboxval,key)"></td>
                         <td>{{key.name}} <br/> {{key.address}}</td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>
                         <td>{{key.financial.split(' ')[0]}} <br/> {{key.familyid}} </td>
@@ -805,7 +812,7 @@
                         <td> {{key.needs}} <br/> Qualification: {{key.qualification}} </td>
                     </tr>
                     <tr ng-show="ReportValues.report_name == 'Childrens Need to join Makthab Madarasa' || ReportValues.report_name == 'Persons Need to join Jumrah Madarasa' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
-                        <td>{{$index+1}}</td>
+                        <td>{{$index+1}} <input type="checkbox" ng-model="checkboxval" ng-true-value="1" ng-false-value="0" ng-checked="checkboxval == 1" ng-click="dosomething(checkboxval,key)"></td>
                         <td>{{key.name}} <br/> {{key.address}}</td>
                         <td>{{key.age}} <br/> {{key.gender}} </td>
                         <td>{{key.financial.split(' ')[0]}} <br/> {{key.familyid}} </td>
@@ -1431,7 +1438,9 @@
     <script type="text/ng-template" id="dashboard.html">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Dashboard</h1>
+                <li class="active">
+                    <h1 class="page-header">Dashboard</h1>
+                </li>    
             </div>
         </div>
         <div class="row">

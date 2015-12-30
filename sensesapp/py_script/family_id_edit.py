@@ -24,19 +24,19 @@ def edit_family_id():
     #     	pass
     #         # print 'id',i.family_id
     #         # print 'error',repr(format_exc())
-    # for i in Member.objects.all():
-    #     try:
-    #         if len(i.mem_id.split('/')[2]) != 4:
-    #             print '59',i.mem_id
-    #             fam_id = i.mem_id.replace(i.mem_id.split('/')[2], '%s%s%s'%(' ','%03d'%eval(i.mem_id.split('/')[2]),' '))
-    #             i.mem_id = fam_id
-    #             i.save()
-    #             print 'fam_id_final',i.mem_id
-    #         else:
-    #             print 'fam_id',fam_id
-    #         # fam_id.save()
-    #     except:
-    #         pass        
+    for i in Member.objects.all():
+        try:
+            if len(i.mem_id.split('/')[2]) != 4:
+                print '59',i.mem_id
+                fam_id = i.mem_id.replace(i.mem_id.split('/')[2], '%s%s%s'%(' ','%03d'%eval(i.mem_id.split('/')[2]),' '))
+                i.mem_id = fam_id
+                i.save()
+                print 'fam_id_final',i.mem_id
+            else:
+                print 'fam_id',fam_id
+            # fam_id.save()
+        except:
+            pass        
     for i in Member.objects.all():
         try:
             if i.Relation=='Family Head':

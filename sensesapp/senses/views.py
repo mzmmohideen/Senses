@@ -20,11 +20,8 @@ from traceback import format_exc
 from itertools import groupby
 from operator import itemgetter
 from django.db.models import Q
-from py_script.import_csv_data import importcsvdata
 from py_script.data_to_pdf import *
-
-from reportlab.platypus import *
-from reportlab.platypus.tables import Table
+from py_script.import_csv_data import importcsvdata
 
 def login_check(request):
     if request.user.is_authenticated():
@@ -390,11 +387,11 @@ def fetchReportData(request):
                 
             for i in member_data:
                 for j in Medical.objects.filter(member=i):
-                    get_mem_medical.append({'name':j.member.name,'qualification':j.member.qualification,'status':True,'solution':'','address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})
+                    get_mem_medical.append({'name':j.member.name,'memberid':j.member.mem_id,'qualification':j.member.qualification,'status':True,'solution':'','address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})
                 for k in Member_scheme.objects.filter(member=i):
-                    get_mem_scheme.append({'name':k.member.name,'qualification':k.member.qualification,'status':k.status,'solution':k.solution,'address':k.member.family.address,'age':k.member.age,'gender':k.member.gender,'financial':k.member.family.financial_status,'familyid':k.member.family.family_id,'mobile':k.member.family.mobile,'needs':k.scheme.name,'needer':'Need Government Scheme Guidance'})
+                    get_mem_scheme.append({'name':k.member.name,'memberid':k.member.mem_id,'qualification':k.member.qualification,'status':k.status,'solution':k.solution,'address':k.member.family.address,'age':k.member.age,'gender':k.member.gender,'financial':k.member.family.financial_status,'familyid':k.member.family.family_id,'mobile':k.member.family.mobile,'needs':k.scheme.name,'needer':'Need Government Scheme Guidance'})
                 for m in Member_service.objects.filter(member=i):
-                    get_mem_service.append({'name':m.member.name,'qualification':m.member.qualification,'status':m.status,'solution':m.solution,'address':m.member.family.address,'age':m.member.age,'gender':m.member.gender,'financial':m.member.family.financial_status,'familyid':m.member.family.family_id,'mobile':m.member.family.mobile,'needs':m.scheme.name,'needer':'Need Other/NGO Guidance'})    
+                    get_mem_service.append({'name':m.member.name,'memberid':m.member.mem_id,'qualification':m.member.qualification,'status':m.status,'solution':m.solution,'address':m.member.family.address,'age':m.member.age,'gender':m.member.gender,'financial':m.member.family.financial_status,'familyid':m.member.family.family_id,'mobile':m.member.family.mobile,'needs':m.scheme.name,'needer':'Need Other/NGO Guidance'})    
             member_details = get_mem_medical + get_mem_scheme + get_mem_service
             get_memData = sorted(map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.all()),key=itemgetter(sort_key),reverse=sort_reverse)
             return HttpResponse(content=json.dumps({'member_details':member_details,'get_mem_service':get_mem_service,'get_mem_medical':get_mem_medical,'get_mem_scheme':get_mem_scheme,'get_memData':get_memData}),content_type='Application/json')
@@ -470,11 +467,11 @@ def fetchReportData(request):
                         get_disease = Disease.objects.get(disease_id=dislist['disease_id'])
                         for i in member_data_med:
                             for j in Medical.objects.filter(member=i,disease_id=get_disease):
-                                get_mem_medical.append({'name':j.member.name,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})
+                                get_mem_medical.append({'name':j.member.name,'memberid':j.member.mem_id,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})
                 else:
                     for i in member_data_med:
                         for j in Medical.objects.filter(member=i):
-                            get_mem_medical.append({'name':j.member.name,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})                    
+                            get_mem_medical.append({'name':j.member.name,'memberid':j.member.mem_id,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})                    
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_medical':sorted(get_mem_medical,key=itemgetter(sort_key),reverse=sort_reverse)}),content_type='Application/json')            
         elif data['report_type'] == 'Government Voter ID Needers':
             get_mem_voter = []
@@ -537,11 +534,11 @@ def fetchReportData(request):
                         get_service = Service.objects.get(service_id=schlist['service_id'])
                         for i in member_data_service:
                             for j in Member_service.objects.filter(member=i,scheme=get_service):
-                                get_mem_service.append({'name':j.member.name,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'via UNWO'})
+                                get_mem_service.append({'name':j.member.name,'memberid':j.member.mem_id,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'via UNWO'})
                 else:
                     for i in member_data_service:
                             for j in Member_service.objects.filter(member=i):
-                                get_mem_service.append({'name':j.member.name,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'via UNWO'})
+                                get_mem_service.append({'name':j.member.name,'memberid':j.member.mem_id,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'via UNWO'})
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_service':sorted(get_mem_service,key=itemgetter(sort_key),reverse=sort_reverse)}),content_type='Application/json')                
         elif data['report_type'] == 'Government Schemes and Guidance Needers Details' or data['report_type'] == 'Educational Help and Guidance Needers List' or data['report_type'] == 'Help for Discontinued and Guidance Needers List' or data['report_type'] == 'Training/Employment Help and Guidance Needers List':
             get_mem_scheme = []
@@ -578,12 +575,12 @@ def fetchReportData(request):
                         print 'scheme',schlist
                         get_scheme = SubScheme.objects.get(subscheme_id=schlist['scheme_id'])
                         for i in member_data_scheme:
-                            for j in Member_scheme.objects.filter(member=i,scheme=get_scheme):
-                                get_mem_scheme.append({'name':j.member.name,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'Need Government Scheme Guidance'})
+                            for j in Member_scheme.objects.filter(member=i,scheme=get_scheme,status=True,solution='Not Yet'):
+                                get_mem_scheme.append({'name':j.member.name,'memberid':j.member.mem_id,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'Need Government Scheme Guidance'})
                 else:
                     for i in member_data_scheme:
-                        for j in Member_scheme.objects.filter(member=i):
-                            get_mem_scheme.append({'name':j.member.name,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'Need Government Scheme Guidance'})
+                        for j in Member_scheme.objects.filter(member=i,status=True,solution='Not Yet'):
+                            get_mem_scheme.append({'name':j.member.name,'memberid':j.member.mem_id,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'Need Government Scheme Guidance'})
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_scheme':sorted(get_mem_scheme,key=itemgetter(sort_key),reverse=sort_reverse)}),content_type='Application/json')                
         elif data['report_type'] == 'Women chldrens Need to join Niswan Madarasa' or data['report_type']  == 'Persons Need to join Jumrah Madarasa' or data['report_type']  == 'Childrens Need to join Makthab Madarasa':
             try:
@@ -677,11 +674,11 @@ def fetchReportData(request):
         get_mem_service = []
         for i in Member.objects.filter(muhalla=Masjid.objects.get(mohalla_id=request.GET['muhalla_id'])):
             for j in Medical.objects.filter(member=i):
-                get_mem_medical.append({'name':j.member.name,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})
+                get_mem_medical.append({'name':j.member.name,'memberid':j.member.mem_id,'address':j.member.family.address,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})
             for k in Member_scheme.objects.filter(member=i):
-                get_mem_scheme.append({'name':k.member.name,'qualification':k.member.qualification,'status':k.status,'solution':k.solution,'address':k.member.family.address,'age':k.member.age,'gender':k.member.gender,'financial':k.member.family.financial_status,'familyid':k.member.family.family_id,'mobile':k.member.family.mobile,'needs':k.scheme.name,'needer':'Need Government Scheme Guidance'})
+                get_mem_scheme.append({'name':k.member.name,'memberid':k.member.mem_id,'qualification':k.member.qualification,'status':k.status,'solution':k.solution,'address':k.member.family.address,'age':k.member.age,'gender':k.member.gender,'financial':k.member.family.financial_status,'familyid':k.member.family.family_id,'mobile':k.member.family.mobile,'needs':k.scheme.name,'needer':'Need Government Scheme Guidance'})
             for m in Member_service.objects.filter(member=i):
-                get_mem_service.append({'name':m.member.name,'qualification':m.member.qualification,'status':m.status,'solution':m.solution,'address':m.member.family.address,'age':m.member.age,'gender':m.member.gender,'financial':m.member.family.financial_status,'familyid':m.member.family.family_id,'mobile':m.member.family.mobile,'needs':m.scheme.name,'needer':'Need Other/NGO Guidance'})    
+                get_mem_service.append({'name':m.member.name,'memberid':m.member.mem_id,'qualification':m.member.qualification,'status':m.status,'solution':m.solution,'address':m.member.family.address,'age':m.member.age,'gender':m.member.gender,'financial':m.member.family.financial_status,'familyid':m.member.family.family_id,'mobile':m.member.family.mobile,'needs':m.scheme.name,'needer':'Need Other/NGO Guidance'})    
         get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=Masjid.objects.get(mohalla_id=request.GET['muhalla_id'])))
         married = sum(1 if(x['marital_status']=='Married' or x['marital_status']=='Widow' or x['marital_status']=='Devorced') else 0 for x in get_memData)
         tot_men = sum(1 if(x['gender']=='MALE') else 0 for x in get_memData)
@@ -1140,18 +1137,17 @@ def report_to_pdf(request):
         pdf_filepath = '%s/static/pdf/%s'%(file_path,pdf_filename)
         options = {
             'page-size': 'Letter',
-            'margin-top': '0.1in',
+            'margin-top': '0.8in',
             'margin-right': '0.75in',
-            'margin-bottom': '0.1in',
+            'margin-bottom': '0.8in',
             'margin-left': '0.75in',
         }
         f = open('myfile.html','w')    
         html_content = render_to_string(html_filename,{'header':data['header'],'data':data['data'],'report':data['report'],'total':len(data['data']),'finacial_value':data['finacial_value']})
         f.write(html_content)
         f.close()
-        print 'data',data['header']
         print_pdf(data,pdf_filename,pdf_filepath)
-        # response = pdfkit.from_string(html_content, pdf_filepath,options=options)
+        response = pdfkit.from_string(html_content, pdf_filepath,options=options)
         return HttpResponse(content=json.dumps({'data':data,'pdfname':pdf_filename}),content_type='Application/json')
     else:
         file_path = os.path.dirname(os.path.dirname(__file__))
@@ -1312,17 +1308,32 @@ def print_pdf(data,name,path):
     data = data['data']
     doc = DataToPdf(fields, data)
     doc.export(name)
-    # doc.export('LogFiles.pdf')
-    # table=Table(data,style=[
-    #  ('GRID',(0,0),(-1,-1),0.5,colors.grey),
-    #  ('BACKGROUND',(0,0),(1,1),colors.palegreen),
-    #  ('SPAN',(0,0),(1,1)),
-    #  ('BACKGROUND',(-2,-2),(-1,-1), colors.pink),
-    #  ('SPAN',(-2,-2),(-1,-1)),
-    #  ])
 
-    # table = Table(data, colWidths=270, rowHeights=79)
-    # elements.append(table)
-    # doc.build(elements)
-    print 'doc',doc 
-    return response
+def reportdatafunc(request):
+    data = json.loads(request.body)
+    if data['action'] == 'delete':
+        try:
+            get_mem = lambda x: Family.objects.filter(family_id=x['familyid']).delete(),data['data']
+            solution = "Selected Families Deleted!"
+            # for i in data['data']:
+                # Family.objects.filter(family_id=i).delete()
+        except:
+            solution = "Something Went Wrong!"
+    else:
+        get_mem = data['data']
+        try:
+            if data['report'] == 'Government Voter ID Needers':
+                get_mem = lambda x: Member.objects.filter(voter_status=False,mem_id=x).update(voter_status=True),get_mem
+            else:
+                for i in get_mem:
+                    get_memid = Member.objects.get(mem_id=i['memberid'])
+                    try:
+                        get_scheme = SubScheme.objects.get(name=i['needs'])
+                        make_solved = Member_scheme.objects.filter(member=get_memid,scheme=get_scheme).update(status=True,solution='Solved')
+                    except:
+                        get_scheme = Service.objects.get(name=i['needs'])
+                        make_solved = Member_service.objects.filter(member=get_memid,scheme=get_scheme).update(status=True,solution='Solved')
+            solution = "Status Changed Successfully!"
+        except:
+            solution = "Something Went Wrong!"               
+    return HttpResponse(content=json.dumps({'data':solution}), content_type='Application/json')

@@ -74,7 +74,6 @@ def importcsvdata(value):
         data = [i[0].split('|') for i in a[1:]]
         maxLenObj = max(map(len,data))
        elif str(name).lower().endswith(('.csv','csvx')):
-        print 'local'
         # csv_data = open('%s'%name)
         a = list(csv.reader(name))
         data = [i[0].split('|') for i in a[1:]]
@@ -147,9 +146,16 @@ def importcsvdata(value):
                 else:
                       volunteer = False
                 family_needs = val[69] if val[69] else ''
-                familyid = '%s / %s' %(masjid.mohalla_id,int(val[4]))
+                familyid = '%s / %s' %(masjid.mohalla_id,'%03d'%(int(val[4])))
                 language = val[12] if val[12] else ''
-                ration_card = val[13] if val[13] else ''
+                # ration_card = val[13] if val[13] else ''
+                if val[13]:
+                  if val[13] == 'N' or val[13] == 'NO' or val[13] == 'No':
+                    ration_card = ''
+                  else:
+                    ration_card = val[13]
+                else:
+                  ration_card = ''                    
                 if val[7] or val[8] or val[9]:
                       door = val[7] if val[7] else ''
                       street = val[8] if val[8] else ''
@@ -173,7 +179,7 @@ def importcsvdata(value):
                       elif val[17] == 'E':
                            financial_status = 'E - Very Poor'
                 else:
-                      financial_status = 'E - Very Poor'
+                      financial_status = 'C - Middle Class'
                 if val[15]:
                   house_cat = '' if val[15] == '-' else val[15]
                 else:
@@ -192,7 +198,6 @@ def importcsvdata(value):
                 if Family.objects.filter(family_id=familyid):
                       family_update = Family.objects.filter(family_id=familyid).update(muhalla=masjid,report_date=data_date,language=language,ration_card=ration_card,address=fam_address,mobile=mobile_no,house_type=fam_house,toilet=toilet,house_cat=house_cat,financial_status=financial_status,health_insurance=insurance,volunteer=volunteer,donor=donor,family_needs=family_needs)
                       family = Family.objects.get(family_id=familyid)
-                      print 'family updated',familyid
                 else:
                       family = Family.objects.create(family_id=familyid,muhalla=masjid,report_date=data_date,language=language,ration_card=ration_card,address=fam_address,mobile=mobile_no,house_type=fam_house,toilet=toilet,house_cat=house_cat,financial_status=financial_status,health_insurance=insurance,volunteer=volunteer,donor=donor,family_needs=family_needs)
                 # member add
@@ -222,22 +227,27 @@ def importcsvdata(value):
                 if val[23]:
                       if val[23] == 'M':
                            marital_status = 'Married'
-                      elif val[23] == 'S':
-                           marital_status = 'Single'
                       elif val[23] == 'W':
                            marital_status = 'Widow'
                       elif val[23] == 'D':
                            marital_status = 'Devorced'
-                      elif val[23] == 'A':
+                      elif val[23] == 'S' and mem_age < 30:
+                           marital_status = 'Single'     
+                      elif val[23] == 'S' and mem_age >= 30 and gender == 'FEMALE':
                            marital_status = 'Aged Unmarried Woman'
                       else:
                            marital_status = 'Unknown'
                 else:
-                      marital_status = 'Single'                     
+                      marital_status = 'Unknown'
                 if val[20]:
-                      gender = 'MALE' if val[20] == 'M' else 'FEMALE'
+                  if val[20] == 'M':
+                    gender = 'MALE'
+                  elif val[20] == 'F':
+                    gender = 'FEMALE'
+                  else:
+                    gender = 'FEMALE'
                 else:
-                      gender = 'MALE'
+                  gender = 'MALE'
                 if val[24]:
                       voterstatus = True if val[24] == 'Y' else False
                 else:
@@ -522,7 +532,7 @@ def importcsvdata(value):
                       mem_service = Member_service.objects.create(member=member,scheme=Service.objects.get(name='Other Government Schemes'),status=True,solution="Not Yet")
             except:
               print 'report',repr(format_exc())
-              return 'Something Went Wrong!'
+              return repr(format_exc())
               # exit()
 
 
