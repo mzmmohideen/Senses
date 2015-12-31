@@ -767,7 +767,7 @@
                     <tr ng-show="ReportValues.report_name == 'New filter' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}} <input type="checkbox" ng-model="checkboxval" ng-true-value="1" ng-false-value="0" ng-checked="checkboxval == 1" ng-click="dosomething(checkboxval,key)"></td>
                         <td>{{key.name}} <br/> {{key.address}}</td>
-                        <td>{{key.age}} <br/> {{key.gender}} </td>
+                        <td><span ng-show="key.age!=0"> {{key.age}} </span> <span ng-show="key.age == 0"> {{key.month}} Months </span> <br/> {{key.gender}} </td>
                         <td>{{key.financial.split(' ')[0]}} <br/> {{key.familyid}} </td>
                         <td>{{key.mobile}} </td>
                         <td> {{key.needs}}</td>
@@ -775,14 +775,14 @@
                     <tr ng-show="ReportValues.report_name == 'Total Family Details' || ReportValues.report_name == 'Own House & Rent House families' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}} <input type="checkbox" ng-model="checkboxval" ng-true-value="1" ng-false-value="0" ng-checked="checkboxval == 1" ng-click="dosomething(checkboxval,key)"></td>
                         <td>{{key.family_head}} <br/> {{key.address}} </td>
-                        <td>{{key.age}} <br/> {{key.gender}} </td>
+                        <td><span ng-show="key.age!=0"> {{key.age}} </span> <span ng-show="key.age == 0"> {{key.month}} Months </span> <br/> {{key.gender}} </td>
                         <td>{{key.familyid}} <br/> {{key.mobile}} </td>
                         <td>{{key.financial_status.split(' ')[0]}} <br/> {{get_jakaath_status(key.financial_status.split(' ')[0])}} </td>
                     </tr>
                     <tr ng-show="ReportValues.report_name == 'Families Eligible for Jakaath' || ReportValues.report_name == 'Government Voter ID Needers' || ReportValues.report_name == 'Families without toilets' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}} <input type="checkbox" ng-model="checkboxval" ng-true-value="1" ng-false-value="0" ng-checked="checkboxval == 1" ng-click="dosomething(checkboxval,key)"></td>
                         <td>{{key.family_head}}</td>
-                        <td>{{key.age}} <br/> {{key.gender}} </td>
+                        <td><span ng-show="key.age!=0"> {{key.age}} </span> <span ng-show="key.age == 0"> {{key.month}} Months </span> <br/> {{key.gender}} </td>
                         <td>{{key.financial_status.split(' ')[0]}} <br/> {{key.familyid}} </td>
                         <td>{{key.mobile}} </td>
                         <td> {{key.address}} </td>
@@ -790,7 +790,7 @@
                     <tr ng-show="ReportValues.report_name == 'Basic Help Needers List' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}} <input type="checkbox" ng-model="checkboxval" ng-true-value="1" ng-false-value="0" ng-checked="checkboxval == 1" ng-click="dosomething(checkboxval,key)"></td>
                         <td>{{key.family_head}} <br/> {{key.address}}</td>
-                        <td>{{key.age}} <br/> {{key.gender}} </td>
+                        <td><span ng-show="key.age!=0"> {{key.age}} </span> <span ng-show="key.age == 0"> {{key.month}} Months </span> <br/> {{key.gender}} </td>
                         <td>{{key.financial_status.split(' ')[0]}} <br/> {{key.familyid}} </td>
                         <td>{{key.mobile}} </td>
                         <td> Help for Basic Needs(Food,Dress,Place) </td>
@@ -798,7 +798,7 @@
                     <tr ng-show="ReportValues.report_name == 'Help for Poor People and Guidance Needers List' ||  ReportValues.report_name == 'Medical Needs and Guidance Needers Details' || ReportValues.report_name == 'Government Schemes and Guidance Needers Details' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}} <input type="checkbox" ng-model="checkboxval" ng-true-value="1" ng-false-value="0" ng-checked="checkboxval == 1" ng-click="dosomething(checkboxval,key)"></td>
                         <td>{{key.name}} <br/> {{key.address}}</td>
-                        <td>{{key.age}} <br/> {{key.gender}} </td>
+                        <td><span ng-show="key.age!=0"> {{key.age}} </span> <span ng-show="key.age == 0"> {{key.month}} Months </span> <br/> {{key.gender}} </td>
                         <td>{{key.financial.split(' ')[0]}} <br/> {{key.familyid}} </td>
                         <td>{{key.mobile}} </td>
                         <td> {{key.needer}} for<br/>{{key.needs}} </td>
@@ -806,7 +806,7 @@
                     <tr ng-show="ReportValues.report_name == 'Training/Employment Help and Guidance Needers List' || ReportValues.report_name == 'Educational Help and Guidance Needers List' || ReportValues.report_name == 'Help for Discontinued and Guidance Needers List' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}} <input type="checkbox" ng-model="checkboxval" ng-true-value="1" ng-false-value="0" ng-checked="checkboxval == 1" ng-click="dosomething(checkboxval,key)"></td>
                         <td>{{key.name}} <br/> {{key.address}}</td>
-                        <td>{{key.age}} <br/> {{key.gender}} </td>
+                        <td><span ng-show="key.age!=0"> {{key.age}} </span> <span ng-show="key.age == 0"> {{key.month}} Months </span> <br/> {{key.gender}} </td>
                         <td>{{key.financial.split(' ')[0]}} <br/> {{key.familyid}} </td>
                         <td>{{key.mobile}} </td>
                         <td> {{key.needs}} <br/> Qualification: {{key.qualification}} </td>
@@ -814,7 +814,7 @@
                     <tr ng-show="ReportValues.report_name == 'Childrens Need to join Makthab Madarasa' || ReportValues.report_name == 'Persons Need to join Jumrah Madarasa' && getReportData.length!=0" ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}} <input type="checkbox" ng-model="checkboxval" ng-true-value="1" ng-false-value="0" ng-checked="checkboxval == 1" ng-click="dosomething(checkboxval,key)"></td>
                         <td>{{key.name}} <br/> {{key.address}}</td>
-                        <td>{{key.age}} <br/> {{key.gender}} </td>
+                        <td><span ng-show="key.age!=0"> {{key.age}} </span> <span ng-show="key.age == 0"> {{key.month}} Months </span> <br/> {{key.gender}} </td>
                         <td>{{key.financial.split(' ')[0]}} <br/> {{key.familyid}} </td>
                         <td>{{key.mobile}} </td>
                         <td> {{key.needs}} <br/> Qualification: {{key.qualification}} </td>

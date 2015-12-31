@@ -859,6 +859,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 if(response.report_type == 'Total Family Details'  || response.report_type == 'Own House & Rent House families') {
                     $scope.ReportHeader = ['S.No','Name & Address','Age & Gender','Family ID & Mobile NO','Financial Status & Jakaath']
                     $scope.getReportData = response.get_family;
+                    console.log('response',typeof(response.get_family[0].age))
                 }
                 else if(response.report_type == 'Basic Help Needers List') {
                     $scope.ReportHeader = ['S.No','Name & Address','Age & Gender','Financial Status & Family ID','Mobile NO','Needs Details']

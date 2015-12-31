@@ -42,7 +42,7 @@ def find_csv_filenames( path_to_dir, suffix=".csv" ):
     return [ filename for filename in filenames if filename.endswith( suffix ) ]
 
 def monthdelta(date, delta):
-    m, y = (date.month+delta) % 12, date.year + ((date.month)+delta-1) // 12
+    m, y = (date.month-delta) % 12, date.year + ((date.month)-delta-1) // 12
     if not m: m = 12
     d = min(date.day, [31,
         29 if y%4==0 and not y%400==0 else 28,31,30,31,30,31,31,30,31,30,31][m-1])
@@ -206,24 +206,45 @@ def importcsvdata(value):
                 else:
                   mem_val = 1             
                 member_id = '%s / %s' %(family.family_id,int(mem_val))
-                try:
-                  if 'M' in val[21]:
-                    dob_date = monthdelta(data_date,int(val[21].split('M')[0]))
-                  else:
-                    dob_date = data_date - relativedelta(years=int(val[21])) if val[21] else data_date
-                except:
+                if val[21]:
                   try:
-                    dob_date = data_date - relativedelta(years=int(val[21].split(' ')[0]))
+                    if 'M' in str(val[21]) or 'm' in str(val[21]):
+                      age_val = str(val[21]).split('M')[0]
+                      dob_date = monthdelta(data_date,int(age_val))
+                    else:
+                      age_val = int(val[21])
+                      dob_date = data_date - relativedelta(years=age_val)
                   except:
-                    try:
-                      dob_date = data_date - relativedelta(years=int(val[21][:1]))
-                    except:
-                      dob_date = data_date - relativedelta(years=0)                      
+                    dob_date = data_date - relativedelta(years=0)                      
+                else:
+                  dob_date = data_date - relativedelta(years=0)
+                # try:
+                #   print 'float',val[21]
+                #   if 'M' in val[21]:
+                #     print '1'
+                #     dob_date = monthdelta(data_date,int(val[21].split('M')[0]))
+                #   else:
+                #     print '2'
+                #     dob_date = data_date - relativedelta(years=int(val[21])) if val[21] else data_date
+                # except:
+                #   try:
+                #     print '3'
+                #     dob_date = data_date - relativedelta(years=int(val[21].split(' ')[0]))
+                #   except:
+                #     try:
+                #       print '4'
+                #       dob_date = data_date - relativedelta(years=int(val[21][:1]))
+                #     except:
+                #       print '5'
+                #       dob_date = data_date - relativedelta(years=0)                      
                 mem_age = int(datetime.now().year-dob_date.year)
                 if mem_age == 0:
                   mem_age_month = int(datetime.now().month-dob_date.month)
                 else:
-                  mem_age_month = 0                  
+                  mem_age_month = 0
+                print 'line val',val[21],data[1:].index(val)
+                print 'val',val[21],dob_date,mem_age,mem_age_month
+                # exit()  
                 if val[23]:
                       if val[23] == 'M':
                            marital_status = 'Married'
