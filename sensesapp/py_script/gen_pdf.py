@@ -1,5 +1,5 @@
 from reportlab.pdfgen import canvas
-from reportlab.lib.pagesizes import letter
+from reportlab.lib.pagesizes import *
 from reportlab.lib.pagesizes import landscape
 from reportlab.platypus import Image
 
@@ -7,7 +7,7 @@ from reportlab.platypus import SimpleDocTemplate
 from reportlab.platypus.tables import Table
 cm = 2.54
 
-def print_pdf(modeladmin, request, queryset):
+def print_pdf():
     response = HttpResponse(mimetype='application/pdf')
     response['Content-Disposition'] = 'attachment; filename=somefilename.pdf'
 

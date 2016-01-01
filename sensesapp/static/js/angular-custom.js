@@ -193,7 +193,7 @@ app.config(['$routeProvider',
             templateUrl: 'reports.html',
         }).
         otherwise({
-            redirectTo: '/dashboard'
+            redirectTo: '/reports'
         });
     }
 ]);
@@ -233,6 +233,18 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
     };
     $scope.today();
     $scope.group_value="Select the Group in the list or Enter New...";
+    $scope.get_districtData = function() {
+        $http.get('/get_districtuser_data/',{}).success(function(response){
+            console.log('district',response)
+            $scope.district_data = response.district;
+            $scope.district_val=$scope.district_data.district;
+            $scope.district_code=$scope.district_data.district_code;
+            $scope.moh_user.district = $scope.district_val;
+            $scope.MasjidAddValue.district = $scope.district_val;
+            $scope.ReportValues.district = $scope.district_val;
+            $scope.FamilyValue.district = $scope.district_val; 
+        })
+    }
     $scope.get_group = function(prog,sem) {
         $scope.group_list = [];       
         for(var i in $scope.group_data) {

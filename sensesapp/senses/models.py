@@ -152,6 +152,6 @@ class ChronicDisease(models.Model):
 class SensesMembers(models.Model):
     user = models.OneToOneField(User)
     member_type = models.CharField(max_length=30,choices=NEWMEMTYPE)
-    masjid = models.ForeignKey(Masjid)
+    masjid = models.ForeignKey(Masjid,null=True)
     district = models.ForeignKey(District,null=True)
 # Create your models here.

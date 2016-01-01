@@ -222,6 +222,11 @@ def get_mahallauser_data(request):
     muhalla = {'uname':request.user.username,'mohalla_id':mohallaData.masjid.mohalla_id,'musallas':mohallaData.masjid.musallas,'address':mohallaData.masjid.location,'mohalla':mohallaData.masjid.name,'taluk':mohallaData.masjid.taluk.taluk_name,'district':mohallaData.masjid.taluk.district.district_name}
     return HttpResponse(content=json.dumps({'muhalla':muhalla}),content_type='Application/json')
 
+def get_districtuser_data(request):
+    DistrictData = SensesMembers.objects.get(user=request.user)
+    district = {'uname':request.user.username,'district':DistrictData.district.district_name,'district_code':DistrictData.district.district_code}
+    return HttpResponse(content=json.dumps({'district':district}),content_type='Application/json')
+
 def family_member(request):
     if request.method == 'GET':
         member_id = request.GET['member_id']

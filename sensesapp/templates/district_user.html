@@ -34,23 +34,16 @@
 </head>
 {% verbatim %}
 <body ng-cloak class="ng-cloak" ng-app="senses">
-    <div id="wrapper" ng-controller="dashboardCtrl">
+    <div id="wrapper" ng-controller="dashboardCtrl" ng-init="get_districtData()">
         <nav class="navbar navbar-default navbar-static-top" role="navigation" style="margin-bottom: 0">
             <div class="navbar-header">
-                <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                    <span class="sr-only">Toggle navigation</span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                    <span class="icon-bar"></span>
-                </button>
                 <a class="navbar-brand" style="color: #484747;font-size: 23px;" href="#">Census app</a>
             </div>
-                <button style="float:right;margin: 10px;background-color:red;" class="btn btn-default" type="button">
-                    <a style="color:white !important;text-decoration: none;" href="/logout_view/"><i class="fa fa-sign-out fa-fw"></i> Logout</a>
-                </button>
+            <button style="float:right;margin: 10px;background-color:red;color:white" class="btn btn-default" type="button" ng-click="user_logout()"><i class="fa fa-sign-out"></i>&nbsp;&nbsp;&nbsp;Logout</button>
+            <span style="float:right;margin-top:20px;">Welcome! {{district_data.uname}}.</span>
             <div class="navbar-default sidebar" role="navigation">
                 <div class="sidebar-nav navbar-collapse">
-                    <ul class="nav in" id="side-menu">
+                    <ul style="margin-left:-12.5%" class="nav in" id="side-menu">
                         <li class="menu">
                             <a ng-click="reportbt=false;" href="#/location">Locations</a>
                         </li>
@@ -63,9 +56,6 @@
                         <li class="menu">
                             <a ng-click="reportbt=false;" href="#/family">Families</a>
                         </li>
-                        <!--<li class="menu">
-                            <a ng-click="reportbt=false;" href="#/import">Import CSV & XLS</a>
-                        </li>-->
                         <li class="menu">
                             <a ng-click="reportbt=true;" href="#/reports">Reports</a>
                         </li>
@@ -191,13 +181,10 @@
                 <td><label for="male">DISTRICT CODE</label></td>
                 <td><label for="male">TALUK</label></td>
                 <tr>
-                <td style="padding-right: 2%; width: 30%; border-radius: 2px;"><ui-select style="display: inline-block;height: 34px;width: 100%;float: left;border-radius: 2px;" on-select="getDis=district;get_district(getDis)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="district">
-                    <ui-select-match placeholder="{{district_val}}">{{district_val}}</ui-select-match>
-                    <ui-select-choices refresh="getDis=$select.search;get_district(getDis)" repeat="mod in district_list |SortData | filter:$select.search">
-                        <div ng-bind-html="mod | highlight: $select.search"></div>
-                    </ui-select-choices>
-                </ui-select></td>
-                <td style="padding-right: 2%;width: 30%; border-radius: 2px; "><input ng-disabled="DisCode[district_val][0]==district_code" type="text" style="display: inline-block;height: 34px;border-radius: 2px;width: 100%;float: left;" ng-model="district_code" class="form-control" placeholder="DISTRICT CODE"></td>
+                <td style="padding-right: 2%; width: 30%; border-radius: 2px;">
+                    <input style="display: inline-block;border-radius:2px;height: 34px;width: 97%;float: left;" class="form-control" type="text" ng-model="district_val" readonly/></td>
+                <td style="padding-right: 2%;width: 30%; border-radius: 2px; ">
+                    <input style="display: inline-block;border-radius:2px;height: 34px;width: 97%;float: left;" class="form-control" type="text" ng-model="district_code" readonly/></td>
                 <td style="padding-right: 2%; width: 30%; border-radius: 2px;"><ui-select ng-model="taluk" style="display: inline-block;height: 34px;width: 100%;border-radius: 2px;float: left;" on-select="getTal=taluk;get_taluk(getTal)" reset-search-input="false" theme="bootstrap" ng-disabled="district_val=='' || district_val=='SELECT DISTRICT'">
                     <ui-select-match placeholder="{{taluk_val}}">{{taluk_val}}</ui-select-match>
                     <ui-select-choices refresh="getTal=$select.search;get_taluk(getTal)" repeat="mod in getTaluk[district_val] |SortData | filter:$select.search">
@@ -251,9 +238,8 @@
                 <td> <label for="male">MUHALLAH ID</label> </td>
                 </tr>
                 <tr>
-                <td style="padding-right: 2%;"><select style="display: inline-block;height: 34px;width: 100%;border-radius: 2px;float: left;" ng-model="moh_user.district" ng-options="gen for gen in district_list|SortData" class="form-control">
-                    <option value="">SELECT DISTRICT</option>
-                </select></td>
+                <td style="padding-right: 2%;">
+                    <input style="display: inline-block;height: 34px;width: 100%;border-radius: 2px;float: left;" class="form-control" type="text" ng-model="moh_user.district" readonly/></td>
                 <td style="padding-right: 2%;"><select ng-disabled="!moh_user.district" style="display: inline-block;height: 34px;width: 100%;border-radius: 2px;float: left;" ng-change="getMasjidList(moh_user)" ng-model="moh_user.taluk" ng-options="gen for gen in getTaluk[moh_user.district]|SortData" class="form-control">
                     <option value="">SELECT TALUK</option>
                 </select></td>
@@ -294,7 +280,6 @@
                 </thead>
                 <tbody>
                     <tr ng-show="fetched_moh_user || moh_user.muhalla.mohalla_id" class="ng-scope">
-                    <!--<tr ng-show="fetched_moh_user && moh_user.muhalla.mohalla_id" ng-repeat="val in fetched_moh_user" class="ng-scope">-->
                         <td>{{$index+1}}</td>
                         <td class="ng-binding" ng-init="moh_user.username=fetched_moh_user.username">
                             <span>{{fetched_moh_user.username}}</span>
@@ -331,7 +316,6 @@
                 </button>
                 <button ng-show="!muhalla_val" type="submit" style="margin-left:5px; width:12%;height:34px;float: right;border-radius: 2px;" ng-click="muhalla_val=true;MasjidAddValue.masjid_name='';MasjidAddValue.musallas='';MasjidAddValue.address='';MasjidAddValue.mohalla_id='';" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New Muhalla
                 </button>
-                <!--<button ng-disabled="!MasjidAddValue.taluk" type="submit" style="width: 100px;height: 34px;float: right;border-radius: 2px;margin-top: -5px;" ng-click="add_new_muhalla(MasjidAddValue)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New Muhalla</button>-->
                 </h1>
             </div>
             <div class=" col-lg-12">
@@ -342,9 +326,8 @@
                     <td ng-show="!muhalla_val && MasjidAddValue.taluk"> <label for="male">SELECT MUHALLAH ID: *</label> </td>
                 </tr>
                 <tr>
-                    <td><select style="display: inline-block;height: 34px;width: 100%;float: left;margin-right: 10%;border-radius: 2px;" ng-model="MasjidAddValue.district" ng-options="gen for gen in district_list |SortData" class="form-control">
-                        <option value="">SELECT DISTRICT</option>
-                    </select></td>
+                    <td>
+                    <input style="display: inline-block;height: 34px;width: 100%;float: left;margin-right: 10%;border-radius: 2px;" class="form-control" type="text" ng-model="MasjidAddValue.district" readonly/></td>
                     <td><select style="display: inline-block;height: 34px;width: 100%;margin-right: 10%;float: left;border-radius: 2px;" ng-change="getMasjidList(MasjidAddValue);get_masjid()" ng-model="MasjidAddValue.taluk" ng-options="gen for gen in getTaluk[MasjidAddValue.district]|SortData" class="form-control">
                         <option value="">SELECT TALUK</option>
                     </select></td>
@@ -354,10 +337,6 @@
                                 <div ng-bind-html="mod.name | highlight: $select.search"></div>
                             </ui-select-choices>
                         </ui-select></td>
-                    <td>
-                        <!--<button ng-show="muhalla_val" ng-disabled="!MasjidAddValue.taluk || muhalla_val" type="submit" style="margin-left:5px; width:45%;height:34px;float: left;border-radius: 2px;" ng-click="muhalla_val=true;MasjidAddValue.masjid_name='';MasjidAddValue.musallas='';MasjidAddValue.address='';MasjidAddValue.mohalla_id='';" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New Muhalla</button>-->
-                        <!--move to upward <button ng-show="muhalla_val" ng-disabled="!MasjidAddValue.taluk" type="submit" style="margin-left:5px; float:left;width:45%;background-color: #f0ad4e;border-color: #f0ad4e;height: 34px;" ng-click="muhalla_val=false;" class="btn-sm btn btn-primary">Update Muhalla</button>-->
-                    </td>    
                 </tr>
                 </table>
             </div>
@@ -381,12 +360,7 @@
                     <td ng-show="!muhalla_val"><button ng-show="!new_masjid" ng-disabled="masjidList.indexOf(masjid_val)==-1 && !MasjidAddValue.mohalla_id" type="submit" style="width:100%;margin-left: 5px;background-color: #d9534f;border-color: #d9534f;height: 34px;" ng-confirm-click="Are you Sure you want to Delete?" confirmed-click="addMasjid(masjid_val,MasjidAddValue,'delete')" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-trash"></i> Delete</button></td>
                 </tr>
                 </table>
-            </div>
-        <!--<div class=" col-lg-12" style="padding-bottom: 34px;">
-                    <input ng-show="masjidList.indexOf(masjid_val)==-1" style="display: inline-block;height: 34px;width: 25%;float: left;" placeholder="Enter Masjid Name" ng-model="masjid_val" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required" readonly>
-                    <input style="display: inline-block;width: 15%;height: 34px;float: left;" type="text" placeholder="Number of Musallas" ng-model="MasjidAddValue.musallas" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                    <input style="display: inline-block;width: 35%;height: 34px;float: left;" type="text" placeholder="Address" ng-model="MasjidAddValue.address" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-        </div>-->    
+            </div> 
         <div class="row">
             <div class="col-lg-12">
                 <h1 style="width: 96%; margin-left: 1%;" class="page-header">Muhalla Committee Members <button ng-disabled="!MasjidAddValue.mohalla_id || !MasjidAddValue.masjid_name || !masjid_member_list" type="submit" style="width: 100px;height: 34px;float: right;border-radius: 2px;margin-top: -5px;" ng-click="add_members(MasjidAddValue)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i>New</button></h1>
@@ -425,202 +399,6 @@
             </table>
         </div>
     </script>
-    <script type="text/ng-template" id="schemes.html">
-        <div class="row" ng-init="getScheme()">
-            <div class="col-lg-12">
-                <h1 class="page-header" style="width: 100%;">Schemes</h1>
-            </div>
-            <div class="form-group" style="padding-bottom: 34px; width: 97%; margin-left: 1%;">
-            <table style="width: 100%;">
-             <tr>
-                <td style="width: 24%;"><label for="male">Scheme: *</label></td>
-                <td style="width: 26%;"><label for="male">Sub Scheme: *</label></td>
-                <td style="width: 15%;"><label for="male">Scheme ID: *</label></td>
-                <td><label for="male">Description:</label></td>
-             </tr>
-             </table>
-                <ui-select style="display: inline-block;height: 34px;width: 23%;border-radius: 2px;margin-right: 1%;float: left;" on-select="getDis=scheme_values.scheme;get_scheme(getDis)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="scheme_values.scheme">
-                    <ui-select-match placeholder="{{scheme_val| limitTocustom:25}}">{{scheme_val| limitTocustom:25}}</ui-select-match>
-                    <ui-select-choices refresh="getDis=$select.search;get_scheme(getDis)" repeat="mod in scheme_list |SortData | filter:$select.search">
-                        <div ng-bind-html="mod | highlight: $select.search"></div>
-                    </ui-select-choices>
-                </ui-select>
-                <ui-select ng-model="scheme_values.sub_scheme" style="display: inline-block;height: 34px;width: 25%;margin-right: 1%;float: left;border-radius: 2px;" on-select="getTal=scheme_values.sub_scheme;get_sub_scheme(getTal)" reset-search-input="false" theme="bootstrap" ng-disabled="scheme_val=='' || scheme_val=='SELECT SCHEMES'">
-                    <ui-select-match placeholder="{{sub_scheme_val| limitTocustom:25}}">{{sub_scheme_val| limitTocustom:25}}</ui-select-match>
-                    <ui-select-choices refresh="getTal=$select.search;get_sub_scheme(getTal)" repeat="mod in getSubScheme[scheme_val] |SortData | filter:$select.search">
-                        <div ng-bind-html="mod.sub | highlight: $select.search"></div>
-                    </ui-select-choices>
-                </ui-select>
-                <input style="display: inline-block;height: 34px;border-radius: 2px;width: 14%;margin-right: 1%;float: left;" type="text" placeholder="Scheme ID" ng-model="scheme_values.scheme_id" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required">
-                <input style="display: inline-block;height: 34px;width: 23%;float: left;margin-right: 2%;border-radius: 2px;" class="form-control" type="text" ng-model="scheme_values.description" placeholder="Description(optional)" />
-                <!--<select ng-change="condition_list(scheme_values.field)" style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="scheme_values.field" ng-options="val for val in field_list" class="form-control">
-                    <option value="">SELECT FIELD</option>
-                </select>
-                <select style="display: inline-block;height: 34px;width: 25%;float: left;" ng-model="scheme_values.condition" ng-options="val for val in conditionsData" class="form-control">
-                    <option value="">SELECT CONDITION</option>
-                </select>
-                <ui-select ng-model="scheme_values.value" style="display: inline-block;height: 34px;width: 25%;float: left;" on-select="getVal=scheme_values.value;get_val(getVal)" reset-search-input="false" theme="bootstrap">
-                    <ui-select-match placeholder="{{value}}">{{value}}</ui-select-match>
-                    <ui-select-choices refresh="getVal=$select.search;get_val(getVal)" repeat="mod in getValue | filter:$select.search">
-                        <div ng-bind-html="mod | highlight: $select.search"></div>
-                    </ui-select-choices>
-                </ui-select>-->
-                <button  ng-disabled="scheme_val=='' || scheme_val=='SELECT SCHEMES' || sub_scheme_val=='' || sub_scheme_val=='SELECT SUB SCHEME' || !scheme_values.scheme_id" type="submit" style="width:10%;height: 34px;float:right;" ng-click="add_schemes(scheme_val,sub_scheme_val,scheme_values)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
-            </div>
-            <table style="width: 97%; margin-left: 1%;" class="table table-striped table-bordered table-hover ng-scope" ng-init="getLocation()">
-                <thead>
-                    <tr class="ng-scope">
-                        <th style="text-align: center;">S.No</th>
-                        <th style="text-align: center;">Scheme ID</th>
-                        <th style="text-align: center;">Sub Schemes in {{scheme_val}}</th>
-                        <th style="text-align: center;">Description</th>
-                        <th style="text-align: center;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-show="!getSubScheme[scheme_val]">
-                        <td colspan="8" style="text-align:center;" class="ng-binding">Please Select Above Details !</td>
-                    </tr>
-                    <tr ng-show="getSubScheme[scheme_val].length==0">
-                        <td colspan="8" style="text-align:center;" class="ng-binding">No Sub Schemes Found!</td>
-                    </tr>
-                    <tr ng-show="getSubScheme[scheme_val].length!=0" ng-repeat="sub in getSubScheme[scheme_val]" class="ng-scope">
-                        <td>{{$index+1}}</td>
-                        <td class="ng-binding">{{sub.scheme_id}}</td>
-                        <td class="ng-binding">
-                            <span ng-show="!update_scheme"> {{sub.sub}} </span>
-                            <input style="width:100%;text-align:center;" type="text" ng-show="update_scheme" ng-model="sub.sub"></td>
-                        <td class="ng-binding">{{sub.description}}</td>
-                        <td><a style="cursor:pointer;" ng-show="!update_scheme" ng-click="update_scheme=true;" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a>
-                            <a style="cursor:pointer;" ng-show="update_scheme" ng-click="update_scheme=false;Updatesubscheme(scheme_val,sub)" class="color-edit">
-                                <i class="fa fa-check"></i></a>
-                            <a style="cursor:pointer;" ng-confirm-click="Are you Sure you want to Delete?" confirmed-click="delete_scheme(scheme_val,sub.sub)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </script>
-    <script type="text/ng-template" id="services.html">
-        <div class="row" ng-init="getService()">
-            <div class="col-lg-12">
-                <h1 class="page-header" style="width: 100%;">Services</h1>
-            </div>
-            <div class=" col-lg-12" style="padding-right: 20px; height: 400px; width: 100%;">
-            <div class="form-group" style="padding-bottom: 34px;">
-            <table style="width: 100%;">
-             <tr>
-                <td> <label for="male">Services *</label> </td>
-                <td> <label for="male">Service ID *</label> </td>
-                <td> <label for="male">Description</label> </td>
-            </tr>
-            <tr>
-                <td><ui-select style="display: inline-block;height: 34px;width: 97%;border-radius:2px; float: left;" on-select="get_ser=service_values;get_service(get_ser)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="service_values">
-                    <ui-select-match placeholder="{{service_val}}">{{service_val}}</ui-select-match>
-                    <ui-select-choices refresh="get_ser=$select.search;get_service(get_ser)" repeat="mod in service_list |SortData | filter:$select.search">
-                        <div ng-bind-html="mod | highlight: $select.search"></div>
-                    </ui-select-choices>
-                </ui-select></td>
-                <td><input style="display: inline-block;height: 34px;width: 97%;border-radius:2px;float: left;" type="text" placeholder="Service ID" ng-model="service_id" class="input-sm form-control ng-pristine ng-invalid ng-invalid-required"></td>
-                <td><input style="display: inline-block;height: 34px;width: 97%;border-radius:2px;float: left;" class="form-control" type="text" ng-model="description" placeholder="Description(optional)" /></td>
-                <td><button  ng-disabled="service_val=='' || !service_id || service_val=='SELECT or ADD SERVICES'" type="submit" style="width:100%;height: 34px;float:right;" ng-click="add_service(service_val,service_id,description)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button></td>
-                </tr>
-                </table>
-            </div>
-            <table class="table table-striped table-bordered table-hover ng-scope">
-                <thead>
-                    <tr class="ng-scope">
-                        <th style="text-align: center;">S.No</th>
-                        <th style="width: 10%; text-align: center;">Service ID</th>
-                        <th style="text-align: center;">Services</th>
-                        <th style="text-align: center;">Description</th>
-                        <th style="text-align: center;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr ng-show="getServices.length==0">
-                        <td colspan="8" style="text-align:center;" class="ng-binding">No Services Found!</td>
-                    </tr>
-                    <tr ng-show="getServices.length!=0" ng-repeat="sub in getServices" class="ng-scope">
-                        <td>{{$index+1}}</td>
-                        <td class="ng-binding">{{sub.service_id}}</td>
-                        <td class="ng-binding">
-                            <span ng-show="!update_service"> {{sub.service}} </span>
-                            <input style="width:100%;text-align:center;" type="text" ng-show="update_service" ng-model="sub.service"></td>
-                        <td class="ng-binding">{{sub.description}}</td>
-                        <td><a style="cursor:pointer;" ng-show="!update_service" ng-click="update_service=true;" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a>
-                            <a style="cursor:pointer;" ng-show="update_service" ng-click="update_service=false;Updateservicedata(sub)" class="color-edit">
-                                <i class="fa fa-check"></i></a>
-                            <a style="cursor:pointer;" ng-confirm-click="Are you Sure you want to Delete?" confirmed-click="delete_service(sub.service)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </script>
-    <script type="text/ng-template" id="diseases.html">
-        <div class="row">
-            <div class="col-lg-12">
-                <h1 class="page-header" style="width: 100%;">Diseases</h1>
-            </div>
-            <div class="form-group" style="padding-bottom: 34px;">
-            <table style="width: 98%;float: left; margin-left: 1%;margin-bottom: 2%;">
-            <tr>
-                <td> <label for="male">Select Type * </label> </td>
-                <td> <label for="male">Add Disease *</label> </td>
-                <td> <label for="male">Disease ID *</label> </td>
-                <td> <label for="male">description</label> </td>
-            </tr>
-            <tr ng-init="getDisease('DISEASE')">
-                <!--<td><select ng-change="getDisease(DiseaseVal.sym_type)" style="display: inline-block;height: 34px;width: 98%;border-radius: 2px;float: left;" ng-model="DiseaseVal.sym_type" ng-options="val for val in ['DISEASE','DISORDER']" class="form-control">
-                    <option value="">SELECT TYPE</option>
-                </select></td>-->
-                <td><ui-select style="display: inline-block;height: 34px;border-radius: 2px;width: 98%;float: left;" on-select="getDisease=DiseaseVal.name;get_disease(getDisease)" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-model="DiseaseVal.name">
-                    <ui-select-match placeholder="{{disease_val}}">{{disease_val}}</ui-select-match>
-                    <ui-select-choices refresh="getDisease=$select.search;get_disease(getDisease)" repeat="mod in disease_list |SortData | filter:$select.search">
-                        <div ng-bind-html="mod | highlight: $select.search"></div>
-                    </ui-select-choices>
-                </ui-select></td>
-                <td><input style="display: inline-block;height: 34px;width: 98%;border-radius: 2px;float: left;" type="text" placeholder="Disease ID" ng-model="DiseaseVal.disease_id" class="form-control"></td>
-                <td><input style="display: inline-block;height: 34px;width: 98%;border-radius: 2px;float: left;" class="form-control" type="text" ng-model="DiseaseVal.description" placeholder="Description(optional)" /></td>
-                <td><button  ng-disabled="disease_val=='' || disease_val=='SELECT or ADD DISEASE'" type="submit" style="width:100%;height: 34px;float:right;" ng-click="add_disease(disease_val,DiseaseVal)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button></td>
-            </tr>
-            </table>
-            </div>
-            <table style="width: 98%; margin-left: 1%;" class="table table-striped table-bordered table-hover ng-scope">
-                <thead>
-                    <tr class="ng-scope">
-                        <th style="width: 5%; text-align: center;">S.No</th>
-                        <th ng-show="DiseaseVal.sym_type" style="text-align: center;">{{DiseaseVal.sym_type}}</th>
-                        <th ng-show="!DiseaseVal.sym_type" style="text-align: center;">Symptom Type</th>
-                        <th style="text-align: center;">Disease ID</th>
-                        <th style="text-align: center;">Description</th>
-                        <th style="text-align: center;">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <!--<tr ng-show="!DiseaseVal.sym_type">
-                        <td colspan="8" style="text-align:center;" class="ng-binding">Please Select Type !</td>
-                    </tr>-->
-                    <tr ng-show="getDiseaseData.length==0">
-                        <td colspan="8" style="text-align:center;" class="ng-binding">No Disease Data Found!</td>
-                    </tr>
-                    <tr ng-show="getDiseaseData.length!=0" ng-repeat="sub in getDiseaseData" class="ng-scope">
-                        <td>{{$index+1}}</td>
-                        <td class="ng-binding">
-                            <span ng-show="!update_disease"> {{sub.name}} </span>
-                            <input style="width:100%;text-align:center;" type="text" ng-show="update_disease" ng-model="sub.name"></td>
-                        <td class="ng-binding">{{sub.disease_id}}</td>
-                        <td class="ng-binding">
-                            <span ng-show="!update_disease"> {{sub.description}} </span>
-                            <input style="width:100%;text-align:center;" type="text" ng-show="update_disease" ng-model="sub.description"></td>
-                        <td><a style="cursor:pointer;" ng-show="!update_disease" ng-click="update_disease=true;" class="color-edit"><i class="glyphicon glyphicon-pencil"></i></a>
-                            <a style="cursor:pointer;" ng-show="update_disease" ng-click="update_disease=false;Updatediseasedata(sub,DiseaseVal)" class="color-edit">
-                                <i class="fa fa-check"></i></a>
-                            <a style="cursor:pointer;"  ng-confirm-click="Are you Sure you want to Delete?" confirmed-click="deleteDisease(sub)" class="color-delete"><i class="glyphicon glyphicon-trash"></i></a></td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </script>
     <script type="text/ng-template" id="reports.html">
         <div class="row" ng-init="getLocation();getMasjidData()">
             <div class="col-lg-12">
@@ -639,9 +417,8 @@
                 <td><label for="male">PDF</label></td>
             </tr>
             <tr>
-                <td><select style="border-radius:2px;display: inline-block;height: 34px;border-radius: 2px; width: 97%;float: left;" ng-model="ReportValues.district" ng-options="gen for gen in district_list_report | SortData" class="form-control">
-                    <option value="">SELECT DISTRICT</option>
-                </select></td>
+                <td>
+                <input style="border-radius:2px;display: inline-block;height: 34px;border-radius: 2px; width: 97%;float: left;" class="form-control" type="text" ng-model="ReportValues.district" readonly/></td>
                 <td><select ng-disabled="!ReportValues.district" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;border-radius: 2px; float: left;" ng-change="getMasjidList(ReportValues)" ng-model="ReportValues.taluk" ng-options="gen for gen in getTaluk[ReportValues.district] | SortData" class="form-control">
                     <option value="">SELECT TALUK</option>
                 </select></td>
@@ -977,9 +754,9 @@
                 <td ng-show="new_fam_bt"> <label for="male">Select Family ID</label> </td>
             </tr>
             <tr>
-                <td><select style="display: inline-block;border-radius:2px;height: 34px;width: 97%;float: left;" ng-model="FamilyValue.district" ng-options="gen for gen in district_list|SortData" class="form-control">
-                        <option value="">SELECT DISTRICT</option>
-                    </select>
+                <td>
+                    <input style="display: inline-block;border-radius:2px;height: 34px;width: 97%;float: left;" class="form-control" type="text" ng-model="FamilyValue.district" 
+                    readonly/>
                 </td>
                 <td><select ng-change="getMahallaData(FamilyValue);FamilyValue.masjid=''" style="display: inline-block;height: 34px;width: 97%;border-radius:2px;float: left;" ng-model="FamilyValue.taluk" ng-options="gen for gen in getTaluk[FamilyValue.district]|SortData" class="form-control">
                         <option value="">SELECT TALUK</option>
@@ -1372,160 +1149,6 @@
                 <input type="submit" class="btn btn-primary" ng-click="update_memberScheme(MemschemeList,MemserviceList,DiseaseValue,SurgeryValue,ChronicValue,'exit');" value="Save and Exit" />-->
             </div>
     </div>
-    </script>
-    <script type="text/ng-template" id="dashboard.html">
-        <div class="row">
-            <div class="col-lg-12">
-                <li class="active">
-                    <h1 class="page-header">Dashboard</h1>
-                </li>    
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-3 col-md-6">
-                <div class="panel panel-primary" style="border-radius: 2px;">
-                    <div class="panel-heading">
-                        <div class="row">
-                            <div class="col-xs-3">
-                                <i class="fa fa-sitemap fa-5x"></i>
-                            </div>
-                            <div class="col-xs-9 text-right">
-                                <div class="huge">
-                                    <span ng-show="!loading_gif"_>
-                                        <img width="5px" src="../static/images/load_icon.gif"/>
-                                    </span>
-                                    <span ng-show="loading_gif">{{dashboard_data.volunteer_interest}}
-                                    </span>
-                                </div>
-                                <div>New Volunteers!</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="panel panel-green" style="border-radius: 2px;">
-                    <div class="panel-heading">
-                        <div class="row">
-                            <div class="col-xs-3">
-                                <i class="fa fa-heart fa-5x"></i>
-                            </div>
-                            <div class="col-xs-9 text-right">
-                                <div class="huge">
-                                    <span ng-show="!loading_gif"_>
-                                        <img width="5px" src="../static/images/load_icon.gif"/>
-                                    </span>
-                                    <span ng-show="loading_gif">{{dashboard_data.donor_interest}}
-                                    </span>
-                                </div>
-                                <div>New Donors!</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="panel panel-yellow" style="border-radius: 2px;">
-                    <div class="panel-heading">
-                        <div class="row">
-                            <div class="col-xs-3">
-                                <i class="fa fa-users fa-5x"></i>
-                            </div>
-                            <div class="col-xs-9 text-right">
-                                <div class="huge">
-                                    <span ng-show="!loading_gif"_>
-                                        <img width="5px" src="../static/images/load_icon.gif"/>
-                                    </span>
-                                    <span ng-show="loading_gif">{{dashboard_data.tot_family}}
-                                    </span>
-                                </div>
-                                <div>Total Families!</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-6">
-                <div class="panel panel-red" style="border-radius: 2px;">
-                    <div class="panel-heading">
-                        <div class="row">
-                            <div class="col-xs-3">
-                                <i class="fa fa-users fa-5x"></i>
-                            </div>
-                            <div class="col-xs-9 text-right">
-                                <div class="huge">
-                                    <span ng-show="!loading_gif"_>
-                                        <img width="5px" src="../static/images/load_icon.gif"/>
-                                    </span>
-                                    <span ng-show="loading_gif">{{dashboard_data.fam_member}}
-                                    </span>
-                                </div>
-                                <div>Total Members!</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-lg-8">
-                <div class="panel panel-default" style="border-radius: 2px;">
-                    <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> New Family Entries
-                        <div class="pull-right">
-                            <div class="btn-group">
-                                <!--<button type="button" class="btn btn-default btn-xs dropdown-toggle" data-toggle="dropdown">
-                                    Actions
-                                    <span class="caret"></span>
-                                </button>-->
-                                <ul class="dropdown-menu pull-right" role="menu">
-                                    <li><a href="#">Action</a>
-                                    </li>
-                                    <li><a href="#">Another action</a>
-                                    </li>
-                                    <li><a href="#">Something else here</a>
-                                    </li>
-                                    <li class="divider"></li>
-                                    <li><a href="#">Separated link</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                    <div ng-show="!loading_gif" class="panel-body">
-                        <img width="100%" src="../static/images/loading.gif" alt="Loading..."/>
-                    </div>
-                    <div class="panel-body">
-                        <div id="morris-bar-chart"></div>
-                    </div>
-                </div>
-                <!-- /.panel -->
-            </div>
-            <!-- /.col-lg-8 -->
-            <div class="col-lg-4">
-                <div class="panel panel-default" style="border-radius: 2px;">
-                    <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> Mahallas Present in District
-                    </div>
-                    <div ng-show="!loading_gif" class="panel-body">
-                        <img width="100%" src="../static/images/spin.gif" alt="Loading..."/>
-                    </div>
-                    <div class="panel-body">
-                        <div style="width:100% !important;" id="morris-donut-chart"></div>
-                    </div>
-                </div>
-            </div>
-            <!--<div class="col-lg-12">
-                <div class="panel panel-default" style="border-radius: 2px;">
-                    <div class="panel-heading">
-                        <i class="fa fa-bar-chart-o fa-fw"></i> Mahallas
-                    </div>
-                    <div class="panel-body">
-                        <div style="width:100% !important;" id="morris-area-chart"></div>
-                    </div>
-                </div>
-            </div>-->
-        </div>
     </script>
     {% endverbatim %}
     <!-- Bootstrap core JavaScript
