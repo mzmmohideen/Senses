@@ -81,6 +81,9 @@ app.controller('loginCtrl',function($scope,$http,_,$location) {
 		else if(response.data == 'mohalla_user') {
 			window.location.href = '/mohallauser/'
 		}
+        else if(response.data == 'district_user') {
+            window.location.href = '/districtuser/'
+        }
 		else if(response.data == 'end_user') {
 			window.location.href = '/enduser/'
 		}

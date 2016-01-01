@@ -31,8 +31,10 @@ def login_check(request):
             get_mem_data = SensesMembers.objects.get(user=request.user)
             if get_mem_data.member_type == 'Mohalla User':
                 return HttpResponseRedirect('/mohallauser/')
+            elif get_mem_data.member_type == 'District User':
+                return HttpResponseRedirect('/districtuser/')
             elif get_mem_data.member_type == 'End Users & Donors':
-                return HttpResponseRedirect('/enduser/')                
+                return HttpResponseRedirect('/enduser/')
     else:
         if User.objects.filter(first_name="Admin"):
             return render(request, 'login.html')
@@ -56,6 +58,8 @@ def login_page(request):
             get_mem_data = SensesMembers.objects.get(user=user_val)
             if get_mem_data.member_type == 'Mohalla User':
                 return HttpResponse(content=json.dumps({'data':'mohalla_user'}), content_type='Application/json')
+            if get_mem_data.member_type == 'District User':
+                return HttpResponse(content=json.dumps({'data':'district_user'}), content_type='Application/json')    
             elif get_mem_data.member_type == 'End Users & Donors':
                 return HttpResponse(content=json.dumps({'data':'end_user'}), content_type='Application/json')
         else:
@@ -88,12 +92,16 @@ def apping(request):
     return render(request, 'apping.html')        
 
 @login_required(login_url='/login/')
-def mohallauser(request):    
+def mohallauser(request):
     return render(request, 'mohuser.html')
 
 @login_required(login_url='/login/')
-def enduser(request):    
-    return render(request, 'enduser.html')    
+def districtuser(request):
+    return render(request, 'district_user.html')
+
+@login_required(login_url='/login/')
+def enduser(request):
+    return render(request, 'enduser.html')
 
 def addLocation(request):
     if request.method == 'POST':
@@ -1277,7 +1285,8 @@ def fetch_data_api(request):
                 callback_val = request.GET['callback']
                 data = '%s(%s);' % (callback_val,data)
         except:
-            print 'report',repr(format_exc())                               
+            # print 'report',repr(format_exc())   
+            pass                            
     return HttpResponse(data,content_type='Application/json')
 
 def sortReportData(request):

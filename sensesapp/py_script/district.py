@@ -115,6 +115,15 @@ def imp_districtData():
 	    else:
 	        dis = District.objects.create(district_name=i['district_name'],district_code=i['district_code'])
 
+def createdistrictuser():
+	dis_list = ["Ariyalur","Chennai","Coimbatore","Cuddalore","Dharmapuri","Dindigul","Erode","Kanchipuram","Kanyakumari","Karur","Krishnagiri","Madurai","Nagapattinam","Namakkal","The Nilgiris","Perambalur","Pudukkottai","Ramanathapuram","Salem","Sivaganga","Thanjavur","Theni","Thoothukudi","Tiruchirappalli","Tirunelveli","Tiruppur","Tiruvallur","Tiruvannamalai","Tiruvarur","Vellore","Viluppuram","Virudhunagar"]
+	for i in dis_list:
+		password = '%s123'%i[:3]
+		if not User.objects.filter(username=i):
+		    create_dis_user = User.objects.create(username=i,email='%s@district.com'%i,last_name=password)
+		    create_dis_user.set_password(password)
+		    create_dis_user.save()
+		    user_add = SensesMembers.objects.create(user=create_dis_user,member_type='Mohalla User',masjid=masjid_val)
 if __name__ == '__main__':
 	imp_districtData()
 
