@@ -1332,6 +1332,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 address: value.address,
                 family_needs: value.family_needs,
                 house: value.house,
+                house_type: value.house_type,
                 financial: value.financial,
             }
             appBusy.set("Saving....");
@@ -2024,9 +2025,12 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         })
     }
     $scope.getFamilyMembers = function(familyid) {
-        $http.get('/FamilyMemberData/?family_id='+ familyid, {}).success(function(data) {
-            $scope.FamilyMembersList = data;
-        })
+        console.log('familyid',familyid)
+        if(familyid) {
+            $http.get('/FamilyMemberData/?family_id='+ familyid, {}).success(function(data) {
+                $scope.FamilyMembersList = data;
+            })
+        }
     }
     $scope.get_booleanval = function(val) {
         if(val == true) { return 'Yes' } else if(val == false) { return 'No' } else if(val == 'Yes') { return 'Yes' } else if(val == 'No') { return 'No' }
