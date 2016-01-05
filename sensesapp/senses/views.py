@@ -446,7 +446,31 @@ def fetchReportData(request):
                         family_value = family_value.filter(house_type=data['house'])                        
                 except:
                     family_value = Family.objects.filter(muhalla=muhalla)
-                    finacial_value = 'ALL'            
+                    finacial_value = 'ALL'
+            elif data['report_type'] == 'Families without toilets':
+                try:
+                    if data['financial']:
+                        family_value = Family.objects.filter(muhalla=muhalla,toilet=False,financial_status=data['financial'])
+                        finacial_value = data['financial'].split(' ')[0]
+                    else:
+                        family_value = Family.objects.filter(muhalla=muhalla,toilet=False)                    
+                        finacial_value = 'ALL'
+                    if data['house']:
+                        family_value = family_value.filter(house_type=data['house'])                        
+                except:
+                    family_value = Family.objects.filter(muhalla=muhalla,toilet=False)
+                    finacial_value = 'ALL'
+            elif data['report_type'] == 'Families Eligible for Jakaath':
+                try:
+                    if data['financial']:
+                        family_value = Family.objects.filter(muhalla=muhalla,financial_status=data['financial'])
+                        finacial_value = data['financial'].split(' ')[0]
+                    else:
+                        family_value = Family.objects.filter(muhalla=muhalla,financial_status='D - Poor').filter(financial_status='E - Very Poor')
+                        finacial_value = 'D and E'
+                except:
+                    family_value = Family.objects.filter(muhalla=muhalla,financial_status='D - Poor').filter(financial_status='E - Very Poor')
+                    finacial_value = 'D and E'
             else:
                 try:
                     if data['financial']:

@@ -553,7 +553,8 @@ def importcsvdata(value):
                       mem_service = Member_service.objects.create(member=member,scheme=Service.objects.get(name='Other Government Schemes'),status=True,solution="Not Yet")
             except:
               print 'report',repr(format_exc())
-              return repr(format_exc())
+              return 'Error in Row number: ',data.index(i),'Error:',repr(format_exc())
+              # return repr(format_exc())
               # exit()
 
 

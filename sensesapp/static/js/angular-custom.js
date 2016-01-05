@@ -3,7 +3,7 @@ underscore.factory('_', function() {
     'use strict';
     return window._; // assumes underscore has already been loaded on the page
 });
-var app = angular.module('senses', ['ngSanitize', 'ngCookies', 'ui.bootstrap', 'ngRoute', 'ui.select', 'underscore','loading.services']);
+var app = angular.module('senses', ['ngSanitize', 'ngCookies', 'ui.bootstrap', 'ngRoute', 'ui.select', 'underscore','loading.services','pasvaz.bindonce']);
 app.run(function($http, $cookies) {
     console.log($cookies.csrftoken,'csrrf')
     $http.defaults.headers.post['X-CSRFToken'] = $cookies.csrftoken;
