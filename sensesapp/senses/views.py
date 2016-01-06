@@ -466,10 +466,10 @@ def fetchReportData(request):
                         family_value = Family.objects.filter(muhalla=muhalla,financial_status=data['financial'])
                         finacial_value = data['financial'].split(' ')[0]
                     else:
-                        family_value = Family.objects.filter(muhalla=muhalla,financial_status='D - Poor').filter(financial_status='E - Very Poor')
+                        family_value = Family.objects.filter(muhalla=muhalla,financial_status__in=['D - Poor','E - Very Poor'])
                         finacial_value = 'D and E'
                 except:
-                    family_value = Family.objects.filter(muhalla=muhalla,financial_status='D - Poor').filter(financial_status='E - Very Poor')
+                    family_value = Family.objects.filter(muhalla=muhalla,financial_status__in=['D - Poor','E - Very Poor'])
                     finacial_value = 'D and E'
             else:
                 try:
@@ -1074,14 +1074,14 @@ def change_password(request):
 
 def dashboard_api(request):
     if request.method == 'GET':
-        muhalla = len(Masjid.objects.all())
+        muhalla = Masjid.objects.count()
         count_dict = {}
         fam_dict = {}
         item_list = [dic.district.district_name for dic in Masjid.objects.all()]
         for i in item_list:
             count_dict[i] = count_dict.setdefault(i,0) + 1
-        fam_member = len(Member.objects.all())
-        tot_family = len(Family.objects.all())
+        fam_member = Member.objects.count()
+        tot_family = Family.objects.count()
         fam_list = [dic.muhalla.district.district_name for dic in Family.objects.all()]
         for j in fam_list:
             fam_dict[j] = fam_dict.setdefault(j,0) + 1
