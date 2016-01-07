@@ -381,122 +381,125 @@ def fetchReportData(request):
         get_mem_scheme = []
         get_mem_service = []
         member_data = Member.objects.all()
-        if data['report_type'] == 'New filter' or data['report_type'] == '':
-            if data['age_from']:
-                member_data = Member.objects.filter(age__gte=data['age_from'])
-            if  data['age_to']:
-                member_data = member_data.filter(age__lte=data['age_to'])
-            if data['gender']:
-                member_data = member_data.filter(gender=data['gender'])
-            if data['marital_status']:
-                member_data = member_data.filter(marital_status=data['marital_status'])
-            if data['district']:
-                if data['district'] == 'all':
-                    member_data = member_data
-                else:
-                    district_val = District.objects.get(district_name=data['district'])
-                    member_data = member_data.filter(district=district_val)
-                    if data['taluk']:
-                        if data['taluk'] == 'all':
-                            member_data = member_data
-                        else:
-                            taluk_val = Taluk.objects.get(taluk_name=data['taluk'])
-                            member_data = member_data.filter(taluk=taluk_val)
-                            if data['muhalla_id']:
-                                if data['muhalla_id'] == 'all':
-                                    member_data = member_data
-                                else:
-                                    muhalla_val = Masjid.objects.get(mohalla_id=data['muhalla_id'])
-                                    member_data = member_data.filter(muhalla=muhalla_val)
+        try:
+            if data['district'] == 'all':
+                muhalla = Masjid.objects.all()
+            elif data['taluk'] == 'all':
+                muhalla = Masjid.objects.filter(district=District.objects.get(district_name=data['district']))
+            elif data['muhalla_id'] == 'all':
+                muhalla = Masjid.objects.filter(taluk=Taluk.objects.get(taluk_name=data['taluk']))
+            else:
+                muhalla = Masjid.objects.filter(mohalla_id=data['muhalla_id'])
+        except:
+            muhalla = Masjid.objects.all()
+        # if data['report_type'] == 'New filter' or data['report_type'] == '':
+        #     if data['age_from']:
+        #         member_data = Member.objects.filter(age__gte=data['age_from'])
+        #     if  data['age_to']:
+        #         member_data = member_data.filter(age__lte=data['age_to'])
+        #     if data['gender']:
+        #         member_data = member_data.filter(gender=data['gender'])
+        #     if data['marital_status']:
+        #         member_data = member_data.filter(marital_status=data['marital_status'])
+        #     if data['district']:
+        #         if data['district'] == 'all':
+        #             print 'all district'
+        #             member_data = member_data
+        #         else:
+        #             district_val = District.objects.get(district_name=data['district'])
+        #             member_data = member_data.filter(district=district_val)
+        #             if data['taluk']:
+        #                 if data['taluk'] == 'all':
+        #                     print 'all taluk'
+        #                     member_data = member_data
+        #                 else:
+        #                     taluk_val = Taluk.objects.get(taluk_name=data['taluk'])
+        #                     member_data = member_data.filter(taluk=taluk_val)
+        #                     if data['muhalla_id']:
+        #                         if data['muhalla_id'] == 'all':
+        #                             print 'all muhalla'
+        #                             member_data = member_data
+        #                         else:
+        #                             muhalla_val = Masjid.objects.get(mohalla_id=data['muhalla_id'])
+        #                             member_data = member_data.filter(muhalla=muhalla_val)
                 
-            for i in member_data:
-                for j in Medical.objects.filter(member=i):
-                    get_mem_medical.append({'name':j.member.name,'memberid':j.member.mem_id,'qualification':j.member.qualification,'status':True,'solution':'','address':j.member.family.address,'month':j.member.mem_age_month,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})
-                for k in Member_scheme.objects.filter(member=i):
-                    get_mem_scheme.append({'name':k.member.name,'memberid':k.member.mem_id,'qualification':k.member.qualification,'status':k.status,'solution':k.solution,'address':k.member.family.address,'month':k.member.mem_age_month,'age':k.member.age,'gender':k.member.gender,'financial':k.member.family.financial_status,'familyid':k.member.family.family_id,'mobile':k.member.family.mobile,'needs':k.scheme.name,'needer':'Need Government Scheme Guidance'})
-                for m in Member_service.objects.filter(member=i):
-                    get_mem_service.append({'name':m.member.name,'memberid':m.member.mem_id,'qualification':m.member.qualification,'status':m.status,'solution':m.solution,'address':m.member.family.address,'month':m.member.mem_age_month,'age':m.member.age,'gender':m.member.gender,'financial':m.member.family.financial_status,'familyid':m.member.family.family_id,'mobile':m.member.family.mobile,'needs':m.scheme.name,'needer':'Need Other/NGO Guidance'})    
-            member_details = get_mem_medical + get_mem_scheme + get_mem_service
-            get_memData = sorted(map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'month':x.mem_age_month,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.all()),key=itemgetter(sort_key),reverse=sort_reverse)
-            return HttpResponse(content=json.dumps({'member_details':member_details,'get_mem_service':get_mem_service,'get_mem_medical':get_mem_medical,'get_mem_scheme':get_mem_scheme,'get_memData':get_memData}),content_type='Application/json')
-        elif data['report_type'] == 'Total Family Details' or data['report_type'] == 'Own House & Rent House families' or data['report_type'] == 'Basic Help Needers List' or data['report_type'] == 'Families Eligible for Jakaath' or data['report_type'] == 'Families without toilets' :
-            try:
-                if data['muhalla_id']:
-                    muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
-                elif data['taluk']:
-                    muhalla = Masjid.objects.filter(taluk=Taluk.objects.filter(taluk_name=data['taluk'])[0])[0]
-                elif data['district']:
-                    muhalla = Masjid.objects.filter(district=District.objects.get(district_name=data['district']))[0]                        
-                else:
-                    muhalla = Masjid.objects.all()[0]
-            except:
-                muhalla = Masjid.objects.all()[0]
+        #     for i in member_data:
+        #         for j in Medical.objects.filter(member=i):
+        #             get_mem_medical.append({'name':j.member.name,'memberid':j.member.mem_id,'qualification':j.member.qualification,'status':True,'solution':'','address':j.member.family.address,'month':j.member.mem_age_month,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.disease.disease_name,'needer':'Need Medical Guidance'})
+        #         for k in Member_scheme.objects.filter(member=i):
+        #             get_mem_scheme.append({'name':k.member.name,'memberid':k.member.mem_id,'qualification':k.member.qualification,'status':k.status,'solution':k.solution,'address':k.member.family.address,'month':k.member.mem_age_month,'age':k.member.age,'gender':k.member.gender,'financial':k.member.family.financial_status,'familyid':k.member.family.family_id,'mobile':k.member.family.mobile,'needs':k.scheme.name,'needer':'Need Government Scheme Guidance'})
+        #         for m in Member_service.objects.filter(member=i):
+        #             get_mem_service.append({'name':m.member.name,'memberid':m.member.mem_id,'qualification':m.member.qualification,'status':m.status,'solution':m.solution,'address':m.member.family.address,'month':m.member.mem_age_month,'age':m.member.age,'gender':m.member.gender,'financial':m.member.family.financial_status,'familyid':m.member.family.family_id,'mobile':m.member.family.mobile,'needs':m.scheme.name,'needer':'Need Other/NGO Guidance'})    
+        #     member_details = get_mem_medical + get_mem_scheme + get_mem_service
+        #     get_memData = sorted(map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'month':x.mem_age_month,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.all()),key=itemgetter(sort_key),reverse=sort_reverse)
+        #     return HttpResponse(content=json.dumps({'member_details':member_details,'get_mem_service':get_mem_service,'get_mem_medical':get_mem_medical,'get_mem_scheme':get_mem_scheme,'get_memData':get_memData}),content_type='Application/json')
+        if data['report_type'] == 'Total Family Details' or data['report_type'] == 'Own House & Rent House families' or data['report_type'] == 'Basic Help Needers List' or data['report_type'] == 'Families Eligible for Jakaath' or data['report_type'] == 'Families without toilets' :
+                # if data['muhalla_id']:
+                #     muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
+                # elif data['taluk']:
+                #     muhalla = Masjid.objects.filter(taluk=Taluk.objects.filter(taluk_name=data['taluk'])[0])[0]
+                # elif data['district']:
+                #     muhalla = Masjid.objects.filter(district=District.objects.get(district_name=data['district']))[0]                        
+                # else:
+                #     muhalla = Masjid.objects.all()[0]
             if data['report_type'] == 'Basic Help Needers List':
-                family_value = Family.objects.filter(muhalla=muhalla,financial_status='E - Very Poor')
+                family_value = Family.objects.filter(muhalla__in=muhalla,financial_status='E - Very Poor')
                 finacial_value = 'E'
             elif data['report_type'] == 'Own House & Rent House families':
                 try:
                     if data['financial']:
-                        family_value = Family.objects.filter(muhalla=muhalla,financial_status=data['financial'])
+                        family_value = Family.objects.filter(muhalla__in=muhalla,financial_status=data['financial'])
                         finacial_value = data['financial'].split(' ')[0]
                     else:
-                        family_value = Family.objects.filter(muhalla=muhalla)                    
+                        family_value = Family.objects.filter(muhalla__in=muhalla)                    
                         finacial_value = 'ALL'
                     if data['house']:
                         family_value = family_value.filter(house_type=data['house'])                        
                 except:
-                    family_value = Family.objects.filter(muhalla=muhalla)
+                    family_value = Family.objects.filter(muhalla__in=muhalla)
                     finacial_value = 'ALL'
             elif data['report_type'] == 'Families without toilets':
                 try:
                     if data['financial']:
-                        family_value = Family.objects.filter(muhalla=muhalla,toilet=False,financial_status=data['financial'])
+                        family_value = Family.objects.filter(muhalla__in=muhalla,toilet=False,financial_status=data['financial'])
                         finacial_value = data['financial'].split(' ')[0]
                     else:
-                        family_value = Family.objects.filter(muhalla=muhalla,toilet=False)                    
+                        family_value = Family.objects.filter(muhalla__in=muhalla,toilet=False)                    
                         finacial_value = 'ALL'
                     if data['house']:
                         family_value = family_value.filter(house_type=data['house'])                        
                 except:
-                    family_value = Family.objects.filter(muhalla=muhalla,toilet=False)
+                    family_value = Family.objects.filter(muhalla__in=muhalla,toilet=False)
                     finacial_value = 'ALL'
             elif data['report_type'] == 'Families Eligible for Jakaath':
                 try:
                     if data['financial']:
-                        family_value = Family.objects.filter(muhalla=muhalla,financial_status=data['financial'])
+                        family_value = Family.objects.filter(muhalla__in=muhalla,financial_status=data['financial'])
                         finacial_value = data['financial'].split(' ')[0]
                     else:
-                        family_value = Family.objects.filter(muhalla=muhalla,financial_status__in=['D - Poor','E - Very Poor'])
+                        family_value = Family.objects.filter(muhalla__in=muhalla,financial_status__in=['D - Poor','E - Very Poor'])
                         finacial_value = 'D and E'
                 except:
-                    family_value = Family.objects.filter(muhalla=muhalla,financial_status__in=['D - Poor','E - Very Poor'])
+                    family_value = Family.objects.filter(muhalla__in=muhalla,financial_status__in=['D - Poor','E - Very Poor'])
                     finacial_value = 'D and E'
             else:
                 try:
                     if data['financial']:
-                        family_value = Family.objects.filter(muhalla=muhalla,financial_status=data['financial'])
+                        family_value = Family.objects.filter(muhalla__in=muhalla,financial_status=data['financial'])
                         finacial_value = data['financial'].split(' ')[0]
                     else:
-                        family_value = Family.objects.filter(muhalla=muhalla)                    
+                        family_value = Family.objects.filter(muhalla__in=muhalla)                    
                         finacial_value = 'ALL'
                 except:
-                    family_value = Family.objects.filter(muhalla=muhalla)   
+                    family_value = Family.objects.filter(muhalla__in=muhalla)   
                     finacial_value = 'ALL'            
+            print 'family_id',family_value        
             get_family = sorted(map(lambda x:{'familyid':x.family_id,'house_type':x.house_type,'address':x.address,'mobile':x.mobile,'family_head':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].name if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'family_head_occ':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].occupation if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'month':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].mem_age_month if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'age':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].age if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'gender':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].gender if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'fam_member':Member.objects.filter(family=Family.objects.get(family_id=x.family_id)).count(),'financial_pdf':x.financial_status.split(' ')[0],'jakath_family': 'Yes' if x.financial_status.split(' ')[0] == 'E' or x.financial_status.split(' ')[0] == 'D' else 'No','financial_status':x.financial_status,'muhalla':x.muhalla.name,'ration_card':x.ration_card,'language':x.language},family_value),key=itemgetter(sort_key),reverse=sort_reverse)
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_family':get_family,'finacial_value':finacial_value}),content_type='Application/json')
         elif data['report_type'] == 'Medical Needs and Guidance Needers Details':
             get_mem_medical = []
             disease_list = json.loads(request.body)['diseaseid_list']
-            try:
-                if data['muhalla_id']:
-                    muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
-                elif data['taluk']:
-                    muhalla = Masjid.objects.filter(taluk=Taluk.objects.filter(taluk_name=data['taluk'])[0])[0]
-                elif data['district']:
-                    muhalla = Masjid.objects.filter(district=District.objects.get(district_name=data['district']))[0]                        
-            except:
-                muhalla = Masjid.objects.all()[0]
-            family_value = Family.objects.filter(muhalla=muhalla)
+            family_value = Family.objects.filter(muhalla__in=muhalla)
             try:
                 if data['financial']:
                     family_value = family_value.filter(financial_status=data['financial'])
@@ -523,16 +526,7 @@ def fetchReportData(request):
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_medical':sorted(get_mem_medical,key=itemgetter(sort_key),reverse=sort_reverse)}),content_type='Application/json')            
         elif data['report_type'] == 'Government Voter ID Needers':
             get_mem_voter = []
-            try:
-                if data['muhalla_id']:
-                    muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
-                elif data['taluk']:
-                    muhalla = Masjid.objects.filter(taluk=Taluk.objects.filter(taluk_name=data['taluk'])[0])[0]
-                elif data['district']:
-                    muhalla = Masjid.objects.filter(district=District.objects.get(district_name=data['district']))[0]                        
-            except:
-                muhalla = Masjid.objects.all()[0]
-            family_value = Family.objects.filter(muhalla=muhalla)
+            family_value = Family.objects.filter(muhalla__in=muhalla)
             for fam in family_value:
                 get_mem_voter_dt = Member.objects.filter(family=fam,voter_status=False)
                 if data['age_from']:
@@ -544,21 +538,12 @@ def fetchReportData(request):
                 if data['marital_status']:
                     get_mem_voter_dt = get_mem_voter_dt.filter(marital_status=data['marital_status'])
                 for i in get_mem_voter_dt:
-                    get_mem_voter.append({'family_head':i.name,'qualification':i.qualification,'address':i.family.address,'month':i.mem_age_month,'age':i.age,'gender':i.gender,'financial_status':i.family.financial_status,'financial_pdf':i.family.financial_status.split(' ')[0],'familyid':i.family.family_id,'mobile':i.family.mobile})
+                    get_mem_voter.append({'family_head':i.name,'mem_id':i.mem_id,'qualification':i.qualification,'address':i.family.address,'month':i.mem_age_month,'age':i.age,'gender':i.gender,'financial_status':i.family.financial_status,'financial_pdf':i.family.financial_status.split(' ')[0],'familyid':i.family.family_id,'mobile':i.family.mobile})
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_voter':sorted(get_mem_voter,key=itemgetter(sort_key),reverse=sort_reverse)}),content_type='Application/json')                
         elif data['report_type'] == 'Help for Poor Peoples and Guidance Needers List':
             get_mem_service = []
             service_list = json.loads(request.body)['serviceid_list']
-            try:
-                if data['muhalla_id']:
-                    muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
-                elif data['taluk']:
-                    muhalla = Masjid.objects.filter(taluk=Taluk.objects.filter(taluk_name=data['taluk'])[0])[0]
-                elif data['district']:
-                    muhalla = Masjid.objects.filter(district=District.objects.get(district_name=data['district']))[0]                        
-            except:
-                muhalla = Masjid.objects.all()[0]
-            family_value = Family.objects.filter(muhalla=muhalla)
+            family_value = Family.objects.filter(muhalla__in=muhalla)
             try:
                 if data['financial']:
                     family_value = family_value.filter(financial_status=data['financial'])
@@ -591,16 +576,7 @@ def fetchReportData(request):
         elif data['report_type'] == 'Government Schemes and Guidance Needers Details' or data['report_type'] == 'Educational Help and Guidance Needers List' or data['report_type'] == 'Help for Discontinued and Guidance Needers List' or data['report_type'] == 'Training/Employment Help and Guidance Needers List':
             get_mem_scheme = []
             scheme_list = json.loads(request.body)['schemeid_list']
-            try:
-                if data['muhalla_id']:
-                    muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
-                elif data['taluk']:
-                    muhalla = Masjid.objects.filter(taluk=Taluk.objects.filter(taluk_name=data['taluk'])[0])[0]
-                elif data['district']:
-                    muhalla = Masjid.objects.filter(district=District.objects.get(district_name=data['district']))[0]                        
-            except:
-                muhalla = Masjid.objects.all()[0]
-            family_value = Family.objects.filter(muhalla=muhalla)
+            family_value = Family.objects.filter(muhalla__in=muhalla)
             try:
                 if data['financial']:
                     family_value = family_value.filter(financial_status=data['financial'])
@@ -631,59 +607,41 @@ def fetchReportData(request):
                             get_mem_scheme.append({'name':j.member.name,'memberid':j.member.mem_id,'qualification':j.member.qualification,'status':j.status,'solution':j.solution,'address':j.member.family.address,'month':j.member.mem_age_month,'age':j.member.age,'gender':j.member.gender,'financial':j.member.family.financial_status,'financial_pdf':j.member.family.financial_status.split(' ')[0],'familyid':j.member.family.family_id,'mobile':j.member.family.mobile,'needs':j.scheme.name,'needer':'Need Government Scheme Guidance'})
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_scheme':sorted(get_mem_scheme,key=itemgetter(sort_key),reverse=sort_reverse)}),content_type='Application/json')                
         elif data['report_type'] == 'Women chldrens Need to join Niswan Madarasa' or data['report_type']  == 'Persons Need to join Jumrah Madarasa' or data['report_type']  == 'Childrens Need to join Makthab Madarasa':
-            try:
-                if data['muhalla_id']:
-                    muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
-                elif data['taluk']:
-                    muhalla = Masjid.objects.filter(taluk=Taluk.objects.filter(taluk_name=data['taluk'])[0])[0]
-                elif data['district']:
-                    muhalla = Masjid.objects.filter(district=District.objects.get(district_name=data['district']))[0]                        
-            except:
-                muhalla = Masjid.objects.all()[0]
             if data['report_type'] == 'Women chldrens Need to join Niswan Madarasa':
-                get_memData = sorted(map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'financial_pdf':x.family.financial_status.split(' ')[0],'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'month':x.mem_age_month,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla,Makthab=True,madarasa_details='Girls For Makthab 4-15')),key=itemgetter(sort_key),reverse=sort_reverse)
+                get_memData = sorted(map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'financial_pdf':x.family.financial_status.split(' ')[0],'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'month':x.mem_age_month,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla__in=muhalla,Makthab=True,madarasa_details='Girls For Makthab 4-15')),key=itemgetter(sort_key),reverse=sort_reverse)
             elif data['report_type'] == 'Childrens Need to join Makthab Madarasa':
-                get_memData = sorted(map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'financial_pdf':x.family.financial_status.split(' ')[0],'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'month':x.mem_age_month,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla,Makthab=True,madarasa_details='Boys For Makthab 4-15')),key=itemgetter(sort_key),reverse=sort_reverse)
+                get_memData = sorted(map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'financial_pdf':x.family.financial_status.split(' ')[0],'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'month':x.mem_age_month,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla__in=muhalla,Makthab=True,madarasa_details='Boys For Makthab 4-15')),key=itemgetter(sort_key),reverse=sort_reverse)
             elif data['report_type'] == 'Persons Need to join Jumrah Madarasa':
-                get_memData = sorted(map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'financial_pdf':x.family.financial_status.split(' ')[0],'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'month':x.mem_age_month,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla,Makthab=True,madarasa_details='Jumrah Madarasa for Boys')),key=itemgetter(sort_key),reverse=sort_reverse)
+                get_memData = sorted(map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'financial_pdf':x.family.financial_status.split(' ')[0],'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'month':x.mem_age_month,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla__in=muhalla,Makthab=True,madarasa_details='Jumrah Madarasa for Boys')),key=itemgetter(sort_key),reverse=sort_reverse)
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_memData':get_memData}),content_type='Application/json')
         elif data['report_type'] == 'Mohalla Report':
             print 'mohalla report_type'
-            try:
-                if data['muhalla_id']:
-                    muhalla = Masjid.objects.get(mohalla_id=data['muhalla_id'])
-                elif data['taluk']:
-                    muhalla = Masjid.objects.filter(taluk=Taluk.objects.filter(taluk_name=data['taluk'])[0])[0]
-                elif data['district']:
-                    muhalla = Masjid.objects.filter(district=District.objects.get(district_name=data['district']))[0]                    
-            except:
-                muhalla = Masjid.objects.all()[0]            
-            get_family = map(lambda x:{'familyid':x.family_id,'r_card':x.ration_card,'address':x.address,'mobile':x.mobile,'family_head':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].name if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'family_head_occ':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].occupation if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'month':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].mem_age_month if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'age':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].age if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'gender':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].gender if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'fam_member':Member.objects.filter(family=Family.objects.get(family_id=x.family_id)).count(),'financial_status':x.financial_status,'muhalla':x.muhalla.name,'ration_card':x.ration_card,'language':x.language},Family.objects.filter(muhalla=muhalla))
-            get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'month':x.mem_age_month,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla=muhalla))
+            get_family = map(lambda x:{'familyid':x.family_id,'r_card':x.ration_card,'address':x.address,'mobile':x.mobile,'family_head':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].name if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'family_head_occ':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].occupation if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'month':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].mem_age_month if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'age':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].age if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'gender':Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True)[0].gender if Member.objects.filter(family=Family.objects.get(family_id=x.family_id),family_head=True) else None,'fam_member':Member.objects.filter(family=Family.objects.get(family_id=x.family_id)).count(),'financial_status':x.financial_status,'muhalla':x.muhalla.name,'ration_card':x.ration_card,'language':x.language},Family.objects.filter(muhalla__in=muhalla))
+            get_memData = map(lambda x:{'familyid':x.family.family_id,'makthab':x.Makthab,'makthab_status':x.madarasa_details,'address':x.family.address,'financial_status':x.family.financial_status,'mobile':x.family.mobile,'family_head':x.name,'mem_id':x.mem_id,'gender':x.gender,'month':x.mem_age_month,'age':x.age,'marital_status':x.marital_status,'voter':x.voter_status},Member.objects.filter(muhalla__in=muhalla))
             married = sum(1 if(x['marital_status']=='Married' or x['marital_status']=='Widow' or x['marital_status']=='Devorced') else 0 for x in get_memData)
             tot_men = sum(1 if(x['gender']=='MALE') else 0 for x in get_memData)
             tot_women = sum(1 if(x['gender']=='FEMALE') else 0 for x in get_memData)
             voter = sum(1 if(x['voter']==True) else 0 for x in get_memData)
             marriage_help = 0
-            for i in Member.objects.filter(muhalla=muhalla):
+            for i in Member.objects.filter(muhalla__in=muhalla):
                 val = len(Member_scheme.objects.filter(member=i,scheme=SubScheme.objects.get(name='Marriage Help'),status=True,solution='Not Yet'))
                 # marriage_help = sum(1 if x else 0 for x in Member_scheme.objects.filter(member=i,scheme=SubScheme.objects.get(name='Marriage Help'),status=True,solution='Not Yet'))
                 marriage_help+=val    
             interest_loan = 0
-            for i in Member.objects.filter(muhalla=muhalla):
+            for i in Member.objects.filter(muhalla__in=muhalla):
                 val = len(Member_service.objects.filter(member=i,scheme=Service.objects.get(name='Suffering Due To Interest Base Loan'),status=True,solution='Not Yet'))
                 interest_loan+=val
             deserted_women_pension = 0    
-            for i in Member.objects.filter(muhalla=muhalla):
+            for i in Member.objects.filter(muhalla__in=muhalla):
                 val = len(Member_scheme.objects.filter(member=i,scheme=SubScheme.objects.get(name='Deserted Women Pension'),status=True,solution='Not Yet'))
                 deserted_women_pension+=val
             orphan = 0
-            for i in Member.objects.filter(muhalla=muhalla):
+            for i in Member.objects.filter(muhalla__in=muhalla):
                 val = len(Member_scheme.objects.filter(member=i,scheme=SubScheme.objects.get(name='Destitute / Orphan Welfare'),status=True,solution='Not Yet'))
                 orphan+=val   
-            daily_prayer = len(Member.objects.filter(muhalla=muhalla,namaz='5 Times a day'))
-            quran_reading = len(Member.objects.filter(muhalla=muhalla,quran_reading=True))
-            only_jumah = len(Member.objects.filter(muhalla=muhalla,namaz='only Jumah',gender='MALE'))
+            daily_prayer = len(Member.objects.filter(muhalla__in=muhalla,namaz='5 Times a day'))
+            quran_reading = len(Member.objects.filter(muhalla__in=muhalla,quran_reading=True))
+            only_jumah = len(Member.objects.filter(muhalla__in=muhalla,namaz='only Jumah',gender='MALE'))
             no_ration_card = sum(1 if(x['r_card']=='' or x['r_card']=='No' or x['r_card']=='-' or x['r_card']=='NA') else 0 for x in get_family)     
             non_voter = sum(1 if(x['voter']==False) else 0 for x in get_memData)
             men_age_60 = sum(1 if(x['gender']=='MALE' and eval(str(str(x['age'])))>=60) else 0 for x in get_memData)
@@ -1196,6 +1154,7 @@ def report_to_pdf(request):
         f.close()
         # print_pdf(data,pdf_filename,pdf_filepath)
         response = pdfkit.from_string(html_content, pdf_filepath,options=options)
+        # return HttpResponse(response,content_type='Application/pdf')
         return HttpResponse(content=json.dumps({'data':data,'pdfname':pdf_filename}),content_type='Application/json')
     else:
         file_path = os.path.dirname(os.path.dirname(__file__))
@@ -1347,7 +1306,6 @@ def print_pdf(data,name,path):
 
     elements = []
     # data=[(1,2),(3,4)]
-    print 'data',name
     # doc = SimpleDocTemplate(response, rightMargin=0, leftMargin=0, topMargin=0, bottomMargin=0)
     # data= [['Top\nLeft', '', '02', '03', '04'],
     #  ['', '', '12', '13', '14'],
@@ -1362,7 +1320,9 @@ def reportdatafunc(request):
     data = json.loads(request.body)
     if data['action'] == 'delete':
         try:
-            get_mem = lambda x: Family.objects.filter(family_id=x['familyid']).delete(),data['data']
+            for i in data['data']:
+                get_fam = Family.objects.get(family_id=i['familyid'])
+                get_fam.delete() 
             solution = "Selected Families Deleted!"
             # for i in data['data']:
                 # Family.objects.filter(family_id=i).delete()
@@ -1371,8 +1331,13 @@ def reportdatafunc(request):
     else:
         get_mem = data['data']
         try:
-            if data['report'] == 'Government Voter ID Needers':
-                get_mem = lambda x: Member.objects.filter(voter_status=False,mem_id=x).update(voter_status=True),get_mem
+            if data['report'] == 'Families without toilets':
+                for f in data['data']:
+                    get_fam = Family.objects.filter(family_id=f['familyid']).update(toilet=True)
+                # get_fam = lambda x: Family.objects.filter(family_id=x['familyid']).update(toilet=True),data['data']
+            elif data['report'] == 'Government Voter ID Needers':
+                for n in data['data']:
+                    get_mem = Member.objects.filter(voter_status=False,mem_id=n['mem_id']).update(voter_status=True)
             else:
                 for i in get_mem:
                     get_memid = Member.objects.get(mem_id=i['memberid'])

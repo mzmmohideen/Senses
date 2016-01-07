@@ -588,6 +588,8 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         $scope.tot_mohalla_list = _.pluck($scope.mahallaList,"mohalla_id")
         $scope.masjidList = _.pluck(_.filter($scope.mahallaList,function(num) {return num.district == data.district && num.taluk == data.taluk}),"mohalla_id")
         $scope.muhallaList = _.filter($scope.mahallaList,function(num) {return num.district == data.district && num.taluk == data.taluk})
+        $scope.muhallaList.push({'name':'all','district': data.district,'taluk': data.taluk,'location': "",'mohalla_id': "all",'musallas': ""})
+        console.log('muhalla',$scope.muhallaList)
     }
     $scope.report_value_change = function() {
         $scope.ReportValues.district = ''
@@ -713,7 +715,11 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         $scope.column_sort = val;
         $scope.fetchReportAPI(data,values)
     }
+    $scope.load_report_type = false;
+    $scope.loading_perc_gif = false;
     $scope.fetchReportAPI = function(data,values) {
+        console.log('fetchReportAPI')
+        $scope.load_report_type = false;
         $scope.list_familyid = []
         $scope.diseaseid_list = []
         $scope.schemeid_list = []
@@ -851,10 +857,11 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
         else {
             data.report_type = values.report_name;
         }
-        if(values.muhalla != '') {
+        if(values.muhalla != '' || values.district == 'all' || values.taluk == 'all') {
             $scope.ReportHeader = true;
             $scope.getReportData = false;
-            appBusy.set("Loading....");
+            // appBusy.set("Loading....");
+            $scope.loading_perc_gif = true;
             console.log('val',$scope.column_sort)
             $http.post('/fetchReportData/',{
                 data : data,
@@ -864,10 +871,11 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 schemeid_list : $scope.schemeid_list,
                 serviceid_list : $scope.serviceid_list,
             }).success(function(response) {
-                appBusy.set('Done...');              
-                $timeout( function() {              
-                    appBusy.set(false);
-                }, 1000);
+                // appBusy.set('Done...');   
+                $scope.loading_perc_gif = false;           
+                // $timeout( function() {              
+                //     appBusy.set(false);
+                // }, 1000);
                 if(response.report_type == 'Total Family Details'  || response.report_type == 'Own House & Rent House families') {
                     $scope.ReportHeader = ['S.No','Name & Address','Age & Gender','Family ID & Mobile NO','Financial Status & Jakaath']
                     $scope.getReportData = response.get_family;
@@ -919,28 +927,44 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                     $scope.ReportValues.report_name = 'New filter'
                 }
                 if(response.report_type == 'Mohalla Report') {
-                    var pdf_data = response.pdf_report;
+                    $scope.pdf_data = response.pdf_report;
                 }
                 else {
-                    var pdf_data = $scope.getReportData;
+                    $scope.pdf_data = $scope.getReportData;
                 }
                 if (response.report_type == 'Total Family Details' || response.report_type == 'Families without toilets'  || response.report_type == 'Own House & Rent House families' || response.report_type == 'Basic Help Needers List' || response.report_type == 'Families Eligible for Jakaath') {
-                    var finacial_value = response.finacial_value;
+                    $scope.finacial_value = response.finacial_value;
                 }
                 else {
-                    var finacial_value = '';
+                    $scope.finacial_value = '';
                 }
+                $scope.load_report_type = true;
                 console.log('reports',$scope.getReportData)
-                $http.post('/report_to_pdf/',{
-                    header : $scope.ReportHeader,
-                    data : pdf_data,
-                    report : $scope.ReportValues,
-                    finacial_value : finacial_value,
-                }).success(function(response){
-                    $scope.get_pdfname = response.pdfname;
-                })
+                // $http.post('/report_to_pdf/',{
+                //     header : $scope.ReportHeader,
+                //     data : $scope.pdf_data,
+                //     report : $scope.ReportValues,
+                //     finacial_value : $scope.finacial_value,
+                // }).success(function(response){
+                //     $scope.get_pdfname = response.pdfname;
+                // })
             })
         }
+    }
+    // $scope.down_pdf = false;
+    $scope.exportPDF = function() {
+        // $scope.down_pdf = false;
+        $http.post('/report_to_pdf/',{
+            header : $scope.ReportHeader,
+            data : $scope.pdf_data,
+            report : $scope.ReportValues,
+            finacial_value : $scope.finacial_value,
+        }).success(function(response){
+            $scope.get_pdfname = response.pdfname;
+            // $scope.down_pdf = true;
+            // window.location.href = '/static/pdf/'+response.pdfname
+            window.open('/static/pdf/'+response.pdfname,'_blank')
+        })
     }
     $scope.export_to_pdf = function(header,data,report) {
         $http.post('/report_to_pdf/',{
@@ -1270,9 +1294,19 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.DisCode = data.district;
             $scope.district_list = _.keys(data.district)
             $scope.district_list_report = _.keys(data.district)
-            $scope.district_list_report.push('all')
+            var dis_li_report = _.keys(data.district)
+            dis_li_report.push('all')
+            $scope.district_list_report = _.uniq(dis_li_report)
             $scope.getTaluk = data.data;
         })
+    }
+    $scope.getTalukdata = function(district,talukList) {
+        if(district != 'all') {
+            $scope.talukReportList = talukList[district]
+            var taluk_li_report = $scope.talukReportList
+            taluk_li_report.push('all')
+            $scope.talukReportList = _.without(_.uniq(taluk_li_report),"")
+        }
     }
     $scope.ReportValues = {
         district : '',

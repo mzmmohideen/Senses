@@ -7,6 +7,7 @@ def absolute_path(path):
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+SERVE_MEDIA = DEBUG
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
@@ -131,6 +132,7 @@ INSTALLED_APPS = (
     'django.contrib.staticfiles',
     'senses',
     'south',
+    'gunicorn',
     # Uncomment the next line to enable the admin:
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:

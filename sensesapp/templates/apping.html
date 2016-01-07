@@ -63,19 +63,7 @@
                 </button>
             <div class="navbar-default sidebar" role="navigation">
                 <div class="sidebar-nav navbar-collapse">
-                    <ul class="nav in" id="side-menu">
-                        <!-- <li class="sidebar-search">
-                            <div class="input-group custom-search-form">
-                                <input type="text" style="border-top-left-radius: 2px;border-bottom-left-radius: 2px;border-top-right-radius: 0px;border-bottom-right-radius: 0px;" class="form-control" placeholder="Search...">
-                                <span class="input-group-btn">
-                                <button style="border-top-left-radius: 0px;border-bottom-left-radius: 0px;border-top-right-radius: 2px;border-bottom-right-radius: 2px;" class="btn btn-default" type="button">
-                                    <i class="fa fa-search"></i>
-                                </button>
-                            </span>
-                            </div> -->
-                        <!-- </li> -->
-                        
-                        <!-- dashboard -->
+                    <ul class="nav in" style="margin-left:-10%" id="side-menu">
                         <li class="menu">
                             <a ng-click="reportbt=false;loading_gif=false;" href="#/dashboard">Dashboard</a>
                         </li>
@@ -707,23 +695,30 @@
                 <td><label for="male">PDF</label></td>
             </tr>
             <tr>
-                <td><select style="border-radius:2px;display: inline-block;height: 34px;border-radius: 2px; width: 97%;float: left;" ng-model="ReportValues.district" ng-options="gen for gen in district_list_report | SortData" class="form-control">
+                <td ng-show="!ReportValues.report_name"><select style="border-radius:2px;display: inline-block;height: 34px;border-radius: 2px; width: 97%;float: left;" ng-change="getTalukdata(ReportValues.district,getTaluk)" ng-model="ReportValues.district" ng-options="gen for gen in district_list_report | SortData" class="form-control">
                     <option value="">SELECT DISTRICT</option>
                 </select></td>
-                <td><select ng-disabled="!ReportValues.district" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;border-radius: 2px; float: left;" ng-change="getMasjidList(ReportValues)" ng-model="ReportValues.taluk" ng-options="gen for gen in getTaluk[ReportValues.district] | SortData" class="form-control">
+                <td ng-show="ReportValues.report_name"><select style="border-radius:2px;display: inline-block;height: 34px;border-radius: 2px; width: 97%;float: left;" ng-change="getTalukdata(ReportValues.district,getTaluk);fetchReportAPI(ReportDatas,ReportValues)" ng-model="ReportValues.district" ng-options="gen for gen in district_list_report | SortData" class="form-control">
+                    <option value="">SELECT DISTRICT</option>
+                </select></td>
+                <td ng-show="!ReportValues.report_name"><select ng-disabled="!ReportValues.district || ReportValues.district=='all'" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;border-radius: 2px; float: left;" ng-change="getMasjidList(ReportValues)" ng-model="ReportValues.taluk" ng-options="gen for gen in talukReportList | SortData" class="form-control">
                     <option value="">SELECT TALUK</option>
                 </select></td>
-                <td ng-show="!ReportValues.report_name"><select ng-disabled="!ReportValues.taluk" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;float: left;border-radius: 2px;" ng-model="ReportValues.muhalla" ng-options="gen.name for gen in muhallaList | SortData" class="form-control">
+                <td ng-show="ReportValues.report_name"><select ng-disabled="!ReportValues.district || ReportValues.district=='all'" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;border-radius: 2px; float: left;" ng-change="getMasjidList(ReportValues);fetchReportAPI(ReportDatas,ReportValues)" ng-model="ReportValues.taluk" ng-options="gen for gen in talukReportList | SortData" class="form-control">
+                    <option value="">SELECT TALUK</option>
+                </select></td>
+                <td ng-show="!ReportValues.report_name"><select ng-disabled="!ReportValues.taluk || ReportValues.taluk=='all'" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;float: left;border-radius: 2px;" ng-model="ReportValues.muhalla" ng-options="gen.name for gen in muhallaList | SortData" class="form-control">
                     <option value="">SELECT MUHALLAH</option>
                 </select></td>
-                <td ng-show="ReportValues.report_name"><select ng-disabled="!ReportValues.taluk" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;float: left;border-radius: 2px;" ng-model="ReportValues.muhalla" ng-change="fetchReportAPI(ReportDatas,ReportValues)" ng-options="gen.name for gen in muhallaList | SortData" class="form-control">
+                <td ng-show="ReportValues.report_name"><select ng-disabled="!ReportValues.taluk || ReportValues.taluk=='all'" style="border-radius:2px;display: inline-block;height: 34px;width: 97%;float: left;border-radius: 2px;" ng-model="ReportValues.muhalla" ng-change="fetchReportAPI(ReportDatas,ReportValues)" ng-options="gen.name for gen in muhallaList | SortData" class="form-control">
                     <option value="">SELECT MUHALLAH</option>
                 </select></td>
                 <td><input style="display: inline-block;height: 34px;border-radius: 2px; width: 100%;float: left;" class="form-control" type="text" ng-model="ReportValues.muhalla.mohalla_id" valid-number ng-change="clear_error()" placeholder="Muhalla ID" readonly/></td>
                 <td><select style="display: inline-block;height: 34px;width: 98%;border-radius: 2px; float: left;" ng-model="ReportValues.report_name" ng-change="fetchReportAPI(ReportDatas,ReportValues)" ng-options="gen for gen in senses_reports | SortData" class="form-control"><option value="">SELECT REPORT</option></select>
                     </td>
-                <td><a download="{{get_pdfname}}" href="/static/pdf/{{get_pdfname}}" target="_blank"><button ng-disabled="!ReportValues.muhalla || !ReportValues.report_name || !get_pdfname" type="submit" style="display: inline-block;height: 34px;width: 98%;border-radius: 2px; float: left;" class="btn-sm btn btn-primary"><i class="fa fa-cloud-download"></i>&nbsp;Export</button></a>
+                <td><button ng-disabled="!ReportValues.report_name || !load_report_type" ng-click="exportPDF()" type="submit" style="display: inline-block;height: 34px;width: 98%;border-radius: 2px; float: left;" class="btn-sm btn btn-primary"><i class="fa fa-cloud-download"></i>&nbsp;Export</button>
                     </td>
+                    <!--<a ng-disabled="!down_pdf" download="{{get_pdfname}}" href="/static/pdf/{{get_pdfname}}" target="_blank"></a>-->
                     <!--ng-click="export_to_pdf(ReportHeader,getReportData,ReportValues)"--> 
 
             </tr>
@@ -732,11 +727,14 @@
             <div ng-show="list_familyid.length>0">
                 <button ng-show="ReportValues.report_name == 'Basic Help Needers List' || ReportValues.report_name == 'Total Family Details' || ReportValues.report_name == 'Own House & Rent House families' || ReportValues.report_name == 'Families Eligible for Jakaath' || ReportValues.report_name == 'Families without toilets'" style="background-color:red;margin-left: 35%;margin-top:-2%;position: relative;" ng-click="performaction('delete',ReportDatas,ReportValues)" class="btn btn-primary"><i class="glyphicon glyphicon-trash"></i> Delete Selected</button>
                 <button ng-show="ReportValues.report_name == 'Training/Employment Help and Guidance Needers List' || ReportValues.report_name == 'Educational Help and Guidance Needers List' || ReportValues.report_name == 'Help for Discontinued and Guidance Needers List' || ReportValues.report_name == 'Help for Poor People and Guidance Needers List' || ReportValues.report_name == 'Government Schemes and Guidance Needers Details' || ReportValues.report_name == 'Government Voter ID Needers'" style="background-color:green;position: relative;margin-left:35%;margin-top:-2%;" ng-click="performaction('make_sol',ReportDatas,ReportValues)" class="btn btn-primary"><i class="fa fa-check"></i> Make it solved</button>
+                <button ng-show="ReportValues.report_name == 'Families without toilets'" style="background-color:green;position: relative;margin-top:-2%;" ng-click="performaction('make_sol',ReportDatas,ReportValues)" class="btn btn-primary"><i class="fa fa-check"></i> Make it solved</button>
+
             </div>    
             <!--<div class="form-group" style="padding-bottom: 34px;">
                 <button  ng-disabled="scheme_val=='' || scheme_val=='SELECT SCHEMES' || sub_scheme_val=='' || sub_scheme_val=='SELECT SUB SCHEME'" type="submit" style="width:25%;height: 34px;float:right;" ng-click="add_schemes(scheme_val,sub_scheme_val,scheme_values)" class="btn-sm btn btn-primary"><i class="glyphicon glyphicon-plus"></i> Add</button>
             </div>-->
-            <table class="table table-striped table-bordered table-hover ng-scope" style="width: 97%;margin-left: 1.5%;">
+            <img src="../static/images/loading.gif" style="margin-left: 25%;" ng-show="loading_perc_gif"/>
+            <table ng-show="!loading_perc_gif" class="table table-striped table-bordered table-hover ng-scope" style="width: 97%;margin-left: 1.5%;">
                 <thead>
                     <tr style="cursor:pointer;" class="ng-scope">
                         <th ng-click="header_sort(header,ReportDatas,ReportValues)" bindonce ng-repeat="header in ReportHeader">{{header}} <i ng-show="sort_type" class="fa fa-sort-amount-asc"></i> <i ng-show="!sort_type" class="fa fa-sort-amount-desc"></i></th>
@@ -768,7 +766,7 @@
                         <td>{{key.beneficiaries}}</td>
                     </tr>
                     <tr ng-show="ReportValues.report_name != 'Mohalla Report' && getReportData.length==0" class="ng-scope">
-                        <td colspan="7">No Data Found!</td>
+                        <td style="text-align:center" colspan="7">No Data Found!</td>
                     </tr>
                     <tr ng-show="ReportValues.report_name == 'New filter' && getReportData.length!=0" bindonce ng-repeat="key in getReportData" class="ng-scope">
                         <td>{{$index+1}} <input type="checkbox" ng-model="checkboxval" ng-true-value="1" ng-false-value="0" ng-checked="checkboxval == 1" ng-click="dosomething(checkboxval,key)"></td>
