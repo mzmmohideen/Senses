@@ -12,6 +12,7 @@ SYMPTOMTYPE = (('DISEASE','DISEASE'),('DISORDER','DISORDER'))
 NAMAS = (('5 Times a day','5 Times a day'),('only Jumah','only Jumah'),('Not at All','Not at All'))
 SOLUTION = (('Solved','Solved'),('Not Yet','Not Yet'))
 NEWMEMTYPE = (('Mohalla User','Mohalla User'),('End Users & Donors','End Users & Donors'),('District User','District User'))
+ACTIONS = (('delete','delete'),('make_sol','make_sol'))
 
 class District(models.Model):
     district_name = models.CharField(max_length=50,unique=True)
@@ -154,4 +155,12 @@ class SensesMembers(models.Model):
     member_type = models.CharField(max_length=30,choices=NEWMEMTYPE)
     masjid = models.ForeignKey(Masjid,null=True)
     district = models.ForeignKey(District,null=True)
+
+class TempMohuserEdit(models.Model):
+    mohuser = models.CharField(max_length=100)
+    action = models.CharField(max_length=30,choices=ACTIONS)
+    family_id = models.CharField(max_length=30,null=True)
+    mem_id = models.CharField(max_length=30,null=True)
+    report_name = models.CharField(max_length=100)
+    needs = models.CharField(max_length=100,null=True)
 # Create your models here.

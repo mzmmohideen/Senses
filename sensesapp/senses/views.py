@@ -5,7 +5,9 @@ from django.core.context_processors import csrf
 from django.contrib.auth import authenticate, login
 from django.views.decorators.csrf import *
 from django.http import HttpResponseRedirect
+from django.core.mail import EmailMultiAlternatives
 import json,csv
+import smtplib
 import xlrd
 import os, sys, operator
 import pdfkit,pdfcrowd
@@ -280,7 +282,7 @@ def masjid_member(request):
         data = request.GET
         if Masjid.objects.filter(mohalla_id=data['masjid_id']):
             masjid = Masjid.objects.get(mohalla_id=data['masjid_id'])
-            get_members = map(lambda x:{'name':x.member_name,'month':x.mem_age_month,'age':x.age,'email':x.email,'coordinator':x.is_coordinator,'whatsapp':x.is_availonwhatsapp,'mobile':x.mobile,'address':x.address,'designation':x.designation},Masjid_members.objects.filter(masjid=masjid))
+            get_members = map(lambda x:{'name':x.member_name,'age':x.age,'email':x.email,'coordinator':x.is_coordinator,'whatsapp':x.is_availonwhatsapp,'mobile':x.mobile,'address':x.address,'designation':x.designation},Masjid_members.objects.filter(masjid=masjid))
         return HttpResponse(content=json.dumps({'data':get_members}),content_type='Application/json')    
 
 def convert_to_IST(timestamp, convert=None):
@@ -538,7 +540,7 @@ def fetchReportData(request):
                 if data['marital_status']:
                     get_mem_voter_dt = get_mem_voter_dt.filter(marital_status=data['marital_status'])
                 for i in get_mem_voter_dt:
-                    get_mem_voter.append({'family_head':i.name,'mem_id':i.mem_id,'qualification':i.qualification,'address':i.family.address,'month':i.mem_age_month,'age':i.age,'gender':i.gender,'financial_status':i.family.financial_status,'financial_pdf':i.family.financial_status.split(' ')[0],'familyid':i.family.family_id,'mobile':i.family.mobile})
+                    get_mem_voter.append({'family_head':i.name,'memberid':i.mem_id,'qualification':i.qualification,'address':i.family.address,'month':i.mem_age_month,'age':i.age,'gender':i.gender,'financial_status':i.family.financial_status,'financial_pdf':i.family.financial_status.split(' ')[0],'familyid':i.family.family_id,'mobile':i.family.mobile})
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'get_mem_voter':sorted(get_mem_voter,key=itemgetter(sort_key),reverse=sort_reverse)}),content_type='Application/json')                
         elif data['report_type'] == 'Help for Poor Peoples and Guidance Needers List':
             get_mem_service = []
@@ -1316,6 +1318,79 @@ def print_pdf(data,name,path):
     doc = DataToPdf(fields, data)
     doc.export(name)
 
+def reportmailer(request):
+    from email.mime.multipart import MIMEMultipart
+    from email.mime.text import MIMEText
+    data = json.loads(request.body)
+    get_user = User.objects.get(username=request.user.username)
+    if data['action'] == 'delete':
+        get_list = map(lambda x:x['familyid'],data['data'])
+        get_id_list = []
+        for i in data['data']:
+            if not TempMohuserEdit.objects.filter(mohuser=request.user.username,action='delete',family_id=i['familyid'],report_name=data['report']):
+                cre_fam = TempMohuserEdit.objects.create(mohuser=request.user.username,action='delete',family_id=i['familyid'],report_name=data['report'])
+                get_id_list.insert(len(get_id_list),cre_fam.id)
+    else:
+        get_mem = data['data']
+        if data['report'] == 'Families without toilets':
+            get_list = map(lambda x:x['familyid'],data['data'])
+            get_id_list = []
+            for f in data['data']:
+                if not TempMohuserEdit.objects.filter(mohuser=request.user.username,action='make_sol',family_id=f['familyid'],report_name=data['report']):
+                    cre_fam = TempMohuserEdit.objects.create(mohuser=request.user.username,action='make_sol',family_id=f['familyid'],report_name=data['report'])
+                    get_id_list.insert(len(get_id_list),cre_fam.id)
+        elif data['report'] == 'Government Voter ID Needers':
+            get_list = map(lambda x:x['memberid'],data['data'])
+            get_id_list = []
+            for n in data['data']:
+                if not TempMohuserEdit.objects.filter(mohuser=request.user.username,action='make_sol',family_id=n['familyid'],report_name=data['report'],mem_id=n['memberid']):
+                    cre_fam = TempMohuserEdit.objects.create(mohuser=request.user.username,action='make_sol',family_id=n['familyid'],report_name=data['report'],mem_id=n['memberid'])
+                    get_id_list.insert(len(get_id_list),cre_fam.id)
+        else:
+            get_list = map(lambda x:x['memberid'],data['data'])
+            get_id_list = []
+            for i in data['data']:
+                if not TempMohuserEdit.objects.create(mohuser=request.user.username,action='make_sol',family_id=i['familyid'],report_name=data['report'],mem_id=i['memberid'],needs=i['needs']):
+                    cre_fam = TempMohuserEdit.objects.create(user=request.user.username,action='make_sol',family_id=i['familyid'],report_name=data['report'],mem_id=i['memberid'],needs=i['needs'])
+                    get_id_list.insert(len(get_id_list),cre_fam.id)
+    # email_status = send_reportmail(request.user.username,data['action'],data['report'],get_list)
+    subject, from_email, to = 'Mohalla User Request!','mzmmohideen@gmail.com', 'mzmohideen19@gmail.com'
+    text_content = 'This is an important message.'
+    html_content = render_to_string('report_mail.html',{'user':request.user.username,'id_list':get_id_list,'action':data['action'],'report':data['report'],'get_ben_list':get_list})
+    f = open('reporthtml.html','w')
+    f.write(html_content)
+    f.close()
+    print 'ms'
+    me = "mzmmohideen@gmail.com"
+    my_password = r"9962221811"
+    you = "mzmohideen19@gmail.com"
+    # msg = MIMEMultipart('alternative')
+    # msg['Subject'] = "Alert"
+    # msg['From'] = me
+    # msg['To'] = you
+    # EMAIL = MIMEText(html_content, 'html') 
+    # msg.attach(EMAIL)
+    # smtp = smtplib.SMTP_SSL('smtp.gmail.com')
+    # # smtp.ehlo()
+    # # smtp.starttls()
+    # print 'pass',my_password
+    # smtp.login(me, my_password)
+    # smtp.sendmail(me, you, msg.as_string())
+    # smtp.quit()
+    # print 'status',smtp
+
+    msg = MIMEMultipart('alternative')
+    msg['Subject'], msg['From'], msg['To'] = subject, from_email, to
+    EMAIL = MIMEText(html_content,'html') 
+    msg.attach(EMAIL)
+    smtp = smtplib.SMTP('smtp.gmail.com', 587)
+    smtp.ehlo()
+    smtp.starttls()
+    print 'msgs',smtp
+    smtp.login('mzmmohideen@gmail.com', '9962221811')
+    print 'smtp',smtp
+    smtp.sendmail(from_email, to, msg.as_string())
+
 def reportdatafunc(request):
     data = json.loads(request.body)
     if data['action'] == 'delete':
@@ -1337,7 +1412,7 @@ def reportdatafunc(request):
                 # get_fam = lambda x: Family.objects.filter(family_id=x['familyid']).update(toilet=True),data['data']
             elif data['report'] == 'Government Voter ID Needers':
                 for n in data['data']:
-                    get_mem = Member.objects.filter(voter_status=False,mem_id=n['mem_id']).update(voter_status=True)
+                    get_mem = Member.objects.filter(voter_status=False,mem_id=n['memberid']).update(voter_status=True)
             else:
                 for i in get_mem:
                     get_memid = Member.objects.get(mem_id=i['memberid'])

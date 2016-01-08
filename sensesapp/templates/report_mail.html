@@ -1,0 +1,33 @@
+<html>
+    <head>
+    <style type="text/css">
+    .tg  {border-collapse:collapse;border-spacing:0;border-color:#aabcfe;}
+    .tg td{font-family:Arial, sans-serif;font-size:14px;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#669;background-color:#e8edff;}
+    .tg th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#039;background-color:#b9c9fe;}
+    .tg .tg-7un6{background-color:#ffffff;color:#000000;text-align:center;vertical-align:top}
+    .tg .tg-83xr{background-color:#ffffff;color:#000000;text-align:center;vertical-align:top}
+    .tg .tg-kixb{background-color:#ffffff;color:#000000;vertical-align:top}
+    .tg .tg-pxng{background-color:#ffffff;color:#000000;vertical-align:top}
+    </style>
+    <body>
+      Welcome - {{user}} !
+    <table class="tg">
+      <tr>
+        <th class="tg-7un6" colspan="2">Action - {{action}} </th>
+      </tr>
+      <tr>
+        <th class="tg-7un6" colspan="2">Report - {{report}} </th>
+      </tr>
+      <tr>
+        <td class="tg-kixb">No</td>
+        <td class="tg-83xr">ID</td>
+      </tr>
+      {% for val in get_ben_list %}
+      <tr>
+        <td class="tg-pxng">{{forloop.counter}}</td>
+        <td class="tg-pxng">{{val}}</td>
+      </tr>
+      {% endfor %}
+    </table>
+</body>
+</html>

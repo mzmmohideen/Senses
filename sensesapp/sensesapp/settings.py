@@ -1,5 +1,6 @@
 # Django settings for sensesapp project.
 import os
+PROJECT_DIR=os.path.dirname(os.path.dirname(__file__))
 def absolute_path(path):
     return os.path.abspath(os.path.join(os.path.dirname(__file__), path))
 
@@ -7,7 +8,14 @@ def absolute_path(path):
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-SERVE_MEDIA = DEBUG
+
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 465
+EMAIL_HOST_USER = 'mzmmohideen@gmail.com'
+EMAIL_HOST_PASSWORD = '9962221811'
+
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),
 )
@@ -68,13 +76,14 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/var/www/example.com/static/"
-STATIC_ROOT = ''
+STATIC_ROOT = os.path.join(PROJECT_DIR,'static_media/')
 
 # URL prefix for static files.
 # Example: "http://example.com/static/", "http://static.example.com/"
 STATIC_URL = '/static/'
 
 # Additional locations of static files
+# STATICFILES_DIRS = ( os.path.join(PROJECT_DIR,'static/'),)
 STATICFILES_DIRS = (
     '%s'%(os.path.join(os.getcwd(), 'static')),
     # Put strings here, like "/home/html/static" or "C:/www/django/static".

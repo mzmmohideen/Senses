@@ -1,6 +1,10 @@
 from django.conf.urls import patterns, include, url
+from django.conf.urls.defaults import *
 from senses.views import *
-from django.contrib import admin
+from django.contrib import *
+from sensesapp import settings
+from django.conf import settings
+from django.contrib.staticfiles.urls import staticfiles_urlpatterns
 
 admin.autodiscover()
 
@@ -48,6 +52,9 @@ urlpatterns = patterns('',
     url(r'^report_to_pdf/',report_to_pdf),
     url(r'^upload_bulk_data/',upload_bulk_data),
     url(r'^reportdatafunc/',reportdatafunc),
+    url(r'^reportmailer/',reportmailer),
+    # (r'^static/(?P<path>.*)$', 'django.views.static.serve', {'document_root': settings.STATIC_ROOT}),
+
     # Examples:
     # url(r'^$', 'sensesapp.views.home', name='home'),
     # url(r'^sensesapp/', include('sensesapp.foo.urls')),
@@ -58,3 +65,8 @@ urlpatterns = patterns('',
     # Uncomment the next line to enable the admin:
     # url(r'^admin/', include(admin.site.urls)),
 )
+urlpatterns += patterns('', (
+    r'^static/(?P<path>.*)$',
+    'django.views.static.serve',
+    {'document_root': settings.STATIC_ROOT}
+))
