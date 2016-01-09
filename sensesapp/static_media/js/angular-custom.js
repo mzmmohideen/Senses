@@ -663,6 +663,10 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.moh_user.re_password = ''
         })
     }
+    var offset = 0;
+    var limit = 50;
+    $scope.repr_offset = 0;
+    $scope.repr_limit = 50;
     $scope.getMohallaUser = function(mohalla_data) {
         $http.get('/new_member/?muhalla_id='+mohalla_data.muhalla.mohalla_id,{}).success(function(data){
             if(data.data) {
@@ -718,12 +722,13 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
     $scope.load_report_type = false;
     $scope.loading_perc_gif = false;
     $scope.fetchReportAPI = function(data,values) {
-        console.log('fetchReportAPI')
+        console.log('fetchReportAPI',$scope.schemeid_list)
         $scope.load_report_type = false;
-        $scope.list_familyid = []
-        $scope.diseaseid_list = []
-        $scope.schemeid_list = []
-        $scope.serviceid_list = []
+        // $scope.list_familyid = []
+        // $scope.diseaseid_list = []
+        // $scope.schemeid_list = []
+        // $scope.serviceid_list = []
+        console.log('fetchReportAPI',$scope.schemeid_list)
         if(values.report_name == 'Total Family Details' || values.report_name == 'Own House & Rent House families' || values.report_name == 'Families without toilets') {
             $scope.voter_status_dt = false;
             $scope.tot_fam_dt = true;
@@ -862,16 +867,21 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.getReportData = false;
             // appBusy.set("Loading....");
             $scope.loading_perc_gif = true;
-            console.log('val',$scope.column_sort)
+            $scope.repr_limit = limit;
+            $scope.repr_offset = offset;
+            console.log('val',$scope.column_sort,limit,'offset',offset)
             $http.post('/fetchReportData/',{
                 data : data,
+                offset : offset,
+                limit : limit,
                 sort_val : $scope.column_sort,
                 sort_type : $scope.sort_type,
                 diseaseid_list : $scope.diseaseid_list,
                 schemeid_list : $scope.schemeid_list,
                 serviceid_list : $scope.serviceid_list,
             }).success(function(response) {
-                // appBusy.set('Done...');   
+                // appBusy.set('Done...');
+                $scope.report_count = response.datacount;   
                 $scope.loading_perc_gif = false;           
                 // $timeout( function() {              
                 //     appBusy.set(false);
@@ -1051,6 +1061,45 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 // $scope.getReportData = data.reports;
             })
         }
+    }
+    $scope.more_report_page = function(repr_offset, repr_limit, report_length, value,reportdat,reportval) {
+        if (report_length > repr_limit) {
+            if (value == 'add') {
+                offset = repr_offset + 50;
+                limit = offset + 50;
+            } else if (value == 'sub') {
+                if (repr_offset > 0) {
+                    limit = repr_limit - 50;
+                    offset = repr_offset - 50;
+                } else if (repr_offset == 0) {
+                    offset = 0;
+                    limit = 50;
+                }
+            }
+        } else if (report_length <= repr_limit) {
+            if (value == 'add') {
+                offset = repr_limit;
+                limit = report_length;
+            } else if (value == 'sub') {
+                if (repr_offset > 0) {
+                    limit = repr_offset;
+                    offset = limit - 50;
+                } else if (repr_offset == 0) {
+                    offset = 0;
+                    limit = 50;
+                }
+            }
+        }
+        $scope.fetchReportAPI(reportdat,reportval);
+    }
+    $scope.report_curr_offset = 0;
+    $scope.load_more_report_data = function(plimit, poffset) {
+        $scope.report_curr_offset = offset;
+        $http.get("/get_eb_wl_data/?portfolio=" + portfolio + '&poffset=' + poffset + '&plimit=' + plimit + '&sort=company_name&by=False&sort_in=' + port_status)
+            .success(function(data) {
+                $scope.repr_limit = plimit;
+                $scope.repr_offset = poffset;
+            })
     }
     $scope.get_jakaath_status = function(financial) {
         if(financial == 'A' || financial == 'B' || financial == 'C') { return 'NO' }
