@@ -1330,6 +1330,8 @@ def reportmailer(request):
             if not TempMohuserEdit.objects.filter(mohuser=request.user.username,action='delete',family_id=i['familyid'],report_name=data['report']):
                 cre_fam = TempMohuserEdit.objects.create(mohuser=request.user.username,action='delete',family_id=i['familyid'],report_name=data['report'])
                 get_id_list.insert(len(get_id_list),cre_fam.id)
+            else:
+                get_id_list = map(lambda x:x['family_id'],TempMohuserEdit.objects.filter(mohuser=request.user.username,action='make_sol',report_name=data['report']))    
     else:
         get_mem = data['data']
         if data['report'] == 'Families without toilets':
@@ -1339,6 +1341,8 @@ def reportmailer(request):
                 if not TempMohuserEdit.objects.filter(mohuser=request.user.username,action='make_sol',family_id=f['familyid'],report_name=data['report']):
                     cre_fam = TempMohuserEdit.objects.create(mohuser=request.user.username,action='make_sol',family_id=f['familyid'],report_name=data['report'])
                     get_id_list.insert(len(get_id_list),cre_fam.id)
+                else:
+                    get_id_list = map(lambda x:x['family_id'],TempMohuserEdit.objects.filter(mohuser=request.user.username,action='make_sol',report_name=data['report']))
         elif data['report'] == 'Government Voter ID Needers':
             get_list = map(lambda x:x['memberid'],data['data'])
             get_id_list = []
@@ -1346,83 +1350,105 @@ def reportmailer(request):
                 if not TempMohuserEdit.objects.filter(mohuser=request.user.username,action='make_sol',family_id=n['familyid'],report_name=data['report'],mem_id=n['memberid']):
                     cre_fam = TempMohuserEdit.objects.create(mohuser=request.user.username,action='make_sol',family_id=n['familyid'],report_name=data['report'],mem_id=n['memberid'])
                     get_id_list.insert(len(get_id_list),cre_fam.id)
+                else:
+                    get_id_list = map(lambda x:x['mem_id'],TempMohuserEdit.objects.filter(mohuser=request.user.username,action='make_sol',report_name=data['report']))
         else:
             get_list = map(lambda x:x['memberid'],data['data'])
             get_id_list = []
             for i in data['data']:
-                if not TempMohuserEdit.objects.create(mohuser=request.user.username,action='make_sol',family_id=i['familyid'],report_name=data['report'],mem_id=i['memberid'],needs=i['needs']):
-                    cre_fam = TempMohuserEdit.objects.create(user=request.user.username,action='make_sol',family_id=i['familyid'],report_name=data['report'],mem_id=i['memberid'],needs=i['needs'])
+                if not TempMohuserEdit.objects.filter(mohuser=request.user.username,action='make_sol',family_id=i['familyid'],report_name=data['report'],mem_id=i['memberid'],needs=i['needs']):
+                    cre_fam = TempMohuserEdit.objects.create(mohuser=request.user.username,action='make_sol',family_id=i['familyid'],report_name=data['report'],mem_id=i['memberid'],needs=i['needs'])
                     get_id_list.insert(len(get_id_list),cre_fam.id)
-    # email_status = send_reportmail(request.user.username,data['action'],data['report'],get_list)
-    subject, from_email, to = 'Mohalla User Request!','mzmmohideen@gmail.com', 'mzmohideen19@gmail.com'
+                else:
+                    get_id_list = map(lambda x:x['mem_id'],TempMohuserEdit.objects.filter(mohuser=request.user.username,action='make_sol',report_name=data['report']))
+    approve_url = '%s/reportdatafunc/?user=%s&action=%s&report=%s'%(request.META['HTTP_ORIGIN'],request.user.username,data['action'],data['report'])
+    approve_img_url = '%s/static/images/thumbs.png'%request.META['HTTP_HOST']
+    subject, from_email, to = 'Mohalla User Request!','unwo.census@gmail.com', 'it@unwo.org'
     text_content = 'This is an important message.'
-    html_content = render_to_string('report_mail.html',{'user':request.user.username,'id_list':get_id_list,'action':data['action'],'report':data['report'],'get_ben_list':get_list})
+    html_content = render_to_string('report_mail.html',{'user':request.user.username,'id_list':get_id_list,'action':data['action'],'report':data['report'],'get_ben_list':get_list,'img_url':approve_img_url,'approve_url':approve_url})
     f = open('reporthtml.html','w')
     f.write(html_content)
     f.close()
-    print 'ms'
-    me = "mzmmohideen@gmail.com"
-    my_password = r"9962221811"
-    you = "mzmohideen19@gmail.com"
-    # msg = MIMEMultipart('alternative')
-    # msg['Subject'] = "Alert"
-    # msg['From'] = me
-    # msg['To'] = you
-    # EMAIL = MIMEText(html_content, 'html') 
-    # msg.attach(EMAIL)
-    # smtp = smtplib.SMTP_SSL('smtp.gmail.com')
-    # # smtp.ehlo()
-    # # smtp.starttls()
-    # print 'pass',my_password
-    # smtp.login(me, my_password)
-    # smtp.sendmail(me, you, msg.as_string())
-    # smtp.quit()
-    # print 'status',smtp
-
-    msg = MIMEMultipart('alternative')
-    msg['Subject'], msg['From'], msg['To'] = subject, from_email, to
-    EMAIL = MIMEText(html_content,'html') 
-    msg.attach(EMAIL)
-    smtp = smtplib.SMTP('smtp.gmail.com', 587)
-    smtp.ehlo()
-    smtp.starttls()
-    print 'msgs',smtp
-    smtp.login('mzmmohideen@gmail.com', '9962221811')
-    print 'smtp',smtp
-    smtp.sendmail(from_email, to, msg.as_string())
+    msg = EmailMultiAlternatives(subject, text_content, from_email, [to])
+    msg.attach_alternative(html_content, "text/html")
+    msg.send()
+    return HttpResponse(content=json.dumps({'data':'Request Submitted Successfully!'}), content_type='Application/json')
 
 def reportdatafunc(request):
-    data = json.loads(request.body)
-    if data['action'] == 'delete':
-        try:
-            for i in data['data']:
-                get_fam = Family.objects.get(family_id=i['familyid'])
-                get_fam.delete() 
-            solution = "Selected Families Deleted!"
-            # for i in data['data']:
-                # Family.objects.filter(family_id=i).delete()
-        except:
-            solution = "Something Went Wrong!"
+    if request.method == 'POST':
+        data = json.loads(request.body)
+        if data['action'] == 'delete':
+            try:
+                for i in data['data']:
+                    get_fam = Family.objects.get(family_id=i['familyid'])
+                    get_fam.delete() 
+                solution = "Selected Families Deleted!"
+                # for i in data['data']:
+                    # Family.objects.filter(family_id=i).delete()
+            except:
+                solution = "Something Went Wrong!"
+        else:
+            get_mem = data['data']
+            try:
+                if data['report'] == 'Families without toilets':
+                    for f in data['data']:
+                        get_fam = Family.objects.filter(family_id=f['familyid']).update(toilet=True)
+                    # get_fam = lambda x: Family.objects.filter(family_id=x['familyid']).update(toilet=True),data['data']
+                elif data['report'] == 'Government Voter ID Needers':
+                    for n in data['data']:
+                        get_mem = Member.objects.filter(voter_status=False,mem_id=n['memberid']).update(voter_status=True)
+                else:
+                    for i in get_mem:
+                        get_memid = Member.objects.get(mem_id=i['memberid'])
+                        try:
+                            get_scheme = SubScheme.objects.get(name=i['needs'])
+                            make_solved = Member_scheme.objects.filter(member=get_memid,scheme=get_scheme).update(status=True,solution='Solved')
+                        except:
+                            get_scheme = Service.objects.get(name=i['needs'])
+                            make_solved = Member_service.objects.filter(member=get_memid,scheme=get_scheme).update(status=True,solution='Solved')
+                solution = "Status Changed Successfully!"
+            except:
+                solution = "Something Went Wrong!"
     else:
-        get_mem = data['data']
-        try:
-            if data['report'] == 'Families without toilets':
-                for f in data['data']:
-                    get_fam = Family.objects.filter(family_id=f['familyid']).update(toilet=True)
-                # get_fam = lambda x: Family.objects.filter(family_id=x['familyid']).update(toilet=True),data['data']
-            elif data['report'] == 'Government Voter ID Needers':
-                for n in data['data']:
-                    get_mem = Member.objects.filter(voter_status=False,mem_id=n['memberid']).update(voter_status=True)
+        get_user = User.objects.get(username=request.user.username)
+        if get_user.first_name == 'Admin':
+            if request.GET['action'] == 'delete':
+                try:
+                    for i in TempMohuserEdit.objects.filter(mohuser=request.GET['user'],action='delete',report_name=request.GET['report']):
+                        print 'i',i.family_id
+                        get_fam = Family.objects.get(family_id=i.family_id)
+                        get_fam.delete()
+                        i.delete() 
+                    solution = "Selected Families Deleted!"
+                except:
+                    print 'report',repr(format_exc())
+                    solution = "Something Went Wrong!"
             else:
-                for i in get_mem:
-                    get_memid = Member.objects.get(mem_id=i['memberid'])
-                    try:
-                        get_scheme = SubScheme.objects.get(name=i['needs'])
-                        make_solved = Member_scheme.objects.filter(member=get_memid,scheme=get_scheme).update(status=True,solution='Solved')
-                    except:
-                        get_scheme = Service.objects.get(name=i['needs'])
-                        make_solved = Member_service.objects.filter(member=get_memid,scheme=get_scheme).update(status=True,solution='Solved')
-            solution = "Status Changed Successfully!"
-        except:
-            solution = "Something Went Wrong!"               
+                try:
+                    if request.GET['report'] == 'Families without toilets':
+                        for f in TempMohuserEdit.objects.filter(mohuser=request.GET['user'],action='make_sol',report_name=request.GET['report']):
+                            get_fam = Family.objects.filter(family_id=f.family_id).update(toilet=True)
+                            f.delete()
+                    elif request.GET['report'] == 'Government Voter ID Needers':
+                        for n in TempMohuserEdit.objects.filter(mohuser=request.GET['user'],action='make_sol',report_name=request.GET['report']):
+                            get_mem = Member.objects.filter(voter_status=False,mem_id=n.mem_id).update(voter_status=True)
+                            n.delete()
+                    else:
+                        for i in TempMohuserEdit.objects.filter(mohuser=request.GET['user'],action='make_sol',report_name=request.GET['report']):
+                            get_memid = Member.objects.get(mem_id=i.mem_id)
+                            try:
+                                get_scheme = SubScheme.objects.get(name=i.needs)
+                                make_solved = Member_scheme.objects.filter(member=get_memid,scheme=get_scheme).update(status=True,solution='Solved')
+                                i.delete()
+                            except:
+                                get_scheme = Service.objects.get(name=i.needs)
+                                make_solved = Member_service.objects.filter(member=get_memid,scheme=get_scheme).update(status=True,solution='Solved')
+                                i.delete()
+                    solution = "Status Changed Successfully!"
+                except:
+                    print 'reports',repr(format_exc())
+                    solution = "Something Went Wrong!"
+        else:
+            solution = "You are not an Admin To do this Operation!"            
+                
     return HttpResponse(content=json.dumps({'data':solution}), content_type='Application/json')

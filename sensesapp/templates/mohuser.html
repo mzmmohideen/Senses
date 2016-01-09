@@ -7,7 +7,7 @@
     <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="../../favicon.ico">
+    <link rel="icon" href="{{STATIC_URL}}images/favicon.ico">
     <title>Mohalla Dashboard</title>
     <!-- Bootstrap core CSS -->
     <link href="{{STATIC_URL}}bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -699,24 +699,28 @@
                 <h1 class="page-header">Reports</h1>
             </div>
             <div class=" col-lg-12">
-                <span style="width:16.5%;float:left;">District</span>
-                <span style="width:16.5%;float:left;">Taluk</span>
-                <span style="width:16.5%;float:left;">Mohalla</span>
-                <span style="width:16.5%;float:left;">Mohalla ID</span>
-                <span style="width:16.5%;float:left;">REPORT TYPES</span>
-                <span style="width:16.5%;float:left;">PDF</span>
+                <span style="width:16.5%;float:left;margin-left:-30px;">District</span>
+                <span style="width:16.5%;float:left;margin-left:7.5px;">Taluk</span>
+                <span style="width:16.5%;float:left;margin-left:7.5px;">Mohalla</span>
+                <span style="width:16.5%;float:left;margin-left:7.5px;">Mohalla ID</span>
+                <span style="width:16.5%;float:left;margin-left:7.5px;">REPORT TYPES</span>
+                <span style="width:16.5%;float:left;margin-left:7.5px;">PDF</span>
             </div>
             <div class=" col-lg-12">
-                <span style="display: inline-block;height: 34px;width: 16.5%;float: left;"> <input class="form-control" type="text" ng-model="ReportValues.district" readonly/></span>
-                <span style="display: inline-block;height: 34px;width: 16.5%;float: left;"> <input class="form-control" type="text" ng-model="ReportValues.taluk" readonly/></span>
-                <span style="display: inline-block;height: 34px;width: 16.5%;float: left;"> <input class="form-control" type="text" ng-model="ReportValues.muhalla.name" readonly/></span>
-                <span style="display: inline-block;height: 34px;width: 16.5%;float: left;"> <input class="form-control" type="text" ng-model="ReportValues.muhalla_id" readonly/></span>
-                <span style="display: inline-block;height: 34px;width: 16.5%;float: left;"> 
+                <span style="display: inline-block;height: 34px;width: 16.5%;float: left;margin-left:-30px;"> <input class="form-control" type="text" ng-model="ReportValues.district" readonly/></span>
+                <span style="display: inline-block;height: 34px;width: 16.5%;float: left;margin-left:7.5px;"> <input class="form-control" type="text" ng-model="ReportValues.taluk" readonly/></span>
+                <span style="display: inline-block;height: 34px;width: 16.5%;float: left;margin-left:7.5px;"> <input class="form-control" type="text" ng-model="ReportValues.muhalla.name" readonly/></span>
+                <span style="display: inline-block;height: 34px;width: 16.5%;float: left;margin-left:7.5px;"> <input class="form-control" type="text" ng-model="ReportValues.muhalla_id" readonly/></span>
+                <span style="display: inline-block;height: 34px;width: 16.5%;float: left;margin-left:7.5px;"> 
                     <select ng-model="ReportValues.report_name" ng-change="fetchReportAPI(ReportDatas,ReportValues)" ng-options="gen for gen in senses_reports|SortData" class="form-control"><option value="">SELECT REPORT</option>
                     </select>
                 </span>    
-                <span style="display: inline-block;height: 34px;width: 16.5%;float: left;"><a download="{{get_pdfname}}" href="/static/pdf/{{get_pdfname}}" target="_blank"><button ng-disabled="!ReportValues.muhalla || !ReportValues.report_name || !get_pdfname" type="submit" style="display: inline-block;height: 34px;width: 98%;border-radius: 2px; float: left;" class="btn-sm btn btn-primary"><i class="fa fa-cloud-download"></i>&nbsp;Export</button></a>
+                <span style="display: inline-block;height: 34px;width: 16.5%;float: left;margin-left:7.5px">
+                    <button ng-disabled="!ReportValues.muhalla || !ReportValues.report_name || !load_report_type" ng-click="exportPDF()" type="submit" style="display: inline-block;height: 34px;width: 98%;border-radius: 2px; float: left;" class="btn-sm btn btn-primary"><i class="fa fa-cloud-download"></i>&nbsp;Export</button></a>
                 </span>
+                <!--<a download="{{get_pdfname}}" href="/static/pdf/{{get_pdfname}}" target="_blank">
+                    <button ng-disabled="!ReportValues.muhalla || !ReportValues.report_name || !get_pdfname || !load_report_type">
+                </a>-->
             </div>
         <div class="row">
             <div ng-show="list_familyid.length>0">

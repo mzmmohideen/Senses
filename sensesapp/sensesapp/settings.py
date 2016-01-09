@@ -8,13 +8,15 @@ def absolute_path(path):
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_BACKEND = 'django_smtp_ssl.SSLEmailBackend'
+# EMAIL_HOST = 'mail.example.com'
+# EMAIL_PORT = 465
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_USE_TLS = True
 EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 465
-EMAIL_HOST_USER = 'mzmmohideen@gmail.com'
-EMAIL_HOST_PASSWORD = '9962221811'
+EMAIL_HOST_USER = 'unwo.census@gmail.com'
+EMAIL_HOST_PASSWORD = '9884899868'
 
 ADMINS = (
     # ('Your Name', 'your_email@example.com'),

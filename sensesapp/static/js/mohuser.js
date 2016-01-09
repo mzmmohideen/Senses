@@ -233,6 +233,8 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
             console.log('val',response)
         })
     }
+    $scope.loading_perc_gif = false;
+    $scope.load_report_type = false;
     $scope.fetchReportAPI = function(data,values) {
         $scope.load_report_type = false;
         $scope.list_familyid = []
@@ -370,7 +372,8 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
         if(values.muhalla != '') {
             $scope.ReportHeader = true;
             $scope.getReportData = false;
-            appBusy.set("Loading....");
+            $scope.loading_perc_gif = true;
+            // appBusy.set("Loading....");
             $http.post('/fetchReportData/',{
                 data : data,
                 sort_val : $scope.column_sort,
@@ -379,10 +382,11 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
                 schemeid_list : $scope.schemeid_list,
                 serviceid_list : $scope.serviceid_list,
             }).success(function(response) {
-                appBusy.set('Done...');              
-                $timeout( function() {              
-                    appBusy.set(false);
-                }, 1000);
+                $scope.loading_perc_gif = false;
+                // appBusy.set('Done...');              
+                // $timeout( function() {              
+                //     appBusy.set(false);
+                // }, 1000);
                 if(response.report_type == 'Total Family Details'  || response.report_type == 'Own House & Rent House families') {
                     $scope.ReportHeader = ['S.No','Name & Address','Age & Gender','Family ID & Mobile NO','Financial Status & Jakaath']
                     $scope.getReportData = response.get_family;
@@ -433,27 +437,42 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
                     $scope.ReportValues.report_name = 'New filter'
                 }
                 if(response.report_type == 'Mohalla Report') {
-                    var pdf_data = response.pdf_report;
+                    $scope.pdf_data = response.pdf_report;
                 }
                 else {
-                    var pdf_data = $scope.getReportData;
+                    $scope.pdf_data = $scope.getReportData;
                 }
                 if (response.report_type == 'Total Family Details' || response.report_type == 'Families without toilets'  || response.report_type == 'Own House & Rent House families' || response.report_type == 'Basic Help Needers List' || response.report_type == 'Families Eligible for Jakaath') {
-                    var finacial_value = response.finacial_value;
+                    $scope.finacial_value = response.finacial_value;
                 }
                 else {
-                    var finacial_value = '';
+                    $scope.finacial_value = '';
                 }
-                $http.post('/report_to_pdf/',{
-                    header : $scope.ReportHeader,
-                    data : pdf_data,
-                    report : $scope.ReportValues,
-                    finacial_value : finacial_value,
-                }).success(function(response){
-                    $scope.get_pdfname = response.pdfname;
-                })
+                $scope.load_report_type = true;
+                // $http.post('/report_to_pdf/',{
+                //     header : $scope.ReportHeader,
+                //     data : pdf_data,
+                //     report : $scope.ReportValues,
+                //     finacial_value : finacial_value,
+                // }).success(function(response){
+                //     $scope.get_pdfname = response.pdfname;
+                // })
             })
         }
+    }
+    $scope.exportPDF = function() {
+        // $scope.down_pdf = false;
+        $http.post('/report_to_pdf/',{
+            header : $scope.ReportHeader,
+            data : $scope.pdf_data,
+            report : $scope.ReportValues,
+            finacial_value : $scope.finacial_value,
+        }).success(function(response){
+            $scope.get_pdfname = response.pdfname;
+            // $scope.down_pdf = true;
+            // window.location.href = '/static/pdf/'+response.pdfname
+            window.open('/static/pdf/'+response.pdfname,'_blank')
+        })
     }
     $scope.export_to_pdf = function(header,data,report) {
         $http.post('/report_to_pdf/',{

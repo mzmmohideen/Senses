@@ -10,24 +10,31 @@
     .tg .tg-pxng{background-color:#ffffff;color:#000000;vertical-align:top}
     </style>
     <body>
-      Welcome - {{user}} !
-    <table class="tg">
+      <a href="http://www.unwo.org/">
+          <img style="background: #50005A;height: 40px;width: 110px;" src="http://unwo.org/wp-content/uploads/2015/10/unwo-logo-55px.png" alt="United Welfare Organization">
+      </a>
+    <span style="font-weight:bold;font-size: 30px;">Request from Mohalla User - {{user}} !</span>
+    <table style="width:100%;border-collapse:collapse;border-spacing:0;border-color:#aabcfe;" class="tg">
       <tr>
-        <th class="tg-7un6" colspan="2">Action - {{action}} </th>
+        <th style="font-family:Arial, sans-serif;font-size:20px;font-weight:bold;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#039;background-color:#b9c9fe;background-color:#ffffff;color:#000000;text-align:center;vertical-align:top" class="tg-7un6" colspan="2">Action - {{action}} </th>
       </tr>
       <tr>
-        <th class="tg-7un6" colspan="2">Report - {{report}} </th>
+        <th style="font-family:Arial, sans-serif;font-size:20px;font-weight:bold;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#039;background-color:#b9c9fe;background-color:#ffffff;color:#000000;text-align:center;vertical-align:top" class="tg-7un6" colspan="2">Report - {{report}} </th>
       </tr>
       <tr>
-        <td class="tg-kixb">No</td>
-        <td class="tg-83xr">ID</td>
+        <td style="font-family:Arial, sans-serif;font-size:20px;font-weight:bold;text-align:center;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#669;color:#ffffff;background-color:#000000;vertical-align:top" class="tg-kixb">S.No</td>
+        <td style="font-family:Arial, sans-serif;font-size:20px;font-weight:bold;text-align:center;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:#aabcfe;color:#669;color:#ffffff;background-color:#000000;text-align:center;vertical-align:top" class="tg-83xr">ID</td>
       </tr>
       {% for val in get_ben_list %}
       <tr>
-        <td class="tg-pxng">{{forloop.counter}}</td>
-        <td class="tg-pxng">{{val}}</td>
+        <td style="font-family:Arial, sans-serif;font-size:20px;font-weight:bold;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;text-align:center;border-color:#aabcfe;color:#669;background-color:#e8edff;background-color:#ffffff;color:#000000;vertical-align:top" class="tg-pxng">{{forloop.counter}}</td>
+        <td style="font-family:Arial, sans-serif;font-size:20px;font-weight:bold;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;text-align:center;border-color:#aabcfe;color:#669;background-color:#e8edff;background-color:#ffffff;color:#000000;vertical-align:top" class="tg-pxng">{{val}}</td>
       </tr>
       {% endfor %}
     </table>
+    <br/>
+    <a style="cursor: pointer;" href="{{approve_url}}"><button style="cursor: pointer;color:rgb(255,255,255);display:block;float:left;min-height:30px;vertical-align:middle;white-space:nowrap;width:135px;margin-left:35%;background:rgb(51,122,183) none repeat scroll 0% 0%/auto padding-box border-box;border:1px solid rgb(46,109,164);border-radius:3px 3px 3px 3px;font:normal normal normal normal 12px/18px 'Helvetica Neue',Helvetica,Arial,sans-serif;outline:rgb(255,255,255) none 0px;padding:5px 10px">
+      <i style="color:rgb(255,255,255);display:inline-block;min-height:12px;text-align:center;white-space:nowrap;width:9.4375px;border:0px none rgb(255,255,255);font:normal normal normal normal 12px/12px FontAwesome;outline:rgb(255,255,255) none 0px"></i><img src="{{img_url}}"> Approve Request</button>
+    </a>
 </body>
 </html>
