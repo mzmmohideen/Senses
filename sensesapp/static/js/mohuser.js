@@ -151,6 +151,19 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
     $scope.filter_service_value = function(serviceid_list) {
         $scope.serviceid_list = serviceid_list
     }  
+    $scope.getScheme = function() {
+        $http.get('/SchemeData/',{}).success(function(data) {
+            $scope.scheme_list = _.keys(data.data)
+            $scope.getSubScheme = data.data;
+            console.log('scheme_list',$scope.getSubScheme)
+        })
+    }
+    $scope.getService = function() {
+        $http.get('/ServiceData/',{}).success(function(data) {
+            $scope.service_list = _.pluck(data.data,"service")
+            $scope.getServices = data.data;
+        })
+    }
     $scope.getMasjidList = function(data) {
         $http.get('/add_masjid/').success(function(response){
             $scope.mahallaList = response.data;
@@ -237,10 +250,10 @@ app.controller('MohallaUserCtrl', function($scope, _,appBusy,$timeout, $http, ma
     $scope.load_report_type = false;
     $scope.fetchReportAPI = function(data,values) {
         $scope.load_report_type = false;
-        $scope.list_familyid = []
-        $scope.diseaseid_list = []
-        $scope.schemeid_list = []
-        $scope.serviceid_list = []
+        // $scope.list_familyid = []
+        // $scope.diseaseid_list = []
+        // $scope.schemeid_list = []
+        // $scope.serviceid_list = []
         if(values.report_name == 'Total Family Details' || values.report_name == 'Own House & Rent House families' || values.report_name == 'Families without toilets') {
             $scope.voter_status_dt = false;
             $scope.tot_fam_dt = true;

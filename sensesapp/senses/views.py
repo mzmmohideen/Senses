@@ -1360,7 +1360,8 @@ def reportmailer(request):
                     cre_fam = TempMohuserEdit.objects.create(mohuser=request.user.username,action='make_sol',family_id=i['familyid'],report_name=data['report'],mem_id=i['memberid'],needs=i['needs'])
                     get_id_list.insert(len(get_id_list),cre_fam.id)
                 else:
-                    get_id_list = map(lambda x:x['mem_id'],TempMohuserEdit.objects.filter(mohuser=request.user.username,action='make_sol',report_name=data['report']))
+                    get_id_list = map(lambda x:x.mem_id,TempMohuserEdit.objects.filter(mohuser=request.user.username,action='make_sol',report_name=data['report']))
+                        
     approve_url = '%s/reportdatafunc/?user=%s&action=%s&report=%s'%(request.META['HTTP_ORIGIN'],request.user.username,data['action'],data['report'])
     approve_img_url = '%s/static/images/thumbs.png'%request.META['HTTP_HOST']
     subject, from_email, to = 'Mohalla User Request!','unwo.census@gmail.com', 'it@unwo.org'

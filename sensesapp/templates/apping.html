@@ -680,9 +680,18 @@
     <script type="text/ng-template" id="reports.html">
         <div class="row" ng-init="getLocation();getMasjidData()">
             <div class="col-lg-12">
-                
                 <h1 style="width: 100%;" class="page-header">Reports 
-                </h1>
+                <div style="text-align:center;position:relative;float:right">
+                    <span ng-show="getReportData.length == 0">No Data Found!</span>
+                    <span ng-show="repr_offset == 0 && getReportData.length<=repr_limit && getReportData.length != 0">{{repr_offset+1}}-{{getReportData.length}} of {{getReportData.length}}</span>
+                    <span ng-show="repr_offset == 0 && getReportData.length!=0 && repr_limit<getReportData.length">{{repr_offset+1}}-{{repr_limit}} of {{getReportData.length}}</span>
+                    <span ng-show="repr_offset > 0 && getReportData.length!=0 && repr_limit<getReportData.length">{{repr_offset+1}}-{{repr_limit}} of {{getReportData.length}}</span>
+                    <span ng-show="repr_offset > 0 && getReportData.length!=0 && repr_limit>=getReportData.length">{{repr_offset+1}}-{{getReportData.length}} of {{getReportData.length}}</span>
+                    <span class="btn btn1 btn-primary" style="cursor:pointer;border: 5px solid #428bca;padding: 0px 5px;width:35px;height:30px;text-decoration: none;font-weight: bold;color:#fff;background: rgba(66, 139, 202, 1);" ng-disabled="repr_offset<=0" ng-click="more_report_page(repr_offset,repr_limit,getReportData.length,'sub',ReportDatas,ReportValues);"><i class="fa fa-chevron-left"></i>
+                            </span>
+                    <span style="cursor:pointer;border: 5px solid #428bca;margin-left:-1%;padding: 0px 5px;width:35px;height:30px;text-decoration: none;font-weight: bold;color:#fff;background: rgba(66, 139, 202, 1);" ng-disabled="(repr_offset+1)>=getReportData.length || repr_limit>=getReportData.length" ng-click="more_report_page(repr_offset,repr_limit,getReportData.length,'add',ReportDatas,ReportValues);" class="btn btn1 btn-primary"><i class="fa fa-chevron-right"></i>
+                            </span> 
+                </div></h1>
             </div>
             <div class=" col-lg-12">
             <table style="width: 100%;margin-bottom: 2%;">
