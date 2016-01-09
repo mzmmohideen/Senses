@@ -696,7 +696,18 @@
     <script type="text/ng-template" id="reports.html">
         <div class="row">
             <div class="col-lg-12">
-                <h1 class="page-header">Reports</h1>
+                <h1 class="page-header">Reports
+                <div ng-hide="ReportValues.report_name == 'Mohalla Report' || ReportValues.report_name == 'Needs Types' || !ReportValues.report_name" style="text-align:center;position:relative;float:right">
+                    <span ng-show="report_count == 0">No Data Found!</span>
+                    <span ng-show="repr_offset == 0 && report_count<=repr_limit && report_count != 0">{{repr_offset+1}}-{{report_count}} of {{report_count}}</span>
+                    <span ng-show="repr_offset == 0 && report_count!=0 && repr_limit<report_count">{{repr_offset+1}}-{{repr_limit}} of {{report_count}}</span>
+                    <span ng-show="repr_offset > 0 && report_count!=0 && repr_limit<report_count">{{repr_offset+1}}-{{repr_limit}} of {{report_count}}</span>
+                    <span ng-show="repr_offset > 0 && report_count!=0 && repr_limit>=report_count">{{repr_offset+1}}-{{report_count}} of {{report_count}}</span>
+                    <span class="btn btn1 btn-primary" style="cursor:pointer;border: 5px solid #428bca;padding: 0px 5px;width:35px;height:30px;text-decoration: none;font-weight: bold;color:#fff;background: rgba(66, 139, 202, 1);" ng-disabled="repr_offset<=0" ng-click="more_report_page(repr_offset,repr_limit,report_count,'sub',ReportDatas,ReportValues);"><i class="fa fa-chevron-left"></i>
+                            </span>
+                    <span style="cursor:pointer;border: 5px solid #428bca;margin-left:-1%;padding: 0px 5px;width:35px;height:30px;text-decoration: none;font-weight: bold;color:#fff;background: rgba(66, 139, 202, 1);" ng-disabled="(repr_offset+1)>=report_count || repr_limit>=report_count" ng-click="more_report_page(repr_offset,repr_limit,report_count,'add',ReportDatas,ReportValues);" class="btn btn1 btn-primary"><i class="fa fa-chevron-right"></i>
+                            </span> 
+                </div></h1>
             </div>
             <div class=" col-lg-12">
                 <span style="width:16.5%;float:left;margin-left:-30px;">District</span>
