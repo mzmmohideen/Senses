@@ -663,6 +663,10 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.moh_user.re_password = ''
         })
     }
+    var offset = 0;
+    var limit = 50;
+    $scope.repr_offset = 0;
+    $scope.repr_limit = 50;
     $scope.getMohallaUser = function(mohalla_data) {
         $http.get('/new_member/?muhalla_id='+mohalla_data.muhalla.mohalla_id,{}).success(function(data){
             if(data.data) {
@@ -863,16 +867,21 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             $scope.getReportData = false;
             // appBusy.set("Loading....");
             $scope.loading_perc_gif = true;
-            console.log('val',$scope.column_sort)
+            $scope.repr_limit = limit;
+            $scope.repr_offset = offset;
+            console.log('val',$scope.column_sort,limit,'offset',offset)
             $http.post('/fetchReportData/',{
                 data : data,
+                offset : offset,
+                limit : limit,
                 sort_val : $scope.column_sort,
                 sort_type : $scope.sort_type,
                 diseaseid_list : $scope.diseaseid_list,
                 schemeid_list : $scope.schemeid_list,
                 serviceid_list : $scope.serviceid_list,
             }).success(function(response) {
-                // appBusy.set('Done...');   
+                // appBusy.set('Done...');
+                $scope.report_count = response.datacount;   
                 $scope.loading_perc_gif = false;           
                 // $timeout( function() {              
                 //     appBusy.set(false);
@@ -940,7 +949,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                     $scope.finacial_value = '';
                 }
                 $scope.load_report_type = true;
-                console.log('reports',$scope.getReportData.length)
+                console.log('reports',$scope.getReportData)
                 // $http.post('/report_to_pdf/',{
                 //     header : $scope.ReportHeader,
                 //     data : $scope.pdf_data,
@@ -1053,11 +1062,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
             })
         }
     }
-    var offset = 0;
-    var limit = 0;
-    $scope.repr_offset = 0;
-    $scope.repr_limit = 50;
-    $scope.more_report_page = function(repr_offset, repr_limit, report_length, value) {
+    $scope.more_report_page = function(repr_offset, repr_limit, report_length, value,reportdat,reportval) {
         if (report_length > repr_limit) {
             if (value == 'add') {
                 offset = repr_offset + 50;
@@ -1085,7 +1090,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                 }
             }
         }
-        $scope.load_more_report_data(limit, offset);
+        $scope.fetchReportAPI(reportdat,reportval);
     }
     $scope.report_curr_offset = 0;
     $scope.load_more_report_data = function(plimit, poffset) {
