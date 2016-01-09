@@ -949,7 +949,7 @@ app.controller('dashboardCtrl', function($scope,_,appBusy,$timeout, $http,masjid
                     $scope.finacial_value = '';
                 }
                 $scope.load_report_type = true;
-                console.log('reports',$scope.getReportData)
+                console.log('reports',$scope.getReportData.length)
                 // $http.post('/report_to_pdf/',{
                 //     header : $scope.ReportHeader,
                 //     data : $scope.pdf_data,
