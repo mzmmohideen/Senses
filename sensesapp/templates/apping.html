@@ -124,89 +124,91 @@
                     </ul>
                 </div>
                 <div ng-show="reportbt">                    
-                        <div ng-show="medical_needers || voter_status_dt || govt_needers || service_needers || edu_needers" style="margin-left:15px;margin-top:15px;">
-                            <span style="text-decoration:none">Age</span>  <input ng-model="ReportDatas.age_from" style="width:37%" type="text" placeholder="From"> - <input ng-model="ReportDatas.age_to" style="width:37%" type="text" placeholder="To">
-                            <span style="cursor:pointer;" ng-click="ReportDatas.age_from='';ReportDatas.age_to=''"><i class="fa fa-times"></i></span> 
-                        </div>
-                        <div ng-show="medical_needers || voter_status_dt || govt_needers || service_needers || edu_needers" style="margin-left:15px;margin-top:15px;">
-                            <span style="text-decoration:none">Gender</span> <select ng-model="ReportDatas.gender" ng-options="gen for gen in family_gender" style="width:60%;display:inline-block;margin-left:10%" class="form-control"><option value="">SELECT GENDER</option></select>
-                            <span style="cursor:pointer;" ng-click="ReportDatas.gender='';"><i class="fa fa-times"></i></span> 
-                        </div>
-                        <div ng-show="govt_needers || service_needers || voter_status_dt || edu_needers" style="margin-left:15px;margin-top:15px;">
-                            <span style="text-decoration:none">Marital Status</span>  <select style="width:57%;display:inline-block;" ng-model="ReportDatas.marital_status" ng-options="gen for gen in family_marital_status" class="form-control"><option value="">MARITAL STATUS</option>
-                            </select> 
-                            <span style="cursor:pointer;" ng-click="ReportDatas.marital_status='';"><i class="fa fa-times"></i></span>
-                        </div>
-                        <div ng-show="govt_needers || service_needers || edu_needers" style="margin-left:15px;margin-top:15px;">
-                            <span style="text-decoration:none">Voter Status</span> &nbsp; <select ng-model="ReportDatas.voter_status" ng-options="gen for gen in fam_voter_status" style="width:55%;display:inline-block;" class="form-control"><option value="">VOTER ID?</option></select>
-                            <span style="cursor:pointer;" ng-click="ReportDatas.voter_status='';"><i class="fa fa-times"></i></span>
-                        </div>
-                        <div ng-show="tot_fam_dt || medical_needers || govt_needers || service_needers || edu_needers" style="margin-left:15px;margin-top:15px;">
-                            <span style="text-decoration:none">Financial Status</span> &nbsp; 
-                            <select ng-model="ReportDatas.financial" ng-options="financial for financial in ['A - Well Settled','B - Full Filled','C - Middle Class','D - Poor','E - Very Poor']" style="width:45%;display:inline-block;" class="form-control">
-                                <option value="">Status</option>
-                            </select>
-                            <span style="cursor:pointer;" ng-click="ReportDatas.financial='';"><i class="fa fa-times"></i></span>
-                        </div>
-                        <div ng-show="house_type_filter" style="margin-left:15px;margin-top:15px;">
-                            <span style="text-decoration:none">House Type</span> &nbsp; 
-                            <select ng-model="ReportDatas.house" ng-options="house for house in ['Rent','Own']" style="width:45%;display:inline-block;" class="form-control">
-                                <option value="">House Type</option>
-                            </select>
-                            <span style="cursor:pointer;" ng-click="ReportDatas.house='';"><i class="fa fa-times"></i></span>
-                        </div>
-                        <div ng-show="tot_fam_jakath && !basic_needs" style="margin-left:15px;margin-top:15px;">
-                            <span style="text-decoration:none">Financial Status</span> &nbsp; 
-                            <select ng-model="ReportDatas.financial" ng-options="financial for financial in ['D - Poor','E - Very Poor']" style="width:45%;display:inline-block;" class="form-control">
-                                <option value="">Status</option>
-                            </select>
-                            <span style="cursor:pointer;" ng-click="ReportDatas.financial='';"><i class="fa fa-times"></i></span>
-                        </div>
-                        <div ng-show="medical_needers" ng-init="getDisease('DISEASE')" style="margin-left:15px;margin-top:15px;">
-                            <span style="text-decoration:none">Disease ID</span> &nbsp; 
-                            <ui-select multiple style="display: inline-block;height: 34px;width: 90%;float: left;" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-change="filter_disease_value(diseaseid_list)" ng-model="diseaseid_list">
-                                <ui-select-match placeholder="Select Disease">{{$item.disease_id}}
-                                </ui-select-match>
-                                <ui-select-choices bindonce repeat="mod in disease_dict | filter:$select.search">
-                                <div ng-bind-html="mod.name | highlight: $select.search"></div>
-                                </ui-select-choices>
-                            </ui-select>
-                        </div>    
-                        <div ng-show="govt_needers" ng-init="getScheme();" style="margin-left:15px;margin-top:15px;">
-                            <span style="text-decoration:none">SCHEME ID</span> &nbsp; 
-                            <ui-select multiple style="display: inline-block;height: 34px;width: 90%;float: left;" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-change="filter_scheme_value(schemeid_list)" ng-model="schemeid_list">
-                                <ui-select-match placeholder="Select Scheme">{{$item.scheme_id}}
-                                </ui-select-match>
-                                <ui-select-choices bindonce repeat="mod in getSubScheme['Govt/ Other NGOs Related Schemes'] | filter:$select.search">
-                                <div ng-bind-html="mod.sub | highlight: $select.search"></div>
-                                </ui-select-choices>
-                            </ui-select>
-                        </div>
-                        <div ng-show="service_needers" ng-init="getService();" style="margin-left:15px;margin-top:15px;">
-                            <span style="text-decoration:none">SERVICE ID</span> &nbsp; 
-                            <ui-select multiple style="display: inline-block;height: 34px;width: 90%;float: left;" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-change="filter_service_value(serviceid_list)" ng-model="serviceid_list">
-                                <ui-select-match placeholder="Select Service">{{$item.service_id}}
-                                </ui-select-match>
-                                <ui-select-choices bindonce repeat="mod in getServices | filter:$select.search">
-                                <div ng-bind-html="mod.service | highlight: $select.search"></div>
-                                </ui-select-choices>
-                            </ui-select>
-                        </div>
-                        <div ng-show="edu_needers" ng-init="getScheme();" style="margin-left:15px;margin-top:15px;">
-                            <span style="text-decoration:none">EDUCATION SCHEME ID</span> &nbsp; 
-                            <ui-select multiple style="display: inline-block;height: 34px;width: 90%;float: left;" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-change="filter_scheme_value(schemeid_list)" ng-model="schemeid_list">
-                                <ui-select-match placeholder="Select Education Scheme">{{$item.scheme_id}}
-                                </ui-select-match>
-                                <ui-select-choices bindonce repeat="mod in getSubScheme['Education / Employment Related Services'] | filter:$select.search">
-                                <div ng-bind-html="mod.sub | highlight: $select.search"></div>
-                                </ui-select-choices>
-                            </ui-select>
-                        </div>
-                        <div style="margin-left:15px;margin-top:15px;">
-                            <button ng-click="fetchReportAPI(ReportDatas,ReportValues)" class="btn-sm btn btn-primary" style="width:45%;float:left;"><i class="fa fa-filter"></i>Apply Filter</button>
-                            <button ng-click="ReportDatas.age_from='';ReportDatas.age_to='';ReportDatas.gender='';ReportDatas.marital_status='';ReportDatas.voter_status='';ReportDatas.house='';ReportDatas.financial='';ReportDatas.financial='';" class="btn-sm btn btn-primary" style="width:45%;float:left;"><i class="fa fa-times"></i>Clear All</button>
-                        </div>    
-
+                    <div ng-show="medical_needers || voter_status_dt || govt_needers || service_needers || edu_needers" style="margin-left:15px;margin-top:15px;">
+                        <span style="text-decoration:none">Age</span>  <input ng-model="ReportDatas.age_from" style="width:37%" type="text" placeholder="From"> - <input ng-model="ReportDatas.age_to" style="width:37%" type="text" placeholder="To">
+                        <span style="cursor:pointer;" ng-click="ReportDatas.age_from='';ReportDatas.age_to=''"><i class="fa fa-times"></i></span> 
+                    </div>
+                    <div ng-show="medical_needers || voter_status_dt || govt_needers || service_needers || edu_needers" style="margin-left:15px;margin-top:15px;">
+                        <span style="text-decoration:none">Gender</span> <select ng-model="ReportDatas.gender" ng-options="gen for gen in family_gender" style="width:60%;display:inline-block;margin-left:10%" class="form-control"><option value="">SELECT GENDER</option></select>
+                        <span style="cursor:pointer;" ng-click="ReportDatas.gender='';"><i class="fa fa-times"></i></span> 
+                    </div>
+                    <div ng-show="govt_needers || service_needers || voter_status_dt || edu_needers" style="margin-left:15px;margin-top:15px;">
+                        <span style="text-decoration:none">Marital Status</span>  <select style="width:57%;display:inline-block;" ng-model="ReportDatas.marital_status" ng-options="gen for gen in family_marital_status" class="form-control"><option value="">MARITAL STATUS</option>
+                        </select> 
+                        <span style="cursor:pointer;" ng-click="ReportDatas.marital_status='';"><i class="fa fa-times"></i></span>
+                    </div>
+                    <div ng-show="govt_needers || service_needers || edu_needers" style="margin-left:15px;margin-top:15px;">
+                        <span style="text-decoration:none">Voter Status</span> &nbsp; 
+                        <select ng-model="ReportDatas.voter_status" ng-options="gen for gen in fam_voter_status" style="width:55%;display:inline-block;" class="form-control">
+                        <option value="">VOTER ID?</option>
+                        </select>
+                        <span style="cursor:pointer;" ng-click="ReportDatas.voter_status='';"><i class="fa fa-times"></i></span>
+                    </div>
+                    <div ng-show="tot_fam_dt || medical_needers || govt_needers || service_needers || edu_needers" style="margin-left:15px;margin-top:15px;">
+                        <span style="text-decoration:none">Financial Status</span> &nbsp; 
+                        <select ng-model="ReportDatas.financial" ng-options="financial for financial in ['A - Well Settled','B - Full Filled','C - Middle Class','D - Poor','E - Very Poor']" style="width:45%;display:inline-block;" class="form-control">
+                            <option value="">Status</option>
+                        </select>
+                        <span style="cursor:pointer;" ng-click="ReportDatas.financial='';"><i class="fa fa-times"></i></span>
+                    </div>
+                    <div ng-show="house_type_filter" style="margin-left:15px;margin-top:15px;">
+                        <span style="text-decoration:none">House Type</span> &nbsp; 
+                        <select ng-model="ReportDatas.house" ng-options="house for house in ['Rent','Own']" style="width:45%;display:inline-block;" class="form-control">
+                            <option value="">House Type</option>
+                        </select>
+                        <span style="cursor:pointer;" ng-click="ReportDatas.house='';"><i class="fa fa-times"></i></span>
+                    </div>
+                    <div ng-show="tot_fam_jakath && !basic_needs" style="margin-left:15px;margin-top:15px;">
+                        <span style="text-decoration:none">Financial Status</span> &nbsp; 
+                        <select ng-model="ReportDatas.financial" ng-options="financial for financial in ['D - Poor','E - Very Poor']" style="width:45%;display:inline-block;" class="form-control">
+                            <option value="">Status</option>
+                        </select>
+                        <span style="cursor:pointer;" ng-click="ReportDatas.financial='';"><i class="fa fa-times"></i></span>
+                    </div>
+                    <div ng-show="medical_needers" ng-init="getDisease('DISEASE')" style="margin-left:15px;margin-top:15px;">
+                        <span style="text-decoration:none">Disease ID</span> &nbsp; 
+                        <ui-select multiple style="display: inline-block;height: 34px;width: 90%;float: left;" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-change="filter_disease_value(diseaseid_list)" ng-model="diseaseid_list">
+                            <ui-select-match placeholder="Select Disease">{{$item.disease_id}}
+                            </ui-select-match>
+                            <ui-select-choices bindonce repeat="mod in disease_dict | filter:$select.search">
+                            <div ng-bind-html="mod.name | highlight: $select.search"></div>
+                            </ui-select-choices>
+                        </ui-select>
+                    </div>    
+                    <div ng-show="govt_needers" ng-init="getScheme();" style="margin-left:15px;margin-top:15px;">
+                        <span style="text-decoration:none">SCHEME ID</span> &nbsp; 
+                        <ui-select multiple style="display: inline-block;height: 34px;width: 90%;float: left;" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-change="filter_scheme_value(schemeid_list)" ng-model="schemeid_list">
+                            <ui-select-match placeholder="Select Scheme">{{$item.scheme_id}}
+                            </ui-select-match>
+                            <ui-select-choices bindonce repeat="mod in getSubScheme['Govt/ Other NGOs Related Schemes'] | filter:$select.search">
+                            <div ng-bind-html="mod.sub | highlight: $select.search"></div>
+                            </ui-select-choices>
+                        </ui-select>
+                    </div>
+                    <div ng-show="service_needers" ng-init="getService();" style="margin-left:15px;margin-top:15px;">
+                        <span style="text-decoration:none">SERVICE ID</span> &nbsp; 
+                        <ui-select multiple style="display: inline-block;height: 34px;width: 90%;float: left;" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-change="filter_service_value(serviceid_list)" ng-model="serviceid_list">
+                            <ui-select-match placeholder="Select Service">{{$item.service_id}}
+                            </ui-select-match>
+                            <ui-select-choices bindonce repeat="mod in getServices | filter:$select.search">
+                            <div ng-bind-html="mod.service | highlight: $select.search"></div>
+                            </ui-select-choices>
+                        </ui-select>
+                    </div>
+                    <div ng-show="edu_needers" ng-init="getScheme();" style="margin-left:15px;margin-top:15px;">
+                        <span style="text-decoration:none">EDUCATION SCHEME ID</span> &nbsp; 
+                        <ui-select multiple style="display: inline-block;height: 34px;width: 90%;float: left;" reset-search-input="false" theme="bootstrap" ng-disabled="" ng-change="filter_scheme_value(schemeid_list)" ng-model="schemeid_list">
+                            <ui-select-match placeholder="Select Education Scheme">{{$item.scheme_id}}
+                            </ui-select-match>
+                            <ui-select-choices bindonce repeat="mod in getSubScheme['Education / Employment Related Services'] | filter:$select.search">
+                            <div ng-bind-html="mod.sub | highlight: $select.search"></div>
+                            </ui-select-choices>
+                        </ui-select>
+                    </div>
+                    <div style="margin-left:15px;margin-top:15px;">
+                        <button ng-click="fetchReportAPI(ReportDatas,ReportValues)" class="btn-sm btn btn-primary" style="width:45%;float:left;"><i class="fa fa-filter"></i>Apply Filter</button>
+                        <button ng-click="ReportDatas.age_from='';ReportDatas.age_to='';ReportDatas.gender='';ReportDatas.marital_status='';ReportDatas.voter_status='';ReportDatas.house='';ReportDatas.financial='';ReportDatas.financial='';" class="btn-sm btn btn-primary" style="width:45%;float:left;"><i class="fa fa-times"></i>Clear All</button>
+                    </div>
                 </div>
                 <!-- /.sidebar-collapse -->
             </div>

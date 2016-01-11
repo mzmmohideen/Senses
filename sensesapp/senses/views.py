@@ -629,25 +629,25 @@ def fetchReportData(request):
             voter = sum(1 if(x['voter']==True) else 0 for x in get_memData)
             marriage_help = 0
             for i in Member.objects.filter(muhalla__in=muhalla):
-                val = len(Member_scheme.objects.filter(member=i,scheme=SubScheme.objects.get(name='Marriage Help'),status=True,solution='Not Yet'))
+                val = Member_scheme.objects.filter(member=i,scheme=SubScheme.objects.get(name='Marriage Help'),status=True,solution='Not Yet').count()
                 # marriage_help = sum(1 if x else 0 for x in Member_scheme.objects.filter(member=i,scheme=SubScheme.objects.get(name='Marriage Help'),status=True,solution='Not Yet'))
                 marriage_help+=val    
             interest_loan = 0
             for i in Member.objects.filter(muhalla__in=muhalla):
-                val = len(Member_service.objects.filter(member=i,scheme=Service.objects.get(name='Suffering Due To Interest Base Loan'),status=True,solution='Not Yet'))
+                val = Member_service.objects.filter(member=i,scheme=Service.objects.get(name='Suffering Due To Interest Base Loan'),status=True,solution='Not Yet').count()
                 interest_loan+=val
             deserted_women_pension = 0    
             for i in Member.objects.filter(muhalla__in=muhalla):
-                val = len(Member_scheme.objects.filter(member=i,scheme=SubScheme.objects.get(name='Deserted Women Pension'),status=True,solution='Not Yet'))
+                val = Member_scheme.objects.filter(member=i,scheme=SubScheme.objects.get(name='Deserted Women Pension'),status=True,solution='Not Yet').count()
                 deserted_women_pension+=val
             orphan = 0
             for i in Member.objects.filter(muhalla__in=muhalla):
-                val = len(Member_scheme.objects.filter(member=i,scheme=SubScheme.objects.get(name='Destitute / Orphan Welfare'),status=True,solution='Not Yet'))
+                val = Member_scheme.objects.filter(member=i,scheme=SubScheme.objects.get(name='Destitute / Orphan Welfare'),status=True,solution='Not Yet').count()
                 orphan+=val   
-            daily_prayer = len(Member.objects.filter(muhalla__in=muhalla,namaz='5 Times a day'))
-            quran_reading = len(Member.objects.filter(muhalla__in=muhalla,quran_reading=True))
-            only_jumah = len(Member.objects.filter(muhalla__in=muhalla,namaz='only Jumah',gender='MALE'))
-            no_ration_card = sum(1 if(x['r_card']=='' or x['r_card']=='No' or x['r_card']=='-' or x['r_card']=='NA') else 0 for x in get_family)     
+            daily_prayer = Member.objects.filter(muhalla__in=muhalla,namaz='5 Times a day').count()
+            quran_reading = Member.objects.filter(muhalla__in=muhalla,quran_reading=True).count()
+            only_jumah = Member.objects.filter(muhalla__in=muhalla,namaz='only Jumah',gender='MALE').count()
+            no_ration_card = sum(1 if(x['r_card']=='' or x['r_card']=='No' or x['r_card']=='-' or x['r_card']=='NA') else 0 for x in get_family)
             non_voter = sum(1 if(x['voter']==False) else 0 for x in get_memData)
             men_age_60 = sum(1 if(x['gender']=='MALE' and eval(str(str(x['age'])))>=60) else 0 for x in get_memData)
             women_age_60 = sum(1 if(x['gender']=='FEMALE' and eval(str(x['age']))>=60) else 0 for x in get_memData)
@@ -667,13 +667,15 @@ def fetchReportData(request):
             widowed = sum(1 if(x['marital_status']=='Widow' and x['gender']=='FEMALE') else 0 for x in get_memData)
             divorced = sum(1 if(x['marital_status']=='Devorced' and x['gender']=='FEMALE') else 0 for x in get_memData)
             print 'nuhbug',muhalla
-            rep_data = {'Taluk':muhalla[0].taluk.taluk_name,'Daily Prayer Observers':daily_prayer,'Observe Only Jumma Prayer (Male)':only_jumah,'Able to recite Quran':quran_reading,'Deserted Destitute Widows':deserted_women_pension,'Orphans':orphan,'Families without Ration Card':no_ration_card,'Taluk Count':1,'Total Family':len(get_family),'Families having Interest Loan':interest_loan,'Nikkah Assistance Required':marriage_help,'Total Population':len(get_memData),'Total Male':tot_men,'Total Female':tot_women,'Married':married,'Male age 60+':men_age_60,'Female age 60+':women_age_60,'Male age between 22-59':men_age_22to59,'Female age between 22-59':women_age_22to59,'Male age between 11-21':men_age_11to21,'Female age between 11-21':women_age_11to21,'Child upto 11 age ':child_upto11,'A - Well Settled':cat_A,'B - Full Filled':cat_B,'C - Middle Class':cat_C,'D - Poor':cat_D,'E - Very Poor':cat_E,'Widow':widowed,'Divorced':divorced,'Mother Tongue':{'Tamil':lang_tamil,'Urdu':lang_urdu,'Others':lang_others}}
-            pdf_rep_data = {'Taluk':muhalla[0].taluk.taluk_name,'Daily_Prayer_Observers':daily_prayer,'Observe_Only_Jumma_Prayer':only_jumah,'Able_to_recite_Quran':quran_reading,'deserted_women_pension':deserted_women_pension,'Orphan':orphan,'no_ration_card':no_ration_card,'Taluk_Count':1,'Total_Family':len(get_family),'Families_having_Interest_Loan':interest_loan,'Nikkah_Assistance_Required':marriage_help,'non_voter':non_voter,'voter':voter,'Total_Population':len(get_memData),'Total_Male':tot_men,'Total_Female':tot_women,'Married':married,'Male_age_60':men_age_60,'Female_age_60':women_age_60,'Male_age_between_22to59':men_age_22to59,'Female_age_between_22to59':women_age_22to59,'Male_age_between_11to21':men_age_11to21,'Female_age_between_11to21':women_age_11to21,'Child_upto_11_age':child_upto11,'A_Well_Settled':cat_A,'B_Full_Filled':cat_B,'C_Middle_Class':cat_C,'D_Poor':cat_D,'E_Very_Poor':cat_E,'Widow':widowed,'Divorced':divorced,'Mother_Tongue':{'Tamil':lang_tamil,'Urdu':lang_urdu,'Others':lang_others}}
+            fam_length = len(get_family)
+            mem_length = len(get_memData)
+            rep_data = {'Taluk':muhalla[0].taluk.taluk_name,'Daily Prayer Observers':daily_prayer,'Observe Only Jumma Prayer (Male)':only_jumah,'Able to recite Quran':quran_reading,'Deserted Destitute Widows':deserted_women_pension,'Orphans':orphan,'Families without Ration Card':no_ration_card,'Taluk Count':1,'Total Family':fam_length,'Families having Interest Loan':interest_loan,'Nikkah Assistance Required':marriage_help,'Total Population':mem_length,'Total Male':tot_men,'Total Female':tot_women,'Married':married,'Male age 60+':men_age_60,'Female age 60+':women_age_60,'Male age between 22-59':men_age_22to59,'Female age between 22-59':women_age_22to59,'Male age between 11-21':men_age_11to21,'Female age between 11-21':women_age_11to21,'Child upto 11 age ':child_upto11,'A - Well Settled':cat_A,'B - Full Filled':cat_B,'C - Middle Class':cat_C,'D - Poor':cat_D,'E - Very Poor':cat_E,'Widow':widowed,'Divorced':divorced,'Mother Tongue':{'Tamil':lang_tamil,'Urdu':lang_urdu,'Others':lang_others}}
+            pdf_rep_data = {'Taluk':muhalla[0].taluk.taluk_name,'Daily_Prayer_Observers':daily_prayer,'Observe_Only_Jumma_Prayer':only_jumah,'Able_to_recite_Quran':quran_reading,'deserted_women_pension':deserted_women_pension,'Orphan':orphan,'no_ration_card':no_ration_card,'Taluk_Count':1,'Total_Family':fam_length,'Families_having_Interest_Loan':interest_loan,'Nikkah_Assistance_Required':marriage_help,'non_voter':non_voter,'voter':voter,'Total_Population':mem_length,'Total_Male':tot_men,'Total_Female':tot_women,'Married':married,'Male_age_60':men_age_60,'Female_age_60':women_age_60,'Male_age_between_22to59':men_age_22to59,'Female_age_between_22to59':women_age_22to59,'Male_age_between_11to21':men_age_11to21,'Female_age_between_11to21':women_age_11to21,'Child_upto_11_age':child_upto11,'A_Well_Settled':cat_A,'B_Full_Filled':cat_B,'C_Middle_Class':cat_C,'D_Poor':cat_D,'E_Very_Poor':cat_E,'Widow':widowed,'Divorced':divorced,'Mother_Tongue':{'Tamil':lang_tamil,'Urdu':lang_urdu,'Others':lang_others}}
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'non_voter':non_voter,'voter':voter,'reports':rep_data,'pdf_report':pdf_rep_data}),content_type='Application/json')
         elif data['report_type'] == 'Needs Types':
-            scheme_data = sorted(map(lambda x:{'name':x.name,'need_id':x.subscheme_id,'beneficiaries':len(Member_scheme.objects.filter(scheme=x,status=True,solution='Solved')),'total':len(Member_scheme.objects.filter(scheme=x,status=True))},SubScheme.objects.all()),key=itemgetter(sort_key),reverse=sort_reverse)
-            service_data = sorted(map(lambda x:{'name':x.name,'need_id':x.service_id,'beneficiaries':len(Member_service.objects.filter(scheme=x,status=True,solution='Solved')),'total':len(Member_service.objects.filter(scheme=x,status=True))},Service.objects.all()),key=itemgetter(sort_key),reverse=sort_reverse)
-            dis_data = sorted(map(lambda x:{'name':x.disease_name,'total':len(Medical.objects.filter(disease=x)),'beneficiaries':0,'need_id':x.disease_id},Disease.objects.all()),key=itemgetter(sort_key),reverse=sort_reverse)
+            scheme_data = sorted(map(lambda x:{'name':x.name,'need_id':x.subscheme_id,'beneficiaries':Member_scheme.objects.filter(scheme=x,status=True,solution='Solved').count(),'total':Member_scheme.objects.filter(scheme=x,status=True).count()},SubScheme.objects.all()),key=itemgetter(sort_key),reverse=sort_reverse)
+            service_data = sorted(map(lambda x:{'name':x.name,'need_id':x.service_id,'beneficiaries':Member_service.objects.filter(scheme=x,status=True,solution='Solved').count(),'total':Member_service.objects.filter(scheme=x,status=True).count()},Service.objects.all()),key=itemgetter(sort_key),reverse=sort_reverse)
+            dis_data = sorted(map(lambda x:{'name':x.disease_name,'total':Medical.objects.filter(disease=x).count(),'beneficiaries':0,'need_id':x.disease_id},Disease.objects.all()),key=itemgetter(sort_key),reverse=sort_reverse)
             rep_data = scheme_data + service_data + dis_data
             return HttpResponse(content=json.dumps({'report_type':data['report_type'],'reports':rep_data}),content_type='Application/json')
         # return HttpResponse(content=json.dumps({'data':data,'member_details':member_details,'get_mem_service':get_mem_service,'get_mem_medical':get_mem_medical,'get_mem_scheme':get_mem_scheme,'get_memData':get_memData}),content_type='Application/json')
@@ -1038,20 +1040,23 @@ def change_password(request):
 
 def dashboard_api(request):
     if request.method == 'GET':
-        muhalla = Masjid.objects.count()
+        muhalla = Masjid.objects.all().count()
         count_dict = {}
         fam_dict = {}
         item_list = [dic.district.district_name for dic in Masjid.objects.all()]
+        print 'item_list',item_list
         for i in item_list:
             count_dict[i] = count_dict.setdefault(i,0) + 1
-        fam_member = Member.objects.count()
-        tot_family = Family.objects.count()
+        print 'item_list',count_dict
+        fam_member = Member.objects.all().count()
+        tot_family = Family.objects.all().count()
         fam_list = [dic.muhalla.district.district_name for dic in Family.objects.all()]
         for j in fam_list:
             fam_dict[j] = fam_dict.setdefault(j,0) + 1
-        volunteer_interest = len(Member.objects.filter(volunteer=True))
-        donor_interest = len(Member.objects.filter(donor=True))
-        return HttpResponse(content=json.dumps({'muhalla':muhalla,'fam_count':fam_dict,'muhalla_total':count_dict,'fam_member':fam_member,'tot_family':tot_family,'volunteer_interest':volunteer_interest,'donor_interest':donor_interest}),content_type='Application/json')
+        print 'mohalla_id',fam_dict
+        volunteer_interest = Member.objects.filter(volunteer=True).count()
+        donor_interest = Member.objects.filter(donor=True).count()
+        return HttpResponse(content=json.dumps({'muhalla':muhalla,'muhalla_total':count_dict,'fam_count':fam_dict,'fam_member':fam_member,'tot_family':tot_family,'volunteer_interest':volunteer_interest,'donor_interest':donor_interest}),content_type='Application/json')
 
 #convert xls to csv
 # def csv_from_excel(xlsfile):
